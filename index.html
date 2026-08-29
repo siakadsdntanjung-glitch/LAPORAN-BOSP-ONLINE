@@ -511,15 +511,18 @@
             <div class="flex flex-wrap gap-2">
               <button id="btn-tambah-transaksi" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2">+ Transaksi</button>
               <label class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2 cursor-pointer">
-                Import CSV<input type="file" id="input-import-csv" accept=".csv" class="hidden">
+                Import Data<input type="file" id="input-import-csv" accept=".csv,.xlsx,.xls" class="hidden">
               </label>
+              <button id="btn-unduh-template" class="bg-white border border-navy-200 text-navy-400 text-sm font-semibold rounded px-4 py-2">Unduh Template</button>
             </div>
             <div class="flex flex-wrap gap-2">
               <button id="btn-export-csv" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">Export CSV</button>
+              <button id="btn-export-xlsx" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">Export Excel</button>
               <button id="btn-export-pdf" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">Export PDF</button>
             </div>
           </div>
           <div id="import-feedback" class="hidden text-sm rounded px-3 py-2 no-print"></div>
+          <p class="text-xs text-navy-300 no-print">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Klik "Unduh Template" untuk contoh filenya.</p>
           <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
             <div class="overflow-x-auto ledger-bg">
               <table class="w-full text-sm min-w-[1100px]">
@@ -635,6 +638,56 @@
           <button id="btn-cetak-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak Dokumen Terpilih</button>
         </section>
 
+        <!-- LAMPIRAN PENERIMA -->
+        <section id="page-lampiran-penerima" class="page hidden space-y-4">
+          <div id="lampiran-select-box" class="bg-white rounded-lg border border-navy-100 p-4 no-print">
+            <p class="text-xs text-navy-400 mb-3">Pilih kwitansi (transaksi pengeluaran) yang ditandai "Perlu Lampiran Daftar Penerima" pada Buku Kas Umum. Nama penerima pada kwitansi tersebut akan otomatis tercentang di bawah — tinggal tambahkan penerima lain bila kwitansi ini mencakup banyak orang.</p>
+            <label class="block text-xs font-semibold text-navy-400 mb-1">Pilih Kwitansi</label>
+            <select id="lampiran-pilih-tx" class="w-full sm:w-2/3 rounded border border-navy-100 px-3 py-2 text-sm bg-white"></select>
+          </div>
+
+          <p id="lampiran-empty" class="hidden text-sm text-navy-300 bg-white rounded-lg border border-navy-100 p-6 text-center">Belum ada kwitansi yang ditandai "Perlu Lampiran Daftar Penerima". Tandai terlebih dahulu pada form transaksi di Buku Kas Umum.</p>
+
+          <div id="lampiran-detail" class="hidden space-y-4">
+            <div class="flex flex-wrap gap-3 justify-between items-center no-print">
+              <p class="text-sm text-navy-400" id="lampiran-tx-info"></p>
+              <div class="flex gap-2">
+                <button id="btn-tambah-penerima-lampiran" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2 whitespace-nowrap">+ Penerima</button>
+                <button id="btn-cetak-lampiran" class="bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-4 py-2 whitespace-nowrap">Cetak Lampiran</button>
+              </div>
+            </div>
+            <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm min-w-[900px]">
+                  <thead><tr class="text-left text-xs uppercase text-navy-400 bg-paper border-b border-navy-100">
+                    <th class="py-3 px-3 w-10">No</th><th class="py-3 px-3">Nama</th><th class="py-3 px-3">NIP</th>
+                    <th class="py-3 px-3">Jabatan</th><th class="py-3 px-3 text-right">Jumlah Uang</th>
+                    <th class="py-3 px-3 text-center">Paraf</th><th class="py-3 px-3">Keterangan</th>
+                    <th class="py-3 px-3 no-print">Aksi</th>
+                  </tr></thead>
+                  <tbody id="tbl-lampiran-penerima" class="font-sans text-[13px]"></tbody>
+                  <tfoot><tr class="border-t border-navy-100 font-semibold text-sm">
+                    <td class="py-2 px-3" colspan="4">TOTAL</td>
+                    <td class="py-2 px-3 text-right font-mono" id="lampiran-total">Rp 0</td>
+                    <td colspan="3"></td>
+                  </tr></tfoot>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg border border-navy-100 p-5 grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+              <div class="text-center">
+                <p class="mb-10 text-navy-400">Bendahara BOS,</p>
+                <p class="font-semibold border-t border-ink pt-1 inline-block" id="lampiran-paraf-bendahara">( ..................... )</p>
+              </div>
+              <div class="text-center">
+                <p class="mb-10 text-navy-400">Mengetahui,<br>Kepala Sekolah,</p>
+                <p class="font-semibold border-t border-ink pt-1 inline-block" id="lampiran-paraf-kepsek">( ..................... )</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <!-- KEPSEK: PERSETUJUAN / VALIDASI -->
         <section id="page-persetujuan" class="page hidden space-y-4">
           <div class="bg-white rounded-lg border border-navy-100 p-5">
@@ -734,9 +787,42 @@
         <div><label class="block text-xs font-semibold text-navy-400 mb-1">NIP Penerima</label>
           <input id="tx-nip" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono"></div>
       </div>
+      <label class="flex items-start gap-2 text-xs text-navy-400 bg-paper rounded px-3 py-2">
+        <input type="checkbox" id="tx-butuh-lampiran" class="rounded border-navy-200 mt-0.5">
+        <span>Perlu <b>Lampiran Daftar Penerima</b> — centang bila kwitansi ini mencakup lebih dari satu penerima (mis. honor beberapa guru dalam satu kwitansi). Nama penerima di atas akan otomatis tercentang pada menu "Lampiran Penerima".</span>
+      </label>
       <div class="flex gap-2 pt-2">
         <button type="submit" class="flex-1 bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded py-2.5">Simpan</button>
         <button type="button" id="btn-batal-transaksi" class="px-5 text-sm font-semibold text-navy-400 hover:text-navy">Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================= MODAL: LAMPIRAN PENERIMA ========================= -->
+<div id="modal-lampiran-penerima" class="hidden fixed inset-0 z-50 bg-navy-900/50 flex items-center justify-center p-4 no-print">
+  <div class="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+    <h3 class="font-serif text-lg font-semibold text-navy mb-4" id="modal-lampiran-title">Tambah Penerima</h3>
+    <form id="form-lampiran-penerima" class="space-y-3">
+      <input type="hidden" id="lp-id">
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Nama</label>
+        <input required id="lp-nama" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-navy-400 mb-1">NIP</label>
+          <input id="lp-nip" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono"></div>
+        <div><label class="block text-xs font-semibold text-navy-400 mb-1">Jabatan</label>
+          <input id="lp-jabatan" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
+      </div>
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Jumlah Uang (Rp)</label>
+        <input required type="number" min="0" id="lp-jumlah" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono"></div>
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Keterangan</label>
+        <input id="lp-keterangan" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="mis. Honor bulan Agustus"></div>
+      <label class="flex items-center gap-2 text-sm text-navy-400">
+        <input type="checkbox" id="lp-paraf" class="rounded border-navy-200"> Sudah paraf / terima
+      </label>
+      <div class="flex gap-2 pt-2">
+        <button type="submit" class="flex-1 bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded py-2.5">Simpan</button>
+        <button type="button" id="btn-batal-lampiran" class="px-5 text-sm font-semibold text-navy-400 hover:text-navy">Batal</button>
       </div>
     </form>
   </div>
@@ -846,6 +932,8 @@ const state = {
   bukuBank: [],       // /buku_bank/{npsn} — opsional, penunjang SPJ
   bukuPajak: [],      // /buku_pajak/{npsn} — opsional, penunjang SPJ
   persetujuan: {},    // /persetujuan/{npsn}/{yyyy-mm} — persetujuan bulanan oleh Kepala Sekolah
+  lampiranPenerima: {}, // /lampiran_penerima/{npsn}/{txId}/{rowId} — daftar penerima per kwitansi
+  lampiranSelectedTx: null,
   pembantuTab: 'bank',
   adminDataError: null, // set when a Firebase read for admin utama fails (e.g. permission denied)
   currentView: null,
@@ -877,6 +965,7 @@ const NAV = {
     { id:'bku', label:'Buku Kas Umum', title:'Buku Kas Umum (BKU)' },
     { id:'buku-pembantu', label:'Buku Pembantu', title:'Buku Pembantu (Opsional Penunjang SPJ)' },
     { id:'cetak', label:'Cetak Dokumen', title:'Cetak Kwitansi / Nota / BAST / SPJ Lengkap' },
+    { id:'lampiran-penerima', label:'Lampiran Penerima', title:'Lampiran Daftar Penerima' },
   ],
   kepala_sekolah: [
     { id:'dashboard-sekolah', label:'Dashboard Monitoring', title:'Dashboard Monitoring' },
@@ -965,13 +1054,27 @@ document.getElementById('form-register').addEventListener('submit', async (e)=>{
       const cred = await auth.createUserWithEmailAndPassword(email, password);
       const uid = cred.user.uid;
 
-      await db.ref('users/'+uid).set({
-        role: 'admin_utama',
-        email: email,
-        status: 'aktif',
-        createdAt: Date.now()
-      });
-      await db.ref('meta/adminUtamaExists').set(true);
+      // Tulis ke Database dibungkus try/catch TERPISAH dari pembuatan akun
+      // Auth di atas. Kalau salah satu write ini gagal (mis. Database Rules
+      // menolak), akun Auth yang baru saja dibuat akan jadi "akun yatim":
+      // tercatat di Firebase Authentication tapi tanpa data apapun di
+      // Database. cleanupOrphanedAuthUser() menghapusnya lagi supaya email
+      // tersebut langsung bisa dipakai ulang untuk mendaftar, tanpa perlu
+      // dihapus manual lewat Firebase Console.
+      try{
+        await db.ref('users/'+uid).set({
+          role: 'admin_utama',
+          email: email,
+          status: 'aktif',
+          createdAt: Date.now()
+        });
+        await db.ref('meta/adminUtamaExists').set(true);
+      }catch(dbErr){
+        await cleanupOrphanedAuthUser(cred.user);
+        justRegistered = false;
+        showAuthError('Pendaftaran gagal disimpan, silakan coba lagi. (' + (dbErr.message||dbErr) + ')');
+        return;
+      }
 
       state.user = cred.user;
       state.userData = { role:'admin_utama', email, status:'aktif' };
@@ -1014,20 +1117,33 @@ document.getElementById('form-register').addEventListener('submit', async (e)=>{
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     const uid = cred.user.uid;
 
-    await db.ref('users/'+uid).set({
-      role: 'admin_sekolah',
-      npsn: npsn,
-      email: email,
-      status: 'pending',
-      createdAt: Date.now()
-    });
+    // Sama seperti jalur admin_utama di atas: writes ke Database dibungkus
+    // try/catch sendiri. Kalau gagal (mis. NPSN ternyata sudah dikunci oleh
+    // sekolah lain yang baru saja mendaftar duluan — race condition kecil
+    // yang disebutkan sebelumnya), akun Auth yang terlanjur dibuat langsung
+    // dihapus lagi supaya tidak jadi akun yatim dan emailnya bisa dipakai
+    // ulang tanpa perlu dibersihkan manual.
+    try{
+      await db.ref('users/'+uid).set({
+        role: 'admin_sekolah',
+        npsn: npsn,
+        email: email,
+        status: 'pending',
+        createdAt: Date.now()
+      });
 
-    await db.ref('sekolah/'+npsn).set({
-      namaSekolah: namaSekolah,
-      npsn: npsn,
-      adminUid: uid,
-      createdAt: Date.now()
-    });
+      await db.ref('sekolah/'+npsn).set({
+        namaSekolah: namaSekolah,
+        npsn: npsn,
+        adminUid: uid,
+        createdAt: Date.now()
+      });
+    }catch(dbErr){
+      await cleanupOrphanedAuthUser(cred.user);
+      justRegistered = false;
+      showAuthError('Pendaftaran gagal disimpan, kemungkinan NPSN baru saja didaftarkan pihak lain. Silakan coba lagi. (' + (dbErr.message||dbErr) + ')');
+      return;
+    }
 
     // Data is now fully written — show the pending screen directly with the
     // values we already have in hand (no need to re-fetch, no race possible).
@@ -1043,6 +1159,22 @@ document.getElementById('form-register').addEventListener('submit', async (e)=>{
     showAuthError(translateAuthError(err));
   }
 });
+
+/* ---- Menghapus akun Auth yang "yatim": berhasil dibuat di Firebase
+   Authentication tapi gagal ditulis ke Realtime Database. Tanpa ini, email
+   tersebut akan terus dianggap "sudah terdaftar" oleh Firebase Auth padahal
+   tidak ada data sekolah/user sama sekali yang tersimpan untuknya. ---- */
+async function cleanupOrphanedAuthUser(user){
+  try{
+    await user.delete();
+  }catch(cleanupErr){
+    // Kalau penghapusan otomatis ini sendiri gagal (jarang terjadi, mis.
+    // sesi re-auth kedaluwarsa), akun yatimnya tetap ada dan perlu dihapus
+    // manual lewat Firebase Console > Authentication > Users, seperti yang
+    // sebelumnya dilakukan secara manual.
+    console.error('Gagal menghapus akun Auth yatim secara otomatis. Hapus manual di Firebase Console > Authentication:', cleanupErr);
+  }
+}
 
 function translateAuthError(err){
   const map = {
@@ -1222,6 +1354,7 @@ function navigateTo(pageId){
   }
   if(pageId === 'dashboard-sekolah') renderDashboardSekolah();
   if(pageId === 'cetak') renderCetakList();
+  if(pageId === 'lampiran-penerima') renderLampiranPenerima();
   if(pageId === 'profil') fillProfilForm();
   if(pageId === 'pejabat') fillPejabatForm();
   if(pageId === 'manajemen-sekolah') renderManajemenSekolah();
@@ -1574,6 +1707,7 @@ function attachSchoolListeners(npsn){
   const bankRef = db.ref('buku_bank/'+npsn);
   const pajakRef = db.ref('buku_pajak/'+npsn);
   const persetujuanRef = db.ref('persetujuan/'+npsn);
+  const lampiranRef = db.ref('lampiran_penerima/'+npsn);
 
   const schoolCb = schoolRef.on('value', snap=>{
     state.schoolData = snap.val() || { npsn };
@@ -1594,6 +1728,7 @@ function attachSchoolListeners(npsn){
     if(state.currentView==='cetak') renderCetakList();
     if(state.currentView==='persetujuan') renderPersetujuan();
     if(state.currentView==='realisasi') renderRealisasi();
+    if(state.currentView==='lampiran-penerima') renderLampiranPenerima();
   });
 
   const bankCb = bankRef.on('value', snap=>{
@@ -1623,10 +1758,15 @@ function attachSchoolListeners(npsn){
     if(state.currentView==='dashboard-sekolah') renderDashboardSekolah();
   });
 
+  const lampiranCb = lampiranRef.on('value', snap=>{
+    state.lampiranPenerima = snap.val() || {};
+    if(state.currentView==='lampiran-penerima') renderLampiranPenerima();
+  });
+
   state.listeners.push(
     [schoolRef,'value',schoolCb],[txRef,'value',txCb],
     [bankRef,'value',bankCb],[pajakRef,'value',pajakCb],
-    [persetujuanRef,'value',persetujuanCb]
+    [persetujuanRef,'value',persetujuanCb],[lampiranRef,'value',lampiranCb]
   );
 }
 
@@ -1973,6 +2113,7 @@ function openTransaksiModal(id){
       document.getElementById('tx-jumlah').value = t.jumlah||0;
       document.getElementById('tx-penerima').value = t.penerima||'';
       document.getElementById('tx-nip').value = t.nipPenerima||'';
+      document.getElementById('tx-butuh-lampiran').checked = !!t.butuhLampiran;
     }
   } else {
     document.getElementById('modal-transaksi-title').textContent = 'Tambah Transaksi';
@@ -2000,20 +2141,282 @@ document.getElementById('form-transaksi').addEventListener('submit', async (e)=>
     jumlah: Number(document.getElementById('tx-jumlah').value)||0,
     penerima: document.getElementById('tx-penerima').value.trim(),
     nipPenerima: document.getElementById('tx-nip').value.trim(),
+    butuhLampiran: document.getElementById('tx-butuh-lampiran').checked,
     updatedAt: Date.now()
   };
   try{
+    let savedId = id;
     if(id){
       await db.ref('transaksi_bku/'+npsn+'/'+id).update(payload);
     } else {
       payload.createdAt = Date.now();
-      await db.ref('transaksi_bku/'+npsn).push(payload);
+      const ref = await db.ref('transaksi_bku/'+npsn).push(payload);
+      savedId = ref.key;
+    }
+    if(payload.butuhLampiran && savedId){
+      // Otomatis membuat & mencentang (paraf) baris penerima utama pada Lampiran
+      // Penerima, memakai Nama/NIP Penerima yang sudah diisi pada kwitansi ini —
+      // hanya sekali, tidak menimpa daftar yang mungkin sudah dilengkapi Admin.
+      ensureLampiranSeed(npsn, {...payload, id: savedId});
     }
     closeTransaksiModal();
   }catch(err){
     alert('Gagal menyimpan transaksi: ' + (err.message || 'Terjadi kesalahan. Periksa koneksi internet Anda dan coba lagi.'));
   }
 });
+
+/* =========================================================================
+   LAMPIRAN PENERIMA — daftar penerima per kwitansi yang butuh lampiran
+   ========================================================================= */
+
+// Dipanggil setiap kali sebuah kwitansi (transaksi pengeluaran) ditandai
+// "Perlu Lampiran Daftar Penerima". Kalau lampirannya untuk kwitansi tsb.
+// masih kosong, baris pertama otomatis dibuat dari Nama/NIP Penerima pada
+// kwitansi itu sendiri dan langsung tercentang (paraf) — sesuai maksud fitur
+// ini: begitu ada kwitansi yang butuh lampiran, nama penerimanya otomatis
+// tercentang, tanpa perlu diketik ulang oleh Admin. Baris ini hanya dibuat
+// sekali; perubahan berikutnya pada daftar lampiran tidak akan ditimpa lagi.
+async function ensureLampiranSeed(npsn, tx){
+  if(!tx || !tx.butuhLampiran || !tx.id) return;
+  try{
+    const ref = db.ref('lampiran_penerima/'+npsn+'/'+tx.id);
+    const snap = await ref.get();
+    if(!snap.exists() && tx.penerima){
+      await ref.push({
+        nama: tx.penerima,
+        nip: tx.nipPenerima || '',
+        jabatan: '',
+        jumlah: Number(tx.jumlah)||0,
+        paraf: true,
+        keterangan: 'Penerima utama pada kwitansi (otomatis tercentang)',
+        createdAt: Date.now()
+      });
+    }
+  }catch(err){
+    console.error('Gagal membuat lampiran otomatis:', err);
+  }
+}
+
+function renderLampiranPenerima(){
+  const eligible = state.transactions.filter(t=>t.jenis==='pengeluaran' && t.butuhLampiran);
+  const selectBox = document.getElementById('lampiran-select-box');
+  const emptyEl = document.getElementById('lampiran-empty');
+  const detailEl = document.getElementById('lampiran-detail');
+
+  if(eligible.length===0){
+    selectBox.classList.add('hidden');
+    detailEl.classList.add('hidden');
+    emptyEl.classList.remove('hidden');
+    return;
+  }
+  selectBox.classList.remove('hidden');
+  emptyEl.classList.add('hidden');
+
+  const select = document.getElementById('lampiran-pilih-tx');
+  select.innerHTML = eligible.map(t=>
+    `<option value="${t.id}">${escapeHtml(t.noBukti||'(Tanpa No. Bukti)')} — ${escapeHtml(t.uraian||'')} (${formatTanggal(t.tanggal)})</option>`
+  ).join('');
+
+  const stillValid = state.lampiranSelectedTx && eligible.some(t=>t.id===state.lampiranSelectedTx);
+  const selectedId = stillValid ? state.lampiranSelectedTx : eligible[0].id;
+  select.value = selectedId;
+  state.lampiranSelectedTx = selectedId;
+
+  renderLampiranDetail(selectedId);
+}
+
+document.getElementById('lampiran-pilih-tx').addEventListener('change', (e)=>{
+  state.lampiranSelectedTx = e.target.value;
+  renderLampiranDetail(e.target.value);
+});
+
+async function renderLampiranDetail(txId){
+  const tx = state.transactions.find(t=>t.id===txId);
+  if(!tx) return;
+  document.getElementById('lampiran-detail').classList.remove('hidden');
+  document.getElementById('lampiran-tx-info').textContent =
+    `No. Bukti ${tx.noBukti||'-'} · ${tx.uraian||'(tanpa uraian)'} · ${fmtRupiah(tx.jumlah)}`;
+
+  // Jaring pengaman: kalau kwitansi ini baru saja ditandai butuh lampiran
+  // lewat cara lain (mis. impor data lama) dan belum sempat di-seed, buat
+  // baris otomatisnya di sini sebelum ditampilkan.
+  await ensureLampiranSeed(state.userData.npsn, tx);
+
+  const s = state.schoolData || {};
+  document.getElementById('lampiran-paraf-bendahara').textContent =
+    (s.bendahara && s.bendahara.nama) ? `${s.bendahara.nama} — NIP. ${s.bendahara.nip||'-'}` : '( ..................... )';
+  document.getElementById('lampiran-paraf-kepsek').textContent =
+    (s.kepsek && s.kepsek.nama) ? `${s.kepsek.nama} — NIP. ${s.kepsek.nip||'-'}` : '( ..................... )';
+
+  const map = state.lampiranPenerima[txId] || {};
+  const rows = Object.entries(map).map(([id,r])=>({id,...r}))
+    .sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+
+  const tbody = rows.map((r,idx)=>`
+    <tr class="border-b border-navy-50">
+      <td class="py-2 px-3 text-center">${idx+1}</td>
+      <td class="py-2 px-3">${escapeHtml(r.nama||'')}</td>
+      <td class="py-2 px-3 font-mono">${escapeHtml(r.nip||'-')}</td>
+      <td class="py-2 px-3">${escapeHtml(r.jabatan||'-')}</td>
+      <td class="py-2 px-3 text-right font-mono">${fmtRupiah(r.jumlah)}</td>
+      <td class="py-2 px-3 text-center">
+        <input type="checkbox" class="chk-paraf-lampiran" data-id="${r.id}" ${r.paraf ? 'checked' : ''}>
+      </td>
+      <td class="py-2 px-3">${escapeHtml(r.keterangan||'')}</td>
+      <td class="py-2 px-3 no-print whitespace-nowrap">
+        <button data-id="${r.id}" class="btn-edit-lampiran text-navy-400 hover:text-navy text-xs font-semibold mr-2">Ubah</button>
+        <button data-id="${r.id}" class="btn-hapus-lampiran text-rust hover:underline text-xs font-semibold">Hapus</button>
+      </td>
+    </tr>`).join('');
+
+  document.getElementById('tbl-lampiran-penerima').innerHTML = rows.length ? tbody :
+    `<tr><td colspan="8" class="py-6 text-center text-navy-300">Belum ada penerima. Klik "+ Penerima" untuk menambahkan.</td></tr>`;
+
+  const total = rows.reduce((sum,r)=>sum+(Number(r.jumlah)||0),0);
+  document.getElementById('lampiran-total').textContent = fmtRupiah(total);
+
+  document.querySelectorAll('.chk-paraf-lampiran').forEach(chk=>{
+    chk.addEventListener('change', async ()=>{
+      try{
+        await db.ref(`lampiran_penerima/${state.userData.npsn}/${txId}/${chk.dataset.id}`).update({paraf: chk.checked});
+      }catch(err){
+        alert('Gagal memperbarui paraf: ' + (err.message || 'Terjadi kesalahan. Periksa koneksi internet Anda dan coba lagi.'));
+        chk.checked = !chk.checked;
+      }
+    });
+  });
+  document.querySelectorAll('.btn-edit-lampiran').forEach(b=>b.addEventListener('click', ()=>openLampiranModal(txId, b.dataset.id)));
+  document.querySelectorAll('.btn-hapus-lampiran').forEach(b=>b.addEventListener('click', async ()=>{
+    if(confirm('Hapus penerima ini dari lampiran?')){
+      try{
+        await db.ref(`lampiran_penerima/${state.userData.npsn}/${txId}/${b.dataset.id}`).remove();
+      }catch(err){
+        alert('Gagal menghapus penerima: ' + (err.message || 'Terjadi kesalahan. Periksa koneksi internet Anda dan coba lagi.'));
+      }
+    }
+  }));
+}
+
+document.getElementById('btn-tambah-penerima-lampiran').addEventListener('click', ()=>{
+  if(!state.lampiranSelectedTx){ alert('Pilih kwitansi terlebih dahulu.'); return; }
+  openLampiranModal(state.lampiranSelectedTx, null);
+});
+document.getElementById('btn-batal-lampiran').addEventListener('click', ()=>{
+  document.getElementById('modal-lampiran-penerima').classList.add('hidden');
+});
+
+function openLampiranModal(txId, id){
+  const form = document.getElementById('form-lampiran-penerima');
+  form.reset();
+  document.getElementById('lp-id').value = id || '';
+  form.dataset.txId = txId;
+  if(id){
+    const r = (state.lampiranPenerima[txId]||{})[id];
+    if(r){
+      document.getElementById('modal-lampiran-title').textContent = 'Ubah Penerima';
+      document.getElementById('lp-nama').value = r.nama||'';
+      document.getElementById('lp-nip').value = r.nip||'';
+      document.getElementById('lp-jabatan').value = r.jabatan||'';
+      document.getElementById('lp-jumlah').value = r.jumlah||0;
+      document.getElementById('lp-keterangan').value = r.keterangan||'';
+      document.getElementById('lp-paraf').checked = !!r.paraf;
+    }
+  } else {
+    document.getElementById('modal-lampiran-title').textContent = 'Tambah Penerima';
+  }
+  document.getElementById('modal-lampiran-penerima').classList.remove('hidden');
+}
+
+document.getElementById('form-lampiran-penerima').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const npsn = state.userData.npsn;
+  const txId = e.target.dataset.txId;
+  const id = document.getElementById('lp-id').value;
+  const payload = {
+    nama: document.getElementById('lp-nama').value.trim(),
+    nip: document.getElementById('lp-nip').value.trim(),
+    jabatan: document.getElementById('lp-jabatan').value.trim(),
+    jumlah: Number(document.getElementById('lp-jumlah').value)||0,
+    keterangan: document.getElementById('lp-keterangan').value.trim(),
+    paraf: document.getElementById('lp-paraf').checked
+  };
+  try{
+    if(id){
+      await db.ref(`lampiran_penerima/${npsn}/${txId}/${id}`).update(payload);
+    } else {
+      payload.createdAt = Date.now();
+      await db.ref(`lampiran_penerima/${npsn}/${txId}`).push(payload);
+    }
+    document.getElementById('modal-lampiran-penerima').classList.add('hidden');
+  }catch(err){
+    alert('Gagal menyimpan penerima: ' + (err.message || 'Terjadi kesalahan. Periksa koneksi internet Anda dan coba lagi.'));
+  }
+});
+
+document.getElementById('btn-cetak-lampiran').addEventListener('click', ()=>{
+  const txId = state.lampiranSelectedTx;
+  const tx = state.transactions.find(t=>t.id===txId);
+  if(!tx){ alert('Pilih kwitansi terlebih dahulu.'); return; }
+  const rows = Object.entries(state.lampiranPenerima[txId]||{}).map(([id,r])=>({id,...r}))
+    .sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  if(rows.length===0){ alert('Belum ada penerima pada lampiran ini.'); return; }
+  buildLampiranPrintDocument(tx, rows);
+  window.print();
+});
+
+function buildLampiranPrintDocument(tx, rows){
+  const s = state.schoolData || {};
+  const kepsek = s.kepsek || {}; const bendahara = s.bendahara || {};
+  const root = document.getElementById('print-root');
+  const kopHtml = buildKopSuratHtml(s);
+  const total = rows.reduce((sum,r)=>sum+(Number(r.jumlah)||0),0);
+
+  const trRows = rows.map((r,idx)=>`
+    <tr>
+      <td style="border:1px solid #16324F; padding:5px 6px; text-align:center;">${idx+1}</td>
+      <td style="border:1px solid #16324F; padding:5px 6px;">${escapeHtml(r.nama||'')}</td>
+      <td style="border:1px solid #16324F; padding:5px 6px;">${escapeHtml(r.nip||'-')}</td>
+      <td style="border:1px solid #16324F; padding:5px 6px;">${escapeHtml(r.jabatan||'-')}</td>
+      <td style="border:1px solid #16324F; padding:5px 6px; text-align:right;">${fmtRupiah(r.jumlah)}</td>
+      <td style="border:1px solid #16324F; padding:5px 6px; text-align:center;">${r.paraf ? '&#10003;' : ''}</td>
+      <td style="border:1px solid #16324F; padding:5px 6px;">${escapeHtml(r.keterangan||'')}</td>
+    </tr>`).join('');
+
+  const bodyHtml = `
+    <div style="border:1px solid #16324F; padding:20px; font-family:Inter,sans-serif; font-size:13px; color:#23262B;">
+      <div style="text-align:center; font-family:Lora,serif; font-weight:700; font-size:15px; letter-spacing:1px;">LAMPIRAN DAFTAR PENERIMA</div>
+      <div style="text-align:center; font-size:12px; margin-bottom:14px;">Lampiran Kwitansi No. ${escapeHtml(tx.noBukti||'-')} — ${escapeHtml(tx.uraian||'')}</div>
+      <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead><tr>
+          <th style="border:1px solid #16324F; padding:5px 6px; background:#EAF0F5;">No</th>
+          <th style="border:1px solid #16324F; padding:5px 6px; background:#EAF0F5;">Nama</th>
+          <th style="border:1px solid #16324F; padding:5px 6px; background:#EAF0F5;">NIP</th>
+          <th style="border:1px solid #16324F; padding:5px 6px; background:#EAF0F5;">Jabatan</th>
+          <th style="border:1px solid #16324F; padding:5px 6px; background:#EAF0F5;">Jumlah Uang</th>
+          <th style="border:1px solid #16324F; padding:5px 6px; background:#EAF0F5;">Paraf</th>
+          <th style="border:1px solid #16324F; padding:5px 6px; background:#EAF0F5;">Keterangan</th>
+        </tr></thead>
+        <tbody>${trRows}</tbody>
+        <tfoot><tr>
+          <td colspan="4" style="border:1px solid #16324F; padding:5px 6px; text-align:right; font-weight:700;">TOTAL</td>
+          <td style="border:1px solid #16324F; padding:5px 6px; text-align:right; font-weight:700;">${fmtRupiah(total)}</td>
+          <td colspan="2" style="border:1px solid #16324F;"></td>
+        </tr></tfoot>
+      </table>
+      <table style="width:100%; margin-top:40px; font-size:13px;"><tr>
+        <td style="width:45%; text-align:center;">Bendahara BOS,</td>
+        <td style="width:10%;"></td>
+        <td style="width:45%; text-align:center;">${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(tx.tanggal)}<br>Mengetahui,<br>Kepala Sekolah,</td>
+      </tr></table>
+      <table style="width:100%; margin-top:55px; font-size:13px;"><tr>
+        <td style="width:45%; text-align:center; border-top:1px solid #23262B; padding-top:4px;"><b>${escapeHtml(bendahara.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(bendahara.nip||'-')}</td>
+        <td style="width:10%;"></td>
+        <td style="width:45%; text-align:center; border-top:1px solid #23262B; padding-top:4px;"><b>${escapeHtml(kepsek.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(kepsek.nip||'-')}</td>
+      </tr></table>
+    </div>`;
+
+  root.innerHTML = `<div style="padding:24px;">${kopHtml}${bodyHtml}</div>`;
+}
 
 /* =========================================================================
    BUKU PEMBANTU: BANK & PAJAK (opsional, penunjang SPJ)
@@ -2312,84 +2715,243 @@ function renderRealisasi(){
 }
 
 /* =========================================================================
-   IMPORT CSV (validated columns; scoped to own npsn; never touches saldo directly)
+   FORMAT DATA TRANSAKSI BKU — satu sumber kebenaran untuk field, label,
+   dan kolom import/export, disamakan persis dengan form "+ Transaksi".
    ========================================================================= */
-const REQUIRED_COLUMNS = ['tanggal','kode','uraian','kualitas','satuan','jenis','jumlah','penerima','nipPenerima'];
+const FIELD_LABELS = {
+  tanggal: 'Tanggal',
+  kode: 'Kode Kegiatan',
+  noBukti: 'No. Bukti/BKU',
+  kodeProgram: 'Kode Program',
+  kodeRekening: 'Kode Rekening',
+  uraian: 'Uraian',
+  kualitas: 'Kualitas',
+  satuan: 'Satuan',
+  jenis: 'Jenis Transaksi',
+  jumlah: 'Jumlah (Rp)',
+  penerima: 'Nama Penerima',
+  nipPenerima: 'NIP Penerima'
+};
+// Field wajib mengikuti atribut required pada form manual (tx-tanggal, tx-uraian, tx-jumlah).
+const REQUIRED_FIELDS = ['tanggal','uraian','jumlah'];
 
+// Beberapa alias nama kolom (huruf besar/kecil & tanda baca diabaikan) agar
+// file lama maupun template baru tetap bisa diimpor.
+const FIELD_ALIASES = {
+  tanggal: ['tanggal','date'],
+  kode: ['kode','kodekegiatan'],
+  noBukti: ['nobuktibku','nobukti','nomorbukti'],
+  kodeProgram: ['kodeprogram'],
+  kodeRekening: ['koderekening'],
+  uraian: ['uraian'],
+  kualitas: ['kualitas'],
+  satuan: ['satuan'],
+  jenis: ['jenistransaksi','jenis'],
+  jumlah: ['jumlahrp','jumlah'],
+  penerima: ['namapenerima','penerima'],
+  nipPenerima: ['nippenerima','nip']
+};
+
+function normalizeHeader(h){
+  return String(h==null?'':h).toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+function buildHeaderKeyMap(){
+  const map = {};
+  Object.keys(FIELD_ALIASES).forEach(key=>{
+    FIELD_ALIASES[key].forEach(alias=>{ map[alias] = key; });
+  });
+  return map;
+}
+function mapRowToFields(row, headerKeyMap){
+  const out = {};
+  Object.keys(row).forEach(h=>{
+    const key = headerKeyMap[normalizeHeader(h)];
+    if(key) out[key] = row[h];
+  });
+  return out;
+}
+function parseTanggalFleksibel(val){
+  if(val==null || val==='') return '';
+  if(val instanceof Date && !isNaN(val)){
+    const y=val.getFullYear(), m=String(val.getMonth()+1).padStart(2,'0'), d=String(val.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
+  }
+  const s = String(val).trim();
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0,10);
+  const m1 = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(m1) return `${m1[3]}-${m1[2].padStart(2,'0')}-${m1[1].padStart(2,'0')}`;
+  if(/^\d+(\.\d+)?$/.test(s)){
+    const num = Number(s);
+    if(num>20000 && num<80000 && window.XLSX && XLSX.SSF){
+      const d = XLSX.SSF.parse_date_code(num);
+      if(d) return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
+    }
+  }
+  return s;
+}
+function transaksiToRow(t){
+  return {
+    [FIELD_LABELS.tanggal]: t.tanggal || '',
+    [FIELD_LABELS.kode]: t.kode || '',
+    [FIELD_LABELS.noBukti]: t.noBukti || '',
+    [FIELD_LABELS.kodeProgram]: t.kodeProgram || '',
+    [FIELD_LABELS.kodeRekening]: t.kodeRekening || '',
+    [FIELD_LABELS.uraian]: t.uraian || '',
+    [FIELD_LABELS.kualitas]: t.kualitas || '',
+    [FIELD_LABELS.satuan]: t.satuan || '',
+    [FIELD_LABELS.jenis]: t.jenis==='pengeluaran' ? 'Pengeluaran' : 'Penerimaan',
+    [FIELD_LABELS.jumlah]: t.jumlah || 0,
+    [FIELD_LABELS.penerima]: t.penerima || '',
+    [FIELD_LABELS.nipPenerima]: t.nipPenerima || ''
+  };
+}
+function showImportFeedback(success, text){
+  const feedback = document.getElementById('import-feedback');
+  feedback.className = 'text-sm rounded px-3 py-2 no-print ' + (success ? 'bg-forest-100 text-forest' : 'bg-rust-100 text-rust');
+  feedback.textContent = text;
+  feedback.classList.remove('hidden');
+}
+
+/* =========================================================================
+   IMPORT DATA (CSV / Excel — bebas tipe file, kolom sama seperti form
+   Tambah Transaksi; scoped ke npsn sendiri; tidak menyentuh saldo langsung)
+   ========================================================================= */
 document.getElementById('input-import-csv').addEventListener('change', (e)=>{
   const file = e.target.files[0];
   if(!file) return;
-  const feedback = document.getElementById('import-feedback');
+  const ext = (file.name.split('.').pop()||'').toLowerCase();
 
-  Papa.parse(file, {
-    header: true,
-    skipEmptyLines: true,
-    complete: async (results)=>{
-      const cols = results.meta.fields || [];
-      const missing = REQUIRED_COLUMNS.filter(c=>!cols.includes(c));
-      if(missing.length){
-        feedback.className = 'text-sm rounded px-3 py-2 bg-rust-100 text-rust no-print';
-        feedback.textContent = 'Kolom tidak sesuai template. Kolom wajib: ' + REQUIRED_COLUMNS.join(', ') + '. Kolom hilang: ' + missing.join(', ');
-        feedback.classList.remove('hidden');
-        e.target.value = '';
-        return;
-      }
-
-      const npsn = state.userData.npsn;
-      const updates = {};
-      let validCount = 0;
-      results.data.forEach(row=>{
-        if(!row.tanggal || !row.uraian) return;
-        const jenis = (row.jenis||'').toLowerCase().includes('peng') ? 'pengeluaran' : 'penerimaan';
-        const newId = db.ref('transaksi_bku/'+npsn).push().key;
-        updates[newId] = {
-          tanggal: row.tanggal,
-          kode: row.kode||'',
-          uraian: row.uraian,
-          kualitas: row.kualitas||'',
-          satuan: row.satuan||'',
-          jenis,
-          jumlah: Number(row.jumlah)||0,
-          penerima: row.penerima||'',
-          nipPenerima: row.nipPenerima||'',
-          createdAt: Date.now()
-        };
-        validCount++;
-      });
-
-      if(validCount===0){
-        feedback.className = 'text-sm rounded px-3 py-2 bg-rust-100 text-rust no-print';
-        feedback.textContent = 'Tidak ada baris valid untuk diimpor.';
-        feedback.classList.remove('hidden');
-        e.target.value = '';
-        return;
-      }
-
-      try{
-        await db.ref('transaksi_bku/'+npsn).update(updates);
-        feedback.className = 'text-sm rounded px-3 py-2 bg-forest-100 text-forest no-print';
-        feedback.textContent = `${validCount} transaksi berhasil diimpor ke sekolah ini (saldo dihitung ulang otomatis).`;
-        feedback.classList.remove('hidden');
-      }catch(err){
-        feedback.className = 'text-sm rounded px-3 py-2 bg-rust-100 text-rust no-print';
-        feedback.textContent = 'Gagal mengimpor transaksi: ' + (err.message || 'Terjadi kesalahan. Periksa koneksi internet Anda dan coba lagi.');
-        feedback.classList.remove('hidden');
-      }
+  const finishImport = async (rawRows)=>{
+    if(!rawRows || !rawRows.length){
+      showImportFeedback(false, 'File kosong atau tidak dapat dibaca.');
       e.target.value = '';
+      return;
     }
-  });
+
+    const headerKeyMap = buildHeaderKeyMap();
+    const foundKeys = new Set();
+    Object.keys(rawRows[0]).forEach(h=>{
+      const k = headerKeyMap[normalizeHeader(h)];
+      if(k) foundKeys.add(k);
+    });
+    const missing = REQUIRED_FIELDS.filter(f=>!foundKeys.has(f));
+    if(missing.length){
+      showImportFeedback(false, 'Kolom wajib tidak ditemukan: ' + missing.map(f=>FIELD_LABELS[f]).join(', ') + '. Gunakan tombol "Unduh Template" agar format kolom sama seperti form "+ Transaksi".');
+      e.target.value = '';
+      return;
+    }
+
+    const npsn = state.userData.npsn;
+    const updates = {};
+    let validCount = 0, skipped = 0;
+    rawRows.forEach(row=>{
+      const f = mapRowToFields(row, headerKeyMap);
+      const tanggal = parseTanggalFleksibel(f.tanggal);
+      const uraian = String(f.uraian||'').trim();
+      const jumlah = Number(String(f.jumlah==null?'':f.jumlah).replace(/[^\d.-]/g,'')) || 0;
+      if(!tanggal || !uraian){ skipped++; return; }
+      const jenis = String(f.jenis||'').toLowerCase().includes('peng') ? 'pengeluaran' : 'penerimaan';
+      const newId = db.ref('transaksi_bku/'+npsn).push().key;
+      updates[newId] = {
+        tanggal,
+        kode: String(f.kode||'').trim(),
+        noBukti: String(f.noBukti||'').trim(),
+        kodeProgram: String(f.kodeProgram||'').trim(),
+        kodeRekening: String(f.kodeRekening||'').trim(),
+        uraian,
+        kualitas: String(f.kualitas||'').trim(),
+        satuan: String(f.satuan||'').trim(),
+        jenis,
+        jumlah,
+        penerima: String(f.penerima||'').trim(),
+        nipPenerima: String(f.nipPenerima||'').trim(),
+        createdAt: Date.now()
+      };
+      validCount++;
+    });
+
+    if(validCount===0){
+      showImportFeedback(false, 'Tidak ada baris valid untuk diimpor. Pastikan kolom Tanggal, Uraian, dan Jumlah (Rp) terisi.');
+      e.target.value = '';
+      return;
+    }
+
+    try{
+      await db.ref('transaksi_bku/'+npsn).update(updates);
+      showImportFeedback(true, `${validCount} transaksi berhasil diimpor${skipped? ' ('+skipped+' baris dilewati karena data tidak lengkap)':''}. Saldo dihitung ulang otomatis.`);
+    }catch(err){
+      showImportFeedback(false, 'Gagal mengimpor transaksi: ' + (err.message || 'Terjadi kesalahan. Periksa koneksi internet Anda dan coba lagi.'));
+    }
+    e.target.value = '';
+  };
+
+  if(ext==='csv'){
+    Papa.parse(file, { header:true, skipEmptyLines:true, complete: (results)=>finishImport(results.data) });
+  } else if(ext==='xlsx' || ext==='xls'){
+    const reader = new FileReader();
+    reader.onload = (evt)=>{
+      try{
+        const wb = XLSX.read(evt.target.result, { type:'array', cellDates:true });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval:'' });
+        finishImport(rows);
+      }catch(err){
+        showImportFeedback(false, 'Gagal membaca file Excel: ' + (err.message || 'format tidak dikenali.'));
+        e.target.value = '';
+      }
+    };
+    reader.onerror = ()=>{
+      showImportFeedback(false, 'Gagal membaca file.');
+      e.target.value = '';
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    showImportFeedback(false, 'Tipe file tidak didukung. Gunakan file .csv, .xlsx, atau .xls.');
+    e.target.value = '';
+  }
 });
 
 /* =========================================================================
-   EXPORT CSV / EXCEL & PDF (isolated per sekolah)
+   UNDUH TEMPLATE (contoh file, kolom sama persis dengan form Tambah Transaksi)
+   ========================================================================= */
+document.getElementById('btn-unduh-template').addEventListener('click', ()=>{
+  const contoh = {
+    [FIELD_LABELS.tanggal]: todayStr(),
+    [FIELD_LABELS.kode]: '07.12.01.',
+    [FIELD_LABELS.noBukti]: 'BPU48',
+    [FIELD_LABELS.kodeProgram]: '07.12.01.',
+    [FIELD_LABELS.kodeRekening]: '5.1.02.02.01.0013',
+    [FIELD_LABELS.uraian]: 'Contoh: Pembelian ATK',
+    [FIELD_LABELS.kualitas]: '10',
+    [FIELD_LABELS.satuan]: 'pcs',
+    [FIELD_LABELS.jenis]: 'Pengeluaran',
+    [FIELD_LABELS.jumlah]: 100000,
+    [FIELD_LABELS.penerima]: 'CV Sinar Jaya',
+    [FIELD_LABELS.nipPenerima]: ''
+  };
+  const ws = XLSX.utils.json_to_sheet([contoh]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Template BKU');
+  XLSX.writeFile(wb, 'Template_Import_BKU.xlsx');
+});
+
+/* =========================================================================
+   EXPORT CSV / Excel / PDF (isolated per sekolah, kolom sama seperti form)
    ========================================================================= */
 document.getElementById('btn-export-csv').addEventListener('click', ()=>{
-  const rows = state.transactions.map(t=>({
-    Tanggal: t.tanggal, Kode: t.kode, Uraian: t.uraian, Kualitas: t.kualitas, Satuan: t.satuan,
-    Penerimaan: t.jenis==='penerimaan'? t.jumlah : '',
-    Pengeluaran: t.jenis==='pengeluaran'? t.jumlah : '',
-    'Nama Penerima': t.penerima, 'NIP Penerima': t.nipPenerima, Saldo: t._saldo
-  }));
+  const rows = state.transactions.map(t=>({ ...transaksiToRow(t), Saldo: t._saldo || 0 }));
+  const csv = Papa.unparse(rows);
+  const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `BKU_${state.userData.npsn}_${todayStr()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btn-export-xlsx').addEventListener('click', ()=>{
+  const rows = state.transactions.map(t=>({ ...transaksiToRow(t), Saldo: t._saldo || 0 }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'BKU');
@@ -2405,15 +2967,15 @@ document.getElementById('btn-export-pdf').addEventListener('click', ()=>{
   doc.text(`Buku Kas Umum — ${s.namaSekolah||''} (NPSN: ${s.npsn||''})`, 14, 12);
 
   const body = state.transactions.map(t=>[
-    formatTanggal(t.tanggal), t.kode||'', t.uraian||'', t.kualitas||'', t.satuan||'',
+    formatTanggal(t.tanggal), t.kode||'', t.noBukti||'', t.kodeProgram||'', t.kodeRekening||'', t.uraian||'', t.kualitas||'', t.satuan||'',
     t.jenis==='penerimaan'? fmtRupiah(t.jumlah):'', t.jenis==='pengeluaran'? fmtRupiah(t.jumlah):'',
     t.penerima||'', t.nipPenerima||'', fmtRupiah(t._saldo)
   ]);
   doc.autoTable({
     startY: 18,
-    head: [['Tanggal','Kode','Uraian','Kualitas','Satuan','Penerimaan','Pengeluaran','Penerima','NIP','Saldo']],
+    head: [['Tanggal','Kode','No.Bukti','Kd.Program','Kd.Rekening','Uraian','Kualitas','Satuan','Penerimaan','Pengeluaran','Penerima','NIP','Saldo']],
     body,
-    styles:{ fontSize:8 },
+    styles:{ fontSize:7 },
     headStyles:{ fillColor:[22,50,79] }
   });
   doc.save(`BKU_${s.npsn||''}_${todayStr()}.pdf`);
@@ -2609,18 +3171,20 @@ function buildSpjLengkapDocument(){
         <table style="width:100%; border-collapse:collapse; font-size:14px; margin:14px 0;">
           <tr><td style="width:170px; padding:4px 0;">Terbilang</td><td>: <b>${fmtRupiah(t.jumlah)}</b></td></tr>
         </table>
-        <div style="text-align:right; font-size:13px; margin-bottom:20px;">Lunas Dibayar ${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(t.tanggal)}</div>
         <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:13px;">
           <div style="text-align:center; width:45%;">
+            <div>Lunas dibayar</div>
             <div>Bendahara BOS,</div>
             <div style="height:55px;"></div>
             <div style="border-top:1px solid #23262B; padding-top:4px;"><b>${escapeHtml(bendahara.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(bendahara.nip||'-')}</div>
           </div>
           <div style="text-align:center; width:45%;">
+            <div>${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(t.tanggal)}</div>
             <div>Yang Menerima,</div>
             <div style="height:55px;"></div>
             <div style="border-top:1px solid #23262B; padding-top:4px;"><b>${escapeHtml(t.penerima||'( ..................... )')}</b><br>NIP. ${escapeHtml(t.nipPenerima||'-')}</div>
           </div>
+        </div>
         </div>
         <div style="text-align:center; margin-top:22px; font-size:13px;">
           Setuju dibayar,<br>Kepala Sekolah,
@@ -2730,14 +3294,15 @@ function buildPrintDocument(docType, items, docHeader){
           <table style="width:100%; border-collapse:collapse; font-size:14px; margin:14px 0;">
             <tr><td style="width:170px; padding:4px 0;">Terbilang</td><td>: <b>${fmtRupiah(t.jumlah)}</b></td></tr>
           </table>
-          <div style="text-align:right; font-size:13px; margin-bottom:20px;">Lunas Dibayar ${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(t.tanggal)}</div>
           <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:13px;">
             <div style="text-align:center; width:45%;">
+              <div>Lunas dibayar</div>
               <div>Bendahara BOS,</div>
               <div style="height:55px;"></div>
               <div style="border-top:1px solid #23262B; padding-top:4px;"><b>${escapeHtml(bendahara.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(bendahara.nip||'-')}</div>
             </div>
             <div style="text-align:center; width:45%;">
+              <div>${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(t.tanggal)}</div>
               <div>Yang Menerima,</div>
               <div style="height:55px;"></div>
               <div style="border-top:1px solid #23262B; padding-top:4px;"><b>${escapeHtml(t.penerima||'( ..................... )')}</b><br>NIP. ${escapeHtml(t.nipPenerima||'-')}</div>
