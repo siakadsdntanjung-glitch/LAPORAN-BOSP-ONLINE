@@ -118,6 +118,9 @@
 
   /* ---- Print isolation: only #print-root is visible when printing ---- */
   #print-root{ display:none; }
+  /* Pemilih jenis dokumen cetak kini berupa dropdown; deretan tombol tab disembunyikan */
+  #cetak-tabs .cetak-tab{ display:none; }
+  #cetak-tabs:not(:has(#cetak-gabung-wrap:not(.hidden))){ display:none; }
   @media print{
     body *{ visibility:hidden; }
     #print-root, #print-root *{ visibility:visible; }
@@ -1150,6 +1153,18 @@
                satu baris dengan tombol Kwitansi selama masih ada tempat, alih-alih
                "dilempar" ke baris baru saat ruang sempit seperti sebelumnya. Penjelasan
                lengkapnya tetap ada, dipindah ke baris kecil di bawah (tidak dihapus). -->
+          <div class="no-print bg-white rounded-lg border border-navy-100 p-4 flex flex-wrap items-center gap-3">
+            <label for="cetak-doc-select" class="text-xs font-semibold text-navy-400 uppercase tracking-wide">Jenis Dokumen</label>
+            <select id="cetak-doc-select" class="rounded border border-navy-200 px-3 py-2 text-sm font-semibold text-navy bg-white min-w-[220px]"><option value="kwitansi">Kwitansi</option><option value="nota">Nota Pesan</option><option value="bast">BAST</option><option value="lampiran">Daftar Lampiran</option><option value="skguru">SK Guru</option><option value="hadir">Daftar Hadir</option><option value="kafer">Kafer Laporan</option><option value="sptjm">SPTJM</option><option value="skrkas">SK Panitia RKAS</option><option value="sktimbos">SK Tim BOS</option><option value="pengantar">Surat Pengantar</option></select>
+          </div>
+
+          <div id="sk-edit-banner" class="hidden no-print bg-gold-50 border border-gold-200 rounded-lg px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-sm text-navy"><span class="font-semibold">Mode Edit:</span> <span id="sk-edit-banner-text"></span> — tombol <b>Simpan SK</b> akan memperbarui SK ini (bukan membuat yang baru).</p>
+            <div class="flex items-center gap-4">
+              <button type="button" id="btn-sk-edit-baru" class="text-xs font-semibold text-gold-600 hover:underline whitespace-nowrap">Buat SK Baru</button>
+            </div>
+          </div>
+
           <div class="flex flex-wrap items-center gap-2 no-print border-b border-navy-100 pb-3" id="cetak-tabs">
             <button data-doc="kwitansi" class="cetak-tab px-4 py-2 text-sm font-semibold rounded bg-navy text-white">Kwitansi</button>
 
@@ -1260,7 +1275,11 @@
               </div>
               <div id="sk-guru-rows" class="space-y-1.5"></div>
             </div>
-            <button id="btn-cetak-skguru-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak SK Guru</button>
+            <div class="flex flex-wrap gap-2 no-print">
+              <button id="btn-simpan-skguru" class="no-print bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan SK</button>
+              <button id="btn-cetak-skguru-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak SK Guru</button>
+            </div>
+            <div id="sk-list-skguru" class="no-print"></div>
           </div>
 
           <!-- Panel DAFTAR HADIR -->
@@ -1375,6 +1394,41 @@
         </section>
 
         <!-- KERTAS KERJA UNIT 2.2.1: BELANJA ATK / JASA / MODAL / HONOR / KEBERSIHAN / ALAT RUMAH TANGGA -->
+        <!-- ========================= AKUN & BANTUAN ========================= -->
+        <section id="page-akun" class="page hidden space-y-4">
+          <div class="bg-white rounded-lg border border-navy-100 p-6 max-w-2xl space-y-4">
+            <h3 class="font-serif font-semibold text-navy">Akun Saya</h3>
+            <dl class="grid grid-cols-3 gap-y-2 text-sm">
+              <dt class="text-navy-400">Email</dt><dd id="akun-email" class="col-span-2 font-mono break-all"></dd>
+              <dt class="text-navy-400">Peran</dt><dd id="akun-peran" class="col-span-2"></dd>
+              <dt class="text-navy-400 akun-baris-sekolah">Sekolah</dt><dd id="akun-sekolah" class="col-span-2 akun-baris-sekolah"></dd>
+              <dt class="text-navy-400 akun-baris-sekolah">NPSN</dt><dd id="akun-npsn" class="col-span-2 font-mono akun-baris-sekolah"></dd>
+              <dt class="text-navy-400">Versi Aplikasi</dt><dd id="akun-versi" class="col-span-2 font-mono"></dd>
+            </dl>
+          </div>
+
+          <div class="bg-white rounded-lg border border-navy-100 p-6 max-w-2xl space-y-3">
+            <h3 class="font-serif font-semibold text-navy">Ganti Password</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="sm:col-span-2"><label class="block text-xs font-semibold text-navy-400 mb-1">Password Saat Ini</label>
+                <input id="akun-pw-lama" type="password" autocomplete="current-password" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
+              <div><label class="block text-xs font-semibold text-navy-400 mb-1">Password Baru</label>
+                <input id="akun-pw-baru" type="password" autocomplete="new-password" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
+              <div><label class="block text-xs font-semibold text-navy-400 mb-1">Ulangi Password Baru</label>
+                <input id="akun-pw-ulang" type="password" autocomplete="new-password" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
+            </div>
+            <button id="btn-akun-ganti-pw" type="button" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan Password Baru</button>
+            <div id="akun-pw-hasil" class="hidden text-sm rounded px-3 py-2"></div>
+          </div>
+
+          <div class="bg-white rounded-lg border border-navy-100 p-6 max-w-2xl space-y-3">
+            <h3 class="font-serif font-semibold text-navy">Bantuan</h3>
+            <p class="text-sm text-navy-400">Mengalami kendala atau butuh bantuan penggunaan SIKEBOS? Hubungi Admin Utama:</p>
+            <p class="text-sm"><span class="font-semibold text-navy">Gordi</span> &middot; <a href="https://wa.me/6285183859997" target="_blank" rel="noopener" class="font-mono text-gold-600 hover:underline">085183859997</a> (WhatsApp)</p>
+            <a id="akun-panduan-link" href="#" target="_blank" rel="noopener" class="hidden items-center gap-2 text-sm font-semibold text-navy hover:underline">📘 Buka Buku Panduan</a>
+          </div>
+        </section>
+
         <section id="page-kk221" class="page hidden space-y-4">
           <p class="text-xs text-navy-400 -mt-1">Mengelompokkan transaksi pengeluaran pada Buku Kas Umum menurut "Kelompok Belanja" yang ditandai pada form Tambah/Ubah Transaksi. Tandai setiap transaksi pengeluaran sebagai Belanja ATK, Belanja Jasa, Belanja Modal, Belanja Honor, Belanja Kebersihan, atau Belanja Alat Rumah Tangga agar otomatis terkumpul pada sub bagian yang sesuai di bawah ini.</p>
 
@@ -1446,6 +1500,30 @@
               </button>
             </div>
             <p id="backup-info" class="text-xs text-navy-300 border-t border-navy-100 pt-4"></p>
+          </div>
+          <div class="bg-white rounded-lg border border-navy-100 p-6 max-w-2xl space-y-4">
+            <div>
+              <h3 class="font-serif font-semibold text-navy mb-1">Impor Database</h3>
+              <p class="text-sm text-navy-400">Pulihkan data dari berkas <b>Backup Lengkap (.json)</b> yang pernah diunduh. Seluruh data dalam berkas — Profil, Kepala Sekolah &amp; Bendahara, Data Pegawai, BKU, Buku Pembantu Bank &amp; Pajak, Pemeriksaan Kas, Rekening Koran, RKAS, Persetujuan, dan SK tersimpan — akan dimasukkan kembali. Berkas Excel (.xlsx) tidak dapat diimpor.</p>
+            </div>
+            <div>
+              <input id="impor-file" type="file" accept=".json,application/json" class="block w-full text-sm text-navy file:mr-3 file:rounded file:border-0 file:bg-navy file:text-white file:text-sm file:font-semibold file:px-4 file:py-2 hover:file:bg-navy-600">
+            </div>
+            <div id="impor-ringkasan" class="hidden"></div>
+            <div id="impor-opsi" class="hidden space-y-2">
+              <p class="text-xs font-semibold text-navy-400 uppercase tracking-wide">Cara Impor</p>
+              <label class="flex items-start gap-2 text-sm text-navy cursor-pointer">
+                <input type="radio" name="impor-mode" value="gabung" checked class="mt-1">
+                <span><b>Gabungkan (disarankan)</b> — semua data di berkas dimasukkan; data yang sudah ada tetap dipertahankan. Bila ada data dengan ID yang sama, isi dari berkas yang dipakai. Tidak ada data yang hilang.</span>
+              </label>
+              <label class="flex items-start gap-2 text-sm text-navy cursor-pointer">
+                <input type="radio" name="impor-mode" value="ganti" class="mt-1">
+                <span><b>Ganti seluruhnya</b> — data sekarang diganti persis sama dengan isi berkas (data yang tidak ada di berkas akan terhapus).</span>
+              </label>
+              <p class="text-[11px] text-navy-300">Sebelum impor, salinan backup data saat ini otomatis diunduh sebagai pengaman. Setelan akses/akun yang dikelola Admin Utama tidak ikut berubah.</p>
+            </div>
+            <button id="btn-impor-mulai" type="button" disabled class="hidden bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5 disabled:opacity-50">Mulai Impor</button>
+            <div id="impor-hasil" class="hidden text-sm rounded px-3 py-2 whitespace-pre-line"></div>
           </div>
         </section>
 
@@ -2127,7 +2205,7 @@ function confirmFix(pesan){
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.1.3"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.1.4"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -2326,6 +2404,7 @@ const NAV = {
     { id:'monitoring', label:'Monitoring Laporan', title:'Monitoring Laporan (Lintas Sekolah)' },
     { id:'rekapitulasi', label:'Rekapitulasi & Unduh', title:'Rekapitulasi & Unduh Laporan' },
     { id:'maintenance', label:'Mode Perbaikan Server', title:'Mode Perbaikan Server' },
+    { id:'akun', label:'Akun & Bantuan', title:'Akun Saya & Bantuan' },
   ],
   admin_sekolah: [
     { id:'dashboard-sekolah', label:'Dashboard', title:'Dashboard Sekolah' },
@@ -2339,6 +2418,7 @@ const NAV = {
     { id:'sppd', label:'SPPD', title:'SPPD (Surat Tugas, SPD, Format SPPD & Laporan Perjalanan Dinas)', conditional:true },
     { id:'audit-trail', label:'Audit Trail', title:'Audit Trail — Riwayat Aktivitas Sistem' },
     { id:'backup', label:'Backup Database', title:'Backup Database Sekolah' },
+    { id:'akun', label:'Akun & Bantuan', title:'Akun Saya & Bantuan' },
   ],
   kepala_sekolah: [
     { id:'dashboard-sekolah', label:'Dashboard Monitoring', title:'Dashboard Monitoring' },
@@ -2346,6 +2426,7 @@ const NAV = {
     { id:'realisasi', label:'Laporan Realisasi', title:'Laporan Realisasi Belanja (Read-Only)' },
     { id:'bku', label:'Buku Kas Umum', title:'Buku Kas Umum (BKU) — Tampilan' },
     { id:'audit-trail', label:'Audit Trail', title:'Audit Trail — Riwayat Aktivitas Sistem' },
+    { id:'akun', label:'Akun & Bantuan', title:'Akun Saya & Bantuan' },
   ]
 };
 
@@ -2684,6 +2765,7 @@ function initAppForRole(userData){
   document.getElementById('sidebar-role-label').textContent = roleLabels[userData.role] || userData.role;
 
   buildNav(userData.role);
+  state.editSK = null;
 
   // Berlaku untuk SEMUA role (termasuk Admin Utama, yang panelnya sendiri
   // dirender lewat listener ini) — lihat attachMaintenanceListener().
@@ -2717,6 +2799,20 @@ function buildNav(role){
   if(role === 'admin_sekolah') updateSppdNavVisibility();
 }
 
+const CETAK_DOC_LABEL = { kwitansi:'Kwitansi', nota:'Nota Pesan', bast:'BAST', lampiran:'Daftar Lampiran', skguru:'SK Guru', hadir:'Daftar Hadir', kafer:'Kafer Laporan', sptjm:'SPTJM', skrkas:'SK Panitia RKAS', sktimbos:'SK Tim BOS', pengantar:'Surat Pengantar' };
+function updateCetakSubActive(){
+  const sel = document.getElementById('cetak-doc-select');
+  const doc = state.cetakDoc || 'kwitansi';
+  if(sel) sel.value = doc;
+  // Opsi "Gabungkan No. Bukti sama" hanya untuk Kwitansi. Disinkronkan di sini karena
+  // Kwitansi kini jenis dokumen bawaan (tanpa klik tab), jadi opsi harus langsung tampil.
+  const gw = document.getElementById('cetak-gabung-wrap'), gd = document.getElementById('cetak-gabung-desc');
+  if(gw) gw.classList.toggle('hidden', doc !== 'kwitansi');
+  if(gd) gd.classList.toggle('hidden', doc !== 'kwitansi');
+  if(state.currentView === 'cetak'){
+    document.getElementById('page-title').textContent = 'Cetak Dokumen — ' + (CETAK_DOC_LABEL[state.cetakDoc||'kwitansi'] || '');
+  }
+}
 /* ---- Menu SPPD hanya tampil ketika ada transaksi (kwitansi) yang ditandai
    "Perjalanan Dinas" pada form Tambah/Ubah Transaksi ---- */
 function updateSppdNavVisibility(){
@@ -2755,6 +2851,7 @@ function navigateTo(pageId){
   }
   if(pageId === 'dashboard-sekolah') renderDashboardSekolah();
   if(pageId === 'cetak') renderCetakList();
+  updateCetakSubActive();
   if(pageId === 'kk221') renderKk221Table();
   if(pageId === 'profil') fillProfilForm();
   if(pageId === 'pejabat') fillPejabatForm();
@@ -2768,6 +2865,7 @@ function navigateTo(pageId){
   if(pageId === 'realisasi') renderRealisasi();
   if(pageId === 'audit-trail') renderAuditTrail();
   if(pageId === 'backup') renderBackupInfo();
+  if(pageId === 'akun') renderAkun();
 }
 
 /* =========================================================================
@@ -3463,6 +3561,7 @@ function attachSchoolListeners(npsn){
     if(state.currentView==='profil') fillProfilForm();
     if(state.currentView==='pejabat') fillPejabatForm();
     if(state.currentView==='pegawai') renderPegawai();
+    if(state.currentView==='cetak') renderSemuaDaftarSK();
     if(!document.getElementById('lp-pegawai-panel').classList.contains('hidden')) renderPilihPegawaiList();
     refreshPanelPegawaiCetak();
     if(state.currentView==='bku') renderBKU();
@@ -6374,6 +6473,31 @@ function unduhBlob(blob, namaFile){
   URL.revokeObjectURL(url);
 }
 
+async function susunBackupJson(){
+  const npsn = state.userData.npsn;
+  // Ambil data sekolah terbaru langsung dari database agar backup selalu akurat.
+  const schoolSnap = await db.ref('sekolah/'+npsn).get();
+  const bersihkanMeta = (arr)=> arr.reduce((acc,t)=>{
+    const { _saldo, _saldoBank, _saldoKoran, _cocok, id, ...rest } = t;
+    acc[id] = rest;
+    return acc;
+  }, {});
+  return {
+    _keterangan: 'Backup Database SIKEBOS (Sistem Keuangan BOSP)',
+    _npsn: npsn,
+    _namaSekolah: (schoolSnap.val()||{}).namaSekolah || '',
+    _dibuatPada: new Date().toISOString(),
+    sekolah: schoolSnap.val() || state.schoolData || {},
+    transaksi_bku: bersihkanMeta(state.transactions),
+    buku_bank: bersihkanMeta(state.bukuBank),
+    buku_pajak: bersihkanMeta(state.bukuPajak),
+    opname_kas: bersihkanMeta(state.opnameKas),
+    rekening_koran: bersihkanMeta(state.rekeningKoran),
+    rkas: bersihkanMeta(state.rkas),
+    persetujuan: state.persetujuan || {}
+  };
+}
+
 document.getElementById('btn-backup-json').addEventListener('click', async ()=>{
   const btn = document.getElementById('btn-backup-json');
   const teksAsli = btn.textContent;
@@ -6381,32 +6505,178 @@ document.getElementById('btn-backup-json').addEventListener('click', async ()=>{
     btn.disabled = true;
     const npsn = state.userData.npsn;
     // Ambil data sekolah terbaru langsung dari database agar backup selalu akurat.
-    const schoolSnap = await db.ref('sekolah/'+npsn).get();
-    const bersihkanMeta = (arr)=> arr.reduce((acc,t)=>{
-      const { _saldo, _saldoBank, _saldoKoran, _cocok, id, ...rest } = t;
-      acc[id] = rest;
-      return acc;
-    }, {});
-    const backup = {
-      _keterangan: 'Backup Database SIKEBOS (Sistem Keuangan BOSP)',
-      _npsn: npsn,
-      _namaSekolah: (schoolSnap.val()||{}).namaSekolah || '',
-      _dibuatPada: new Date().toISOString(),
-      sekolah: schoolSnap.val() || state.schoolData || {},
-      transaksi_bku: bersihkanMeta(state.transactions),
-      buku_bank: bersihkanMeta(state.bukuBank),
-      buku_pajak: bersihkanMeta(state.bukuPajak),
-      opname_kas: bersihkanMeta(state.opnameKas),
-      rekening_koran: bersihkanMeta(state.rekeningKoran),
-      rkas: bersihkanMeta(state.rkas),
-      persetujuan: state.persetujuan || {}
-    };
+    const backup = await susunBackupJson();
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type:'application/json' });
     unduhBlob(blob, `backup-sikebos-${npsn}-${todayStr()}.json`);
   }catch(err){
     alertFix('Gagal membuat backup: ' + (err.message || 'Terjadi kesalahan. Periksa koneksi internet Anda dan coba lagi.'));
   }finally{
     btn.disabled = false; btn.textContent = teksAsli;
+  }
+});
+
+/* =========================================================================
+   IMPOR DATABASE (dari berkas Backup Lengkap .json)
+   - Hanya berkas dengan NPSN yang sama yang diterima.
+   - Mode "Gabungkan": semua data berkas ditulis per ID; data lama yang tidak ada
+     di berkas tetap utuh. Mode "Ganti seluruhnya": data disamakan dengan berkas.
+   - Setelan yang dikelola Admin Utama (kunci akses, akun) tidak pernah ditimpa.
+   - Seluruh penulisan memakai satu multi-path update (atomik: semua masuk atau
+     tidak sama sekali), dan salinan backup data saat ini diunduh lebih dulu.
+   ========================================================================= */
+const IMPOR_KOLEKSI = [
+  { node:'transaksi_bku', label:'Transaksi Buku Kas Umum', state:'transactions' },
+  { node:'buku_bank', label:'Buku Pembantu Bank', state:'bukuBank' },
+  { node:'buku_pajak', label:'Buku Pembantu Pajak', state:'bukuPajak' },
+  { node:'opname_kas', label:'Pemeriksaan Kas', state:'opnameKas' },
+  { node:'rekening_koran', label:'Rekening Koran', state:'rekeningKoran' },
+  { node:'rkas', label:'Kegiatan RKAS', state:'rkas' }
+];
+const IMPOR_SEKOLAH_DILINDUNGI = ['npsn','adminUid','createdAt','aksesDikunci','aksesDikunciPesan','aksesDikunciOleh','aksesDikunciPada'];
+let imporBerkas = null;
+
+function imporIsObj(x){ return !!x && typeof x === 'object' && !Array.isArray(x); }
+function imporJumlah(x){ return imporIsObj(x) ? Object.keys(x).length : 0; }
+
+function imporTampilHasil(pesan, tipe){
+  const el = document.getElementById('impor-hasil');
+  el.textContent = pesan;
+  el.className = 'text-sm rounded px-3 py-2 whitespace-pre-line ' +
+    (tipe === 'ok' ? 'bg-forest-100 text-forest' : 'bg-rust-100 text-rust');
+}
+function imporReset(){
+  imporBerkas = null;
+  document.getElementById('impor-ringkasan').classList.add('hidden');
+  document.getElementById('impor-opsi').classList.add('hidden');
+  const b = document.getElementById('btn-impor-mulai');
+  b.classList.add('hidden'); b.disabled = true;
+}
+
+function imporBangunUpdate(data, mode){
+  const npsn = state.userData.npsn;
+  const up = {};
+  IMPOR_KOLEKSI.forEach(k=>{
+    if(!(k.node in data)) return;
+    const inc = imporIsObj(data[k.node]) ? data[k.node] : {};
+    if(mode === 'ganti'){
+      up[`${k.node}/${npsn}`] = imporJumlah(inc) ? inc : null;
+    }else{
+      Object.entries(inc).forEach(([id, rec])=>{ if(imporIsObj(rec)) up[`${k.node}/${npsn}/${id}`] = rec; });
+    }
+  });
+  if('persetujuan' in data){
+    const inc = imporIsObj(data.persetujuan) ? data.persetujuan : {};
+    if(mode === 'ganti') up[`persetujuan/${npsn}`] = imporJumlah(inc) ? inc : null;
+    else Object.entries(inc).forEach(([k, v])=>{ if(v != null) up[`persetujuan/${npsn}/${k}`] = v; });
+  }
+  if(imporIsObj(data.sekolah)){
+    const sk = data.sekolah;
+    Object.entries(sk).forEach(([k, v])=>{
+      if(IMPOR_SEKOLAH_DILINDUNGI.includes(k) || v == null) return;
+      if(mode === 'gabung' && imporIsObj(v)){
+        Object.entries(v).forEach(([c, cv])=>{ if(cv != null) up[`sekolah/${npsn}/${k}/${c}`] = cv; });
+      }else{
+        up[`sekolah/${npsn}/${k}`] = v;
+      }
+    });
+    if(mode === 'ganti'){
+      Object.keys(state.schoolData || {}).forEach(k=>{
+        if(IMPOR_SEKOLAH_DILINDUNGI.includes(k) || k in sk) return;
+        up[`sekolah/${npsn}/${k}`] = null;
+      });
+    }
+  }
+  return up;
+}
+
+function imporRender(data){
+  const sk = imporIsObj(data.sekolah) ? data.sekolah : {};
+  const baris = [];
+  IMPOR_KOLEKSI.forEach(k=>{
+    baris.push([k.label, imporJumlah(data[k.node]), (state[k.state]||[]).length]);
+  });
+  baris.push(['Data Pegawai', imporJumlah(sk.pegawai), getPegawaiList().length]);
+  baris.push(['SK Tersimpan', imporJumlah(sk.dokumenSK), getSkList().length]);
+  baris.push(['Riwayat Persetujuan', imporJumlah(data.persetujuan), imporJumlah(state.persetujuan)]);
+  const dibuat = data._dibuatPada ? new Date(data._dibuatPada).toLocaleString('id-ID') : '-';
+  document.getElementById('impor-ringkasan').innerHTML = `
+    <div class="border border-navy-100 rounded overflow-hidden">
+      <div class="bg-paper px-3 py-2 text-xs text-navy-400">
+        Berkas backup <b class="text-navy">${escapeHtml(data._namaSekolah || '-')}</b> (NPSN ${escapeHtml(data._npsn || '-')}) &middot; dibuat ${escapeHtml(dibuat)}
+      </div>
+      <table class="w-full text-sm">
+        <thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100">
+          <th class="py-2 px-3">Data</th><th class="py-2 px-3 text-right">Di berkas</th><th class="py-2 px-3 text-right">Saat ini</th>
+        </tr></thead>
+        <tbody>${baris.map(r=>`<tr class="border-b border-navy-100 last:border-0">
+          <td class="py-2 px-3">${r[0]}</td><td class="py-2 px-3 text-right font-mono">${r[1]}</td><td class="py-2 px-3 text-right font-mono text-navy-400">${r[2]}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  document.getElementById('impor-ringkasan').classList.remove('hidden');
+  document.getElementById('impor-opsi').classList.remove('hidden');
+  const b = document.getElementById('btn-impor-mulai');
+  b.classList.remove('hidden'); b.disabled = false;
+}
+
+document.getElementById('impor-file').addEventListener('change', async (ev)=>{
+  const f = ev.target.files && ev.target.files[0];
+  document.getElementById('impor-hasil').classList.add('hidden');
+  imporReset();
+  if(!f) return;
+  let data;
+  try{
+    data = JSON.parse(await f.text());
+  }catch(err){
+    imporTampilHasil('Berkas tidak dapat dibaca. Pastikan yang dipilih adalah berkas Backup Lengkap (.json) dari SIKEBOS.', 'err');
+    document.getElementById('impor-hasil').classList.remove('hidden');
+    return;
+  }
+  const valid = imporIsObj(data) && (imporIsObj(data.sekolah) || IMPOR_KOLEKSI.some(k=>imporIsObj(data[k.node])));
+  if(!valid){
+    imporTampilHasil('Isi berkas bukan format Backup Lengkap SIKEBOS, sehingga tidak diimpor.', 'err');
+    document.getElementById('impor-hasil').classList.remove('hidden');
+    return;
+  }
+  if(String(data._npsn || '') !== String(state.userData.npsn)){
+    imporTampilHasil(`Berkas ini berasal dari NPSN ${data._npsn || '(tidak diketahui)'}, sedangkan akun Anda NPSN ${state.userData.npsn}. Impor dibatalkan agar data sekolah tidak tercampur.`, 'err');
+    document.getElementById('impor-hasil').classList.remove('hidden');
+    return;
+  }
+  imporBerkas = { data, nama: f.name };
+  imporRender(data);
+});
+
+document.getElementById('btn-impor-mulai').addEventListener('click', async ()=>{
+  if(!imporBerkas) return;
+  const mode = (document.querySelector('input[name="impor-mode"]:checked') || {}).value || 'gabung';
+  const pesan = mode === 'ganti'
+    ? 'Mode GANTI SELURUHNYA: data sekolah saat ini akan diganti persis sama dengan isi berkas, dan data yang tidak ada di berkas akan TERHAPUS.\n\nSalinan backup data saat ini akan diunduh lebih dulu. Lanjutkan?'
+    : 'Mode GABUNGKAN: semua data dari berkas akan dimasukkan, data yang sudah ada tetap dipertahankan.\n\nSalinan backup data saat ini akan diunduh lebih dulu. Lanjutkan?';
+  if(!confirmFix(pesan)) return;
+  const btn = document.getElementById('btn-impor-mulai');
+  btn.disabled = true;
+  document.getElementById('impor-hasil').classList.add('hidden');
+  try{
+    const npsn = state.userData.npsn;
+    // 1) Pengaman: unduh backup kondisi sekarang
+    const sebelum = await susunBackupJson();
+    unduhBlob(new Blob([JSON.stringify(sebelum, null, 2)], { type:'application/json' }),
+      `backup-sebelum-impor-sikebos-${npsn}-${todayStr()}.json`);
+    // 2) Tulis semua data dalam satu update atomik
+    const up = imporBangunUpdate(imporBerkas.data, mode);
+    const jumlahPath = Object.keys(up).length;
+    if(!jumlahPath) throw new Error('Tidak ada data yang dapat diimpor dari berkas ini.');
+    await db.ref().update(up);
+    logAudit('Backup Database', 'impor', `Impor database dari ${imporBerkas.nama} (mode ${mode === 'ganti' ? 'ganti seluruhnya' : 'gabungkan'}, ${jumlahPath} entri)`);
+    imporTampilHasil(`Impor berhasil (${mode === 'ganti' ? 'ganti seluruhnya' : 'gabungkan'}): ${jumlahPath} entri data dimasukkan. Salinan backup sebelum impor sudah terunduh di komputer Anda.`, 'ok');
+    document.getElementById('impor-hasil').classList.remove('hidden');
+    document.getElementById('impor-file').value = '';
+    imporReset();
+    renderBackupInfo();
+  }catch(err){
+    imporTampilHasil('Impor gagal, tidak ada data yang diubah: ' + (err.message || 'Periksa koneksi internet Anda dan coba lagi.'), 'err');
+    document.getElementById('impor-hasil').classList.remove('hidden');
+    btn.disabled = false;
   }
 });
 
@@ -7191,6 +7461,7 @@ document.getElementById('btn-cetak-skguru-print').addEventListener('click', ()=>
     alertFix('Mohon lengkapi minimal Nomor SK, Tanggal Penetapan, dan Tentang.');
     return;
   }
+  simpanSK('skguru', true);
   buildSkGuruDocument(skHeader, guru);
   window.print();
 });
@@ -8450,7 +8721,11 @@ function keputusanPanelHtml(key){
         <option value="Ketua Komite"><option value="Anggota Komite"><option value="Anggota">
       </datalist>
     </div>
-    <button id="${p}-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">${c.tombol}</button>`;
+    <div class="flex flex-wrap gap-2 no-print">
+      <button id="${p}-simpan" class="no-print bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan SK</button>
+      <button id="${p}-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">${c.tombol}</button>
+    </div>
+    <div id="sk-list-${key}" class="no-print"></div>`;
 }
 
 function addTimRow(p, data){
@@ -8641,6 +8916,7 @@ function cetakKeputusan(key){
   }
   const rows = collectTimRows(p);
   if(rows.length === 0){ alertFix('Tambahkan minimal satu baris pada Susunan Lampiran sebelum mencetak.'); return; }
+  simpanSK(key, true);
   buildKeputusanDocument(key, v, rows);
   window.print();
 }
@@ -8791,6 +9067,268 @@ function cetakSuratPengantar(){
   });
   document.getElementById('spg-periode').addEventListener('input', (e)=>{ e.target.dataset.manual = '1'; });
 })();
+
+/* =========================================================================
+   SK TERSIMPAN: simpan, edit, cetak ulang, hapus
+   SK Guru, SK Panitia RKAS & SK Tim BOS disimpan di /sekolah/{npsn}/dokumenSK/{id}.
+   Tombol "Simpan SK" menyimpan; tombol Cetak juga menyimpan otomatis. Setelah
+   tersimpan, form masuk ke mode edit sehingga simpan/cetak berikutnya
+   memperbarui SK yang sama (tidak membuat duplikat). Daftar SK tampil di bawah form tiap tab SK.
+   ========================================================================= */
+const SK_LABEL = { skguru:'SK Guru', skrkas:'SK Panitia RKAS', sktimbos:'SK Tim BOS' };
+
+function getSkList(){
+  const raw = (state.schoolData && state.schoolData.dokumenSK) || {};
+  return Object.entries(raw).map(([id, r])=>({ id, ...r }))
+    .sort((a,b)=> (b.updatedAt||0) - (a.updatedAt||0));
+}
+
+function kumpulkanSK(jenis){
+  if(jenis === 'skguru'){
+    const header = {
+      nomor: document.getElementById('sk-nomor').value.trim(),
+      tanggal: document.getElementById('sk-tanggal').value,
+      tentang: document.getElementById('sk-tentang').value.trim(),
+      tahunAjaran: document.getElementById('sk-tahun-ajaran').value.trim(),
+      semester: document.getElementById('sk-semester').value,
+      dasar: document.getElementById('sk-dasar').value
+    };
+    if(!header.nomor || !header.tanggal || !header.tentang) return { error:'Mohon lengkapi minimal Nomor SK, Tanggal Penetapan, dan Tentang.' };
+    return { nomor: header.nomor, tanggal: header.tanggal, judul: header.tentang, data: { header, guru: collectSkGuruRows() } };
+  }
+  const c = KEPUTUSAN_CFG[jenis], p = c.prefix;
+  const g = (id)=>document.getElementById(p+'-'+id).value;
+  const v = {
+    nomor: g('nomor').trim(), tanggal: g('tanggal'), tempat: g('tempat').trim(), tahun: g('tahun').trim(),
+    sosialisasi: g('sosialisasi'), komiteNama: g('komite-nama').trim(), komiteNip: g('komite-nip').trim(),
+    menimbang: g('menimbang'), mengingat: g('mengingat'), memperhatikan: g('memperhatikan'), diktum: g('diktum')
+  };
+  if(!v.nomor || !v.tanggal || !v.tahun) return { error:'Mohon lengkapi minimal Nomor SK, Tanggal Penetapan, dan Tahun Pelajaran.' };
+  return { nomor: v.nomor, tanggal: v.tanggal, judul: `${SK_LABEL[jenis]} Tahun Pelajaran ${v.tahun}`, data: { v, rows: collectTimRows(p) } };
+}
+
+function isiFormSK(jenis, data){
+  data = data || {};
+  if(jenis === 'skguru'){
+    const h = data.header || {};
+    document.getElementById('sk-nomor').value = h.nomor || '';
+    document.getElementById('sk-tanggal').value = h.tanggal || '';
+    document.getElementById('sk-tentang').value = h.tentang || '';
+    document.getElementById('sk-tahun-ajaran').value = h.tahunAjaran || '';
+    document.getElementById('sk-semester').value = h.semester || 'Ganjil';
+    document.getElementById('sk-dasar').value = h.dasar || '';
+    document.getElementById('sk-guru-rows').innerHTML = '';
+    const guru = data.guru || [];
+    if(guru.length) guru.forEach(r=>addSkGuruRow(r)); else addSkGuruRow();
+    return;
+  }
+  const p = KEPUTUSAN_CFG[jenis].prefix, v = data.v || {};
+  const set = (id, val)=>{ document.getElementById(p+'-'+id).value = val || ''; };
+  set('nomor', v.nomor); set('tanggal', v.tanggal); set('tempat', v.tempat); set('tahun', v.tahun);
+  set('sosialisasi', v.sosialisasi); set('komite-nama', v.komiteNama); set('komite-nip', v.komiteNip);
+  set('menimbang', v.menimbang); set('mengingat', v.mengingat); set('memperhatikan', v.memperhatikan); set('diktum', v.diktum);
+  document.getElementById(p+'-rows').innerHTML = '';
+  (data.rows || []).forEach(r=>addTimRow(p, r));
+}
+
+function resetFormSK(jenis){
+  if(jenis === 'skguru'){
+    isiFormSK('skguru', {});
+    document.getElementById('sk-tanggal').value = todayStr();
+    return;
+  }
+  const c = KEPUTUSAN_CFG[jenis];
+  isiFormSK(jenis, { v:{
+    menimbang: c.menimbang.join('\n'), mengingat: c.mengingat.join('\n'),
+    memperhatikan: c.memperhatikan.join('\n'), diktum: c.diktum.join('\n')
+  }, rows: [] });
+  initKeputusanFields(jenis); // isi ulang tempat, tanggal, tahun & susunan standar
+}
+
+async function simpanSK(jenis, diam){
+  const hasil = kumpulkanSK(jenis);
+  if(hasil.error){ if(!diam) alertFix(hasil.error); return false; }
+  const npsn = state.userData && state.userData.npsn;
+  if(!npsn) return false;
+  const email = (state.user && state.user.email) || '-';
+  const sedangEdit = state.editSK && state.editSK.jenis === jenis && state.editSK.id;
+  const base = db.ref('sekolah/'+npsn+'/dokumenSK');
+  const rec = {
+    jenis, nomor: hasil.nomor, tanggal: hasil.tanggal, judul: hasil.judul, data: hasil.data,
+    updatedAt: Date.now(), updatedBy: email
+  };
+  try{
+    if(sedangEdit){
+      await base.child(state.editSK.id).update(rec);
+      logAudit('Cetak SK', 'ubah', `Ubah ${SK_LABEL[jenis]} No. ${rec.nomor}`);
+    }else{
+      const key = base.push().key;
+      rec.createdAt = rec.updatedAt; rec.createdBy = email;
+      await base.child(key).set(rec);
+      state.editSK = { id:key, jenis };
+      logAudit('Cetak SK', 'tambah', `Simpan ${SK_LABEL[jenis]} No. ${rec.nomor}`);
+    }
+    updateSkEditBanner();
+    if(!diam) alertFix(`${SK_LABEL[jenis]} berhasil disimpan. SK dapat dilihat, diedit, atau dicetak ulang dari daftar di bawah form.`);
+    return true;
+  }catch(err){
+    alertFix('Gagal menyimpan SK: ' + (err.message || 'Periksa koneksi internet Anda dan coba lagi.'));
+    return false;
+  }
+}
+
+function updateSkEditBanner(){
+  const box = document.getElementById('sk-edit-banner');
+  const e = state.editSK;
+  const tampil = !!(e && state.currentView === 'cetak' && state.cetakDoc === e.jenis);
+  box.classList.toggle('hidden', !tampil);
+  if(!tampil) return;
+  const rec = getSkList().find(x=>x.id === e.id);
+  document.getElementById('sk-edit-banner-text').textContent =
+    `${SK_LABEL[e.jenis]}${rec && rec.nomor ? ' No. ' + rec.nomor : ''}`;
+}
+
+function renderDaftarSK(jenis){
+  const box = document.getElementById('sk-list-'+jenis);
+  if(!box) return;
+  const list = getSkList().filter(r=>r.jenis === jenis);
+  box.innerHTML = `
+    <div class="bg-white rounded-lg border border-navy-100 p-4 space-y-2">
+      <p class="text-xs font-semibold text-navy-400 uppercase tracking-wide">Daftar ${escapeHtml(SK_LABEL[jenis])} Tersimpan (${list.length})</p>
+      ${list.length ? `<ul class="divide-y divide-navy-100">${list.map(r=>`
+        <li class="py-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-navy truncate">${escapeHtml(r.nomor||'-')}</p>
+            <p class="text-xs text-navy-400">${escapeHtml(r.judul||'-')} &middot; ${r.tanggal ? formatTanggal(r.tanggal) : '-'}${r.updatedAt ? ' &middot; diubah ' + new Date(r.updatedAt).toLocaleString('id-ID') : ''}</p>
+          </div>
+          <div class="whitespace-nowrap">
+            <button data-act="cetak" data-id="${r.id}" class="text-xs font-semibold text-white bg-gold-500 hover:bg-gold-600 rounded px-3 py-1.5">Cetak</button>
+            <button data-act="edit" data-id="${r.id}" class="text-xs font-semibold text-navy border border-navy-200 hover:bg-navy-50 rounded px-3 py-1.5 ml-1">Edit</button>
+            <button data-act="hapus" data-id="${r.id}" class="text-xs font-semibold text-rust border border-rust/30 hover:bg-rust-100 rounded px-3 py-1.5 ml-1">Hapus</button>
+          </div>
+        </li>`).join('')}</ul>`
+      : `<p class="text-sm text-navy-300 py-2">Belum ada SK tersimpan. Klik <b>Simpan SK</b> atau <b>Cetak</b> — SK otomatis masuk daftar ini.</p>`}
+    </div>`;
+}
+function renderSemuaDaftarSK(){ Object.keys(SK_LABEL).forEach(renderDaftarSK); }
+
+function cetakSKTersimpan(rec){
+  const d = rec.data || {};
+  if(rec.jenis === 'skguru'){
+    if(!(d.guru||[]).length){ alertFix('SK ini belum memiliki daftar guru. Klik Edit untuk melengkapinya.'); return; }
+    buildSkGuruDocument(d.header || {}, d.guru);
+  }else{
+    if(!(d.rows||[]).length){ alertFix('SK ini belum memiliki susunan lampiran. Klik Edit untuk melengkapinya.'); return; }
+    buildKeputusanDocument(rec.jenis, d.v || {}, d.rows);
+  }
+  window.print();
+}
+
+function editSKTersimpan(rec){
+  state.editSK = { id: rec.id, jenis: rec.jenis };
+  if(state.currentView !== 'cetak') navigateTo('cetak');
+  const tab = document.querySelector(`.cetak-tab[data-doc="${rec.jenis}"]`);
+  if(tab) tab.click();
+  isiFormSK(rec.jenis, rec.data);
+  updateSkEditBanner();
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+(function setupSkTersimpan(){
+  document.getElementById('btn-simpan-skguru').addEventListener('click', ()=>simpanSK('skguru'));
+  Object.keys(KEPUTUSAN_CFG).forEach(key=>{
+    document.getElementById(KEPUTUSAN_CFG[key].prefix+'-simpan').addEventListener('click', ()=>simpanSK(key));
+  });
+  document.getElementById('cetak-doc-select').addEventListener('change', (e)=>{
+    const tab = document.querySelector(`.cetak-tab[data-doc="${e.target.value}"]`);
+    if(tab) tab.click();
+  });
+  document.querySelectorAll('.cetak-tab').forEach(b=>b.addEventListener('click', ()=>{ updateSkEditBanner(); renderSemuaDaftarSK(); updateCetakSubActive(); }));
+
+  document.getElementById('btn-sk-edit-baru').addEventListener('click', ()=>{
+    const e = state.editSK; if(!e) return;
+    state.editSK = null;
+    resetFormSK(e.jenis);
+    updateSkEditBanner();
+  });
+
+  Object.keys(SK_LABEL).forEach(jenis=>{
+    document.getElementById('sk-list-'+jenis).addEventListener('click', async (ev)=>{
+      const btn = ev.target.closest('button[data-act]');
+      if(!btn) return;
+      const rec = getSkList().find(x=>x.id === btn.dataset.id);
+      if(!rec) return;
+      if(btn.dataset.act === 'cetak') return cetakSKTersimpan(rec);
+      if(btn.dataset.act === 'edit') return editSKTersimpan(rec);
+      if(btn.dataset.act === 'hapus'){
+        if(!confirmFix(`Hapus ${SK_LABEL[rec.jenis]||'SK'} No. ${rec.nomor||'-'}?\n\nSK yang dihapus tidak dapat dikembalikan.`)) return;
+        try{
+          await db.ref('sekolah/'+state.userData.npsn+'/dokumenSK/'+rec.id).remove();
+          logAudit('Cetak SK', 'hapus', `Hapus ${SK_LABEL[rec.jenis]||'SK'} No. ${rec.nomor||'-'}`);
+          if(state.editSK && state.editSK.id === rec.id){ state.editSK = null; updateSkEditBanner(); }
+        }catch(err){
+          alertFix('Gagal menghapus SK: ' + (err.message || 'Periksa koneksi internet Anda dan coba lagi.'));
+        }
+      }
+    });
+  });
+  renderSemuaDaftarSK();
+})();
+
+/* =========================================================================
+   AKUN & BANTUAN: info akun, ganti password (verifikasi password lama), bantuan
+   ========================================================================= */
+function renderAkun(){
+  const ud = state.userData || {};
+  const peran = { admin_utama:'Admin Utama', admin_sekolah:'Admin Sekolah', kepala_sekolah:'Kepala Sekolah' };
+  document.getElementById('akun-email').textContent = (state.user && state.user.email) || '-';
+  document.getElementById('akun-peran').textContent = peran[ud.role] || ud.role || '-';
+  document.getElementById('akun-versi').textContent = APP_VERSION;
+  const adaSekolah = ud.role !== 'admin_utama';
+  document.querySelectorAll('.akun-baris-sekolah').forEach(el=>el.classList.toggle('hidden', !adaSekolah));
+  document.getElementById('akun-sekolah').textContent = (state.schoolData && state.schoolData.namaSekolah) || '-';
+  document.getElementById('akun-npsn').textContent = ud.npsn || '-';
+  const sumber = document.getElementById('sidebar-panduan-link');
+  const tautan = document.getElementById('akun-panduan-link');
+  const url = sumber && !sumber.classList.contains('hidden') ? sumber.getAttribute('href') : '';
+  tautan.classList.toggle('hidden', !url || url === '#');
+  tautan.classList.toggle('inline-flex', !!url && url !== '#');
+  if(url && url !== '#') tautan.href = url;
+}
+function akunTampilPw(pesan, ok){
+  const el = document.getElementById('akun-pw-hasil');
+  el.textContent = pesan;
+  el.className = 'text-sm rounded px-3 py-2 ' + (ok ? 'bg-forest-100 text-forest' : 'bg-rust-100 text-rust');
+}
+document.getElementById('btn-akun-ganti-pw').addEventListener('click', async ()=>{
+  const lama = document.getElementById('akun-pw-lama').value;
+  const baru = document.getElementById('akun-pw-baru').value;
+  const ulang = document.getElementById('akun-pw-ulang').value;
+  if(!lama || !baru || !ulang) return akunTampilPw('Mohon isi ketiga kolom password.', false);
+  if(baru.length < 6) return akunTampilPw('Password baru minimal 6 karakter.', false);
+  if(baru !== ulang) return akunTampilPw('Ulangi Password Baru tidak sama dengan Password Baru.', false);
+  if(baru === lama) return akunTampilPw('Password baru harus berbeda dari password saat ini.', false);
+  const btn = document.getElementById('btn-akun-ganti-pw');
+  btn.disabled = true;
+  try{
+    const user = auth.currentUser;
+    const cred = firebase.auth.EmailAuthProvider.credential(user.email, lama);
+    await user.reauthenticateWithCredential(cred);
+    await user.updatePassword(baru);
+    ['akun-pw-lama','akun-pw-baru','akun-pw-ulang'].forEach(id=>{ document.getElementById(id).value = ''; });
+    akunTampilPw('Password berhasil diganti. Gunakan password baru saat login berikutnya.', true);
+    if(state.userData && state.userData.npsn) logAudit('Akun', 'ubah', 'Ganti password akun');
+  }catch(err){
+    const c = err && err.code;
+    akunTampilPw(
+      (c === 'auth/wrong-password' || c === 'auth/invalid-credential' || c === 'auth/invalid-login-credentials') ? 'Password saat ini salah.'
+      : c === 'auth/weak-password' ? 'Password baru terlalu lemah. Gunakan kombinasi yang lebih panjang.'
+      : c === 'auth/too-many-requests' ? 'Terlalu banyak percobaan. Coba lagi beberapa saat lagi.'
+      : 'Gagal mengganti password: ' + ((err && err.message) || 'periksa koneksi internet Anda.'), false);
+  }finally{
+    btn.disabled = false;
+  }
+});
 
 /* =========================================================================
    UTIL
