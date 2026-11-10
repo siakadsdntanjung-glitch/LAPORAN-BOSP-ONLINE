@@ -1558,6 +1558,20 @@
               </div>
             </div>
 
+            <!-- 6. Rincian belanja modal gelondongan -->
+            <div class="bg-white rounded-lg border border-navy-100 p-5">
+              <h3 class="font-serif font-semibold text-navy text-sm">6. Rincian Belanja Modal</h3>
+              <p class="text-[11px] text-navy-400 mt-0.5 mb-3">Belanja modal yang pada RAPBS masih gelondongan (satu baris, mis. 1 paket) dapat dirinci menjadi beberapa barang. Pada Excel Rekon, baris gelondongan diganti dengan rincian di bawah ini. Rincian dapat dibuat otomatis dari transaksi Belanja Modal pada Buku Kas Umum, atau diisi manual. Total rincian sebaiknya sama dengan anggaran RAPBS.</p>
+              <div id="rekon-modal" class="space-y-3"></div>
+            </div>
+
+            <!-- 7. Pembanding anggaran vs Excel -->
+            <div class="bg-white rounded-lg border border-navy-100 p-5">
+              <h3 class="font-serif font-semibold text-navy text-sm">7. Pembanding Anggaran vs Hasil Excel per Kelompok</h3>
+              <p class="text-[11px] text-navy-400 mt-0.5 mb-3">Membandingkan anggaran (RAPBS + perjalanan dinas tambahan) dengan total belanja yang akan tertulis di Excel Rekon, per kelompok dan per tahap. Selisih bukan nol berarti ada belanja di Excel yang tidak sama dengan anggaran, dan inilah yang menyebabkan surplus/defisit pada Lap. REALISASI.</p>
+              <div id="rekon-banding" class="overflow-x-auto"></div>
+            </div>
+
             <div class="flex flex-wrap items-center gap-3 no-print">
               <button id="btn-rekon-unduh" class="bg-forest hover:bg-forest/90 text-white text-sm font-semibold rounded px-5 py-2.5">Unduh Excel Rekon (Format BPK 2026)</button>
               <span id="rekon-unduh-info" class="text-xs text-navy-400"></span>
@@ -9636,6 +9650,43 @@ function defaultPeserta(vol){
 const clean = s => String(s||'').replace(/[-\s]+$/,'').replace(/\s+/g,' ').trim();
 const r2 = n => Math.round(n*100)/100;
 
+/* Perluas kapasitas lembar "Belanja Modal" bila item melebihi baris template (A: Peralatan & Mesin = 16 baris, B: Aset Tetap Lainnya = 44 baris).
+   Baris di bawah blok digeser ke bawah, rumus total & rujukan Lap. REALISASI disesuaikan. */
+function perluasBelanjaModal(BM, LR, nMesin, nAset){
+  const KOL = 12, extraM = Math.max(0, nMesin-16), extraA = Math.max(0, nAset-44);
+  const geser = (dari, k)=>{
+    if(!k) return;
+    const last = BM.rowCount;
+    const merges = ((BM.model && BM.model.merges) || []).slice().filter(m=>{ const r=parseInt(String(m).replace(/^[A-Z]+/,''),10); return r>=dari; });
+    merges.forEach(m=>BM.unMergeCells(m));
+    for(let r=last; r>=dari; r--){
+      const src=BM.getRow(r), dst=BM.getRow(r+k);
+      for(let c=1;c<=KOL;c++){ const a=src.getCell(c), b=dst.getCell(c); b.value=a.value; b.style=Object.assign({}, a.style); }
+      dst.height = src.height;
+    }
+    for(let r=dari; r<dari+k; r++){                 // baris baru = salinan gaya baris isi terakhir di atasnya
+      const ref=BM.getRow(dari-1), row=BM.getRow(r);
+      for(let c=1;c<=KOL;c++){ const cell=row.getCell(c); cell.value=null; cell.style=Object.assign({}, ref.getCell(c).style); }
+      row.height = ref.height;
+    }
+    merges.forEach(m=>{ const mm=String(m).match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/); if(mm) BM.mergeCells(`${mm[1]}${+mm[2]+k}:${mm[3]}${+mm[4]+k}`); });
+  };
+  geser(28, extraM);                    // baris 28 (judul B) dan seterusnya turun sebanyak extraM
+  geser(73+extraM, extraA);             // judul "BOS KINERJA" dan seterusnya turun sebanyak extraA
+  const mesin=[12,27+extraM], hdrA=28+extraM, aset=[29+extraM,72+extraM+extraA], hdrK=73+extraM+extraA, kin=[hdrK+1,hdrK+14];
+  const rumusIsi = r=>{ BM.getCell(r,5).value={formula:`C${r}*D${r}`}; BM.getCell(r,8).value={formula:`F${r}*G${r}`}; BM.getCell(r,11).value={formula:`I${r}*J${r}`}; };
+  const rumusJml = (r,a,b)=>{ ['E','H','K'].forEach((L,i)=>{ BM.getCell(r,[5,8,11][i]).value={formula:`SUM(${L}${a}:${L}${b})`}; }); };
+  for(let r=mesin[0]; r<=mesin[1]; r++) rumusIsi(r);
+  for(let r=aset[0]; r<=aset[1]; r++) rumusIsi(r);
+  for(let r=kin[0]; r<=kin[1]; r++) rumusIsi(r);
+  rumusJml(11, mesin[0], mesin[1]); rumusJml(hdrA, aset[0], aset[1]); rumusJml(hdrK, kin[0], kin[1]);
+  ['E','H','K'].forEach((L,i)=>{ BM.getCell(10,[5,8,11][i]).value={formula:`${L}11+${L}${hdrA}+${L}${hdrK}`}; });
+  if(extraM){ for(let r=mesin[0]+16; r<=mesin[1]; r++) BM.getCell(r,1).value = null; }
+  // Lap. REALISASI merujuk total blok B
+  if(LR && extraM){ ['C','D','E'].forEach((c,i)=>{ LR.getCell(c+'23').value={formula:`'Belanja Modal'!${['E','H','K'][i]}${hdrA}`}; }); }
+  return {mesin, aset, extraM, extraA};
+}
+
 function fillRekon(wb, d){
   const warn=[];
   const P=wb.getWorksheet('PROFIL SEKOLAH'), BJ=wb.getWorksheet('Belanja Barang dan Jasa'),
@@ -9647,6 +9698,8 @@ function fillRekon(wb, d){
   // Perbaikan rumus template: "Desa/Kel/Kecamatan" pada Lap. REALISASI menunjuk ke Provinsi (C6) -> C4
   LR.getCell('C6').value = {formula:"'PROFIL SEKOLAH'!C4"};
   // Perbaikan rumus template: baris Pendapatan belum punya total Anggaran (C14) & Tahap I (D14)
+  { const th=String(LR.getCell('C10').value||'').match(/20\d\d/), lb=String(LR.getCell('B14').value||'');
+    if(th && /20\d\d/.test(lb)) LR.getCell('B14').value = lb.replace(/20\d\d/, th[0]); }     // label template "Pendapatan Tahun 2025" -> tahun anggaran
   LR.getCell('C14').value = {formula:'SUM(C15:C17)'};
   LR.getCell('D14').value = {formula:'SUM(D15:D17)'};
   // Perbaikan rumus template: SP2B "Penerimaan" menunjuk ke SPTJ!E19 (Penerimaan Lainnya) -> seharusnya Jumlah Penerimaan (SPTJ!F20)
@@ -9654,6 +9707,11 @@ function fillRekon(wb, d){
   // SPTMH: realisasi hibah Tahap I & II diisi dari Lap. REALISASI (di template kosong)
   const SPTMH=wb.getWorksheet('SPTMH'); if(SPTMH){ SPTMH.getCell('D19').value={formula:"'Lap. REALISASI'!D14"}; SPTMH.getCell('E19').value={formula:"'Lap. REALISASI'!E14"}; }
 
+  { const tj=(d.items||[]).reduce((t,x)=>({j:t.j+(Number(x.jumlah)||0),t1:t.t1+(Number(x.t1)||0),t2:t.t2+(Number(x.t2)||0)}),{j:0,t1:0,t2:0}), pg=Number(d.pagu)||0;
+    if(pg && tj.j-pg>1){
+      const f=n=>Number(n).toLocaleString('id-ID');
+      warn.push(`Total belanja pada Excel (Rp ${f(tj.j)}) melebihi anggaran RAPBS (Rp ${f(pg)}) sebesar Rp ${f(tj.j-pg)} — Lap. REALISASI akan menampilkan defisit. Periksa rincian belanja modal (total rincian harus sama dengan anggaran RAPBS) dan kemungkinan item ganda.`);
+    } }
   const leaf=(d.items||[]).filter(x=>x.jumlah>0 || x.t1>0 || x.t2>0).map(x=>Object.assign({},x,{kat:x.kategori||classify(x)}));
   const by={}; leaf.forEach(x=>{(by[x.kat]=by[x.kat]||[]).push(x);});
 
@@ -9734,10 +9792,11 @@ function fillRekon(wb, d){
   blockStart.slice(units.length).forEach(st=>{ for(let k=1;k<=9;k++) BJ.getCell(st+k,2).value=null; });
 
   // ---- Belanja Modal
-  fillBlock(BM,'mesin'); fillBlock(BM,'asetLain');
-  [['mesin',12],['asetLain',29]].forEach(([c,a])=>{
-    const n=(by[c]||[]).length; const cap=KAT[c].rows[1]-KAT[c].rows[0]+1;
-    for(let i=0;i<Math.min(n,cap);i++){ BM.getCell(a+i,1).value = i+1; }
+  const MD = perluasBelanjaModal(BM, LR, (by.mesin||[]).length, (by.asetLain||[]).length);
+  fillBlock(BM,'mesin',MD.mesin); fillBlock(BM,'asetLain',MD.aset);
+  [['mesin',MD.mesin[0]],['asetLain',MD.aset[0]]].forEach(([c,a])=>{
+    const n=(by[c]||[]).length;
+    for(let i=0;i<n;i++){ BM.getCell(a+i,1).value = i+1; }
   });
   // Belanja Modal: kolom unit Tahap realisasi berupa bilangan bulat
   // ---- Lap. REALISASI: penerimaan & saldo awal
@@ -9751,7 +9810,7 @@ function fillRekon(wb, d){
     [[5,'C','D'],[8,'F','G'],[11,'I','J']].forEach(([col,u,h])=>{ const c=ws.getCell(r,col); if(!hasF(c)) c.value={formula:`${u}${r}*${h}${r}`}; });
   }};
   Object.values(KAT).forEach(k=>{ if(k.sheet==='bj' && k.rows[0]<207) ensure(BJ,k.rows[0],k.rows[1]); });
-  ensure(BJ,207,286); ensure(BM,12,27); ensure(BM,29,72);
+  ensure(BJ,207,286); ensure(BM,MD.mesin[0],MD.mesin[1]); ensure(BM,MD.aset[0],MD.aset[1]);
   // Buang nilai cache rumus bawaan template agar semua total dihitung ulang dari data baru
   wb.eachSheet(ws=>ws.eachRow({includeEmpty:false},row=>row.eachCell({includeEmpty:false},c=>{
     const v=c.value;
@@ -9895,6 +9954,8 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     renderPeserta(items);
     renderManualList();
     renderSisaPd();
+    renderModal();
+    renderPembanding();
     { const w=$('rekon-pd-warn'), c=cekAnggaranPd(); if(w){ w.classList.toggle('hidden', !c.msg.length); w.innerHTML = c.msg.length ? '<b>Peringatan: dana melebihi anggaran RAPBS.</b><br>'+c.msg.map(esc).join('<br>') : ''; } }
     document.querySelectorAll('.rekon-kat').forEach(sel=>sel.addEventListener('change', async ()=>{
       try{
@@ -10125,6 +10186,239 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
   });
 
   /* ---- Unduh Excel ---- */
+  /* ===== Rincian Belanja Modal gelondongan: rekon/rincianModal/{key} = [{uraian,vol,sat,tarif,tahap}] ===== */
+  var modalEdit = null;   // {key, lines:[...]} saat sedang mengedit
+  function modalKey(x){ return 'n'+(x.no!==undefined && x.no!==null ? x.no : 'i'+x._i); }
+  function namaModalMap(){ return rekonCfg().namaModal || {}; }
+  function modalItems(){ const ov = namaModalMap(); return rapbsItems().filter(x=>{ const k = x.kategori || RekonFill.classify(x); return k==='mesin' || k==='asetLain'; }).map(x=>{ const n = ov[modalKey(x)]; return n ? Object.assign({}, x, {uraian:n}) : x; }); }
+  function rincianMap(){ return rekonCfg().rincianModal || {}; }
+  function rincianOf(x){ const a = rincianMap()[modalKey(x)]; return Array.isArray(a) ? a : (a ? Object.keys(a).sort((m,n)=>m-n).map(k=>a[k]) : []); }
+  function tahapDefault(x){ return (x.t2>0 && !(x.t1>0)) ? '2' : '1'; }
+  function sumLines(lines){ return lines.reduce((t,l)=>t+(Number(l.vol)||0)*(Number(l.tarif)||0),0); }
+  /* ----- Rincian otomatis dari transaksi Belanja Modal pada BKU ----- */
+  function bkuModalMap(){
+    const its = modalItems(), res = {}, norm = v=>String(v||'').replace(/\s+/g,'');
+    (state.transactions||[]).filter(t=>t.jenis==='pengeluaran' && jenisDanaTransaksi(t)===jdRekon && (t.kelompokBelanja==='modal' || norm(t.kodeRekening).startsWith('5.2')) && Number(t.jumlah)>0)
+      .sort((a,b)=>String(a.tanggal||'').localeCompare(String(b.tanggal||'')))
+      .forEach(t=>{
+        const r = norm(t.kodeRekening), pr = norm(t.kodeProgram);
+        let x = r ? its.find(i=>r===i.rek || r.indexOf(i.rek)===0 || i.rek.indexOf(r)===0) : null;
+        if(!x && pr) x = its.find(i=>norm(i.prog)===pr);
+        if(!x && !r && its.length===1) x = its[0];
+        if(x){ const k = modalKey(x); (res[k]=res[k]||[]).push(t); }
+      });
+    return res;
+  }
+  const normNama = v=>String(v||'').toLowerCase().replace(/[^a-z0-9]+/g,'');
+  /* Cari kuantitas pada RAPBS: item itu sendiri bervolume >1, atau item RAPBS lain bernama sama dengan volume N x harga satuan = jumlah */
+  function cariKuantitas(x, uraian, total){
+    const nm = normNama(uraian||x.uraian), tot = (total!==undefined && total!==null) ? (Number(total)||0) : (Number(x.jumlah)||0);
+    const lain = rapbsItems().find(v=>v.no!==x.no && Number(v.vol)>1 && Number(v.tarif)>0 && Math.abs(Number(v.vol)*Number(v.tarif)-tot)<=1 && (normNama(v.uraian)===nm || (nm.length>8 && (normNama(v.uraian).includes(nm)||nm.includes(normNama(v.uraian))))));
+    if(lain) return {n:Math.round(Number(lain.vol)), sat:lain.sat||'unit'};
+    if(uraian===undefined && Number(x.vol)>1 && Number(x.tarif)>0) return {n:Math.round(Number(x.vol)), sat:x.sat||'unit'};
+    return null;
+  }
+  /* Pecah satu baris menjadi n baris @1 (harga satuan sama; sisa pembulatan masuk baris terakhir) */
+  function pecahBaris(l, n, sat){
+    n = Math.max(1, Math.round(n)); const total = (Number(l.vol)||0)*(Number(l.tarif)||0), unit = Math.floor(total/n), out = [];
+    for(let i=0;i<n;i++) out.push({uraian:l.uraian, vol:1, sat:sat||l.sat||'unit', tarif: i===n-1 ? total-unit*(n-1) : unit, tahap:l.tahap||'1'});
+    return out;
+  }
+  function barisDariBku(x, map){
+    let out = [];
+    (map[modalKey(x)]||[]).forEach(t=>{
+      const l = {uraian: RekonFill.clean(t.uraian) || RekonFill.clean(x.uraian), vol:1, sat: String(t.satuan||'').trim() || 'unit', tarif:Number(t.jumlah), tahap: bulanDalamTahap(t.tanggal,'1') ? '1' : '2'};
+      const q = cariKuantitas(x, l.uraian, l.tarif);
+      out = out.concat(q ? pecahBaris(l, q.n, q.sat) : [l]);
+    });
+    return out;
+  }
+  function barisDariKuantitas(x){
+    const q = cariKuantitas(x); if(!q || q.n<2) return [];
+    const l = {uraian:RekonFill.clean(x.uraian), vol:Number(x.vol)||1, sat:x.sat, tarif:Number(x.tarif)||0, tahap:tahapDefault(x)};
+    if(Number(x.vol)!==q.n){ l.vol = 1; l.tarif = Number(x.jumlah)||0; }
+    const lines = pecahBaris(l, q.n, q.sat), unit = lines[0].tarif;
+    if(x.t1>0 && x.t2>0 && unit>0){ const k = Math.round(x.t1/unit); lines.forEach((ln,i)=>{ ln.tahap = i<k ? '1' : '2'; }); }
+    return lines;
+  }
+  function autoLines(x, map){
+    const b = barisDariBku(x, map); if(b.length) return {lines:b, src:'BKU'};
+    const q = barisDariKuantitas(x); if(q.length) return {lines:q, src:'RAPBS'};
+    return null;
+  }
+  async function simpanRincianOtomatis(x, map){
+    const r = autoLines(x, map); if(!r) return 0;
+    await db.ref(pRekon()+'/rincianModal/'+modalKey(x)).set(r.lines);
+    logAudit('Rekon','ubah','Rincian otomatis belanja modal ('+r.src+'): '+RekonFill.clean(x.uraian)+' — '+r.lines.length+' baris, total Rp '+fmt(sumLines(r.lines)));
+    return r.lines.length;
+  }
+  function renderModal(){
+    const box = $('rekon-modal'); if(!box) return;
+    if(modalEdit && box.contains(document.activeElement)) return;
+    const its = modalItems(), bmap = bkuModalMap();
+    if(!its.length){ box.innerHTML = '<p class="text-xs text-navy-300">Tidak ada belanja modal (kode rekening 5.2.xx) pada RAPBS.</p>'; return; }
+    const gelList = its.filter(x=>!rincianOf(x).length), siap = gelList.filter(x=>autoLines(x,bmap));
+    const bar = gelList.length ? `<div class="flex flex-wrap items-center gap-3 no-print"><button type="button" data-m-auto-all class="bg-navy text-white text-xs font-semibold rounded px-4 py-1.5"${siap.length?'':' disabled style="opacity:.5"'}>Rincikan semua otomatis</button><span class="text-[11px] text-navy-400">${gelList.length} belanja modal gelondongan; ${siap.length} dapat dirinci otomatis (dari transaksi BKU atau kuantitas RAPBS). Hasil otomatis tetap bisa diubah.</span></div>` : '';
+    const jm = a=>a.reduce((t,x)=>({j:t.j+(Number(x.jumlah)||0),t1:t.t1+(Number(x.t1)||0),t2:t.t2+(Number(x.t2)||0)}),{j:0,t1:0,t2:0});
+    const asli = jm(its), hasil = jm(ekspansiModal(its)), dj = hasil.j-asli.j, d1 = hasil.t1-asli.t1, d2 = hasil.t2-asli.t2;
+    const ringkas = (dj||d1||d2) ? `<div class="rounded px-3 py-2 text-xs ${dj>0?'bg-rust-100 text-rust':'bg-navy-50 text-navy'}"><b>Total rincian ${dj>0?'melebihi':'berbeda dari'} anggaran belanja modal RAPBS</b> (Rp ${fmt(hasil.j)} dibanding Rp ${fmt(asli.j)}; selisih Rp ${fmt(dj)}; Tahap I Rp ${fmt(d1)}, Tahap II Rp ${fmt(d2)}).${dj>0?' Kelebihan ini membuat Laporan Realisasi di Excel menjadi <b>defisit</b> karena pengeluaran lebih besar dari penerimaan. Periksa rincian yang berlabel selisih di bawah (mis. barang yang sudah ada sebagai baris RAPBS tersendiri atau harga yang tidak sama).':''}</div>` : '';
+    box.innerHTML = bar + ringkas + its.map(x=>{
+      const key = modalKey(x), ln = rincianOf(x), editing = modalEdit && modalEdit.key===key;
+      const gel = !ln.length, tot = sumLines(editing ? modalEdit.lines : ln), selisih = (x.jumlah||0) - tot;
+      const badge = gel ? '<span class="text-[10px] font-semibold rounded px-2 py-0.5 bg-rust-100 text-rust">Gelondongan — belum dirinci</span>'
+        : `<span class="text-[10px] font-semibold rounded px-2 py-0.5 ${selisih===0?'bg-forest/10 text-forest':'bg-rust-100 text-rust'}">Dirinci ${ln.length} barang${selisih===0?' ✓':' — selisih Rp '+fmt(selisih)}</span>`;
+      let body = '';
+      if(editing){
+        const rows = modalEdit.lines.map((l,i)=>`<tr data-r="${i}">
+          <td class="pr-1 pb-1"><input data-f="uraian" value="${esc(l.uraian||'')}" placeholder="Nama barang" class="w-full min-w-[160px] rounded border border-navy-100 px-2 py-1 text-xs"></td>
+          <td class="pr-1 pb-1"><input data-f="vol" type="number" min="0" step="any" value="${esc(l.vol??'')}" class="w-16 rounded border border-navy-100 px-2 py-1 text-xs text-right font-mono"></td>
+          <td class="pr-1 pb-1"><input data-f="sat" value="${esc(l.sat||'')}" placeholder="unit" class="w-20 rounded border border-navy-100 px-2 py-1 text-xs"></td>
+          <td class="pr-1 pb-1"><input data-f="tarif" type="number" min="0" step="any" value="${esc(l.tarif??'')}" class="w-28 rounded border border-navy-100 px-2 py-1 text-xs text-right font-mono"></td>
+          <td class="pr-1 pb-1"><select data-f="tahap" class="rounded border border-navy-100 px-1 py-1 text-xs bg-white"><option value="1"${String(l.tahap)==='2'?'':' selected'}>Tahap I</option><option value="2"${String(l.tahap)==='2'?' selected':''}>Tahap II</option></select></td>
+          <td class="pb-1 text-right font-mono text-xs" data-jml>${fmt((Number(l.vol)||0)*(Number(l.tarif)||0))}</td>
+          <td class="pb-1 pl-1 whitespace-nowrap"><button type="button" data-m-split="${i}" class="text-xs text-navy hover:underline mr-2">Pecah</button><button type="button" data-m-del="${i}" class="text-xs text-rust hover:underline">✕</button></td></tr>`).join('');
+        body = `<div class="overflow-x-auto mt-2"><table class="w-full"><thead><tr class="text-[11px] text-navy-400 text-left"><th class="font-normal">Uraian</th><th class="font-normal">Vol</th><th class="font-normal">Satuan</th><th class="font-normal">Harga satuan</th><th class="font-normal">Dibayar</th><th class="font-normal text-right">Jumlah</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+          <p class="text-xs mt-1" data-m-total>Total rincian Rp ${fmt(tot)} dari anggaran Rp ${fmt(x.jumlah)} — ${selisih===0?'<span class="text-forest">sama ✓</span>':'<span class="text-rust">selisih Rp '+fmt(selisih)+'</span>'}</p>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <button type="button" data-m-add class="text-xs rounded border border-navy-100 px-3 py-1 bg-white">+ Tambah baris</button>
+            <button type="button" data-m-simpan class="bg-navy text-white text-xs font-semibold rounded px-4 py-1">Simpan Rincian</button>
+            <button type="button" data-m-batal class="text-xs rounded border border-navy-100 px-3 py-1 bg-white">Batal</button>
+            ${gel?'':'<button type="button" data-m-hapus class="text-xs text-rust hover:underline ml-auto">Hapus rincian</button>'}
+          </div>`;
+      } else if(!gel){
+        body = `<ul class="mt-2 text-xs text-navy space-y-0.5">${ln.map(l=>`<li class="flex justify-between gap-3"><span>${esc(l.uraian)} <span class="text-navy-300">(${fmt(l.vol)} ${esc(l.sat||'')} × Rp ${fmt(l.tarif)} · Tahap ${String(l.tahap)==='2'?'II':'I'})</span></span><span class="font-mono">Rp ${fmt((Number(l.vol)||0)*(Number(l.tarif)||0))}</span></li>`).join('')}</ul>`;
+      }
+      return `<div class="rounded border border-navy-100 p-3" data-mkey="${esc(key)}">
+        <div class="flex items-start justify-between gap-2">
+          <div><p class="rekon-m-judul text-sm font-semibold text-navy">${esc(RekonFill.clean(x.uraian))}${editing?'':' <button type="button" data-m-nama class="text-xs font-normal text-navy hover:underline ml-2">Ubah nama</button>'}</p>
+            <p class="text-[11px] text-navy-400">${esc(x.rek)} · ${esc(RekonFill.clean(x.kegiatan||''))}</p>
+            <p class="text-[11px] text-navy-400">Anggaran RAPBS: ${fmt(x.vol)} ${esc(x.sat||'')} × Rp ${fmt(x.tarif)} = <b>Rp ${fmt(x.jumlah)}</b> (Tahap I Rp ${fmt(x.t1)} · Tahap II Rp ${fmt(x.t2)})</p></div>
+          <div class="flex flex-col items-end gap-1 shrink-0">${badge}${editing?'':`<button type="button" data-m-edit class="text-xs text-navy hover:underline">${gel?'Rinci manual':'Edit rincian'}</button>`}${(gel&&!editing)?((()=>{ const r=autoLines(x,bmap); return r?`<button type="button" data-m-auto class="text-xs font-semibold text-forest hover:underline">Buat otomatis (${r.lines.length} baris dari ${r.src})</button>`:'<span class="text-[10px] text-navy-300">Tidak ada data untuk otomatis</span>'; })()):''}</div>
+        </div>${body}</div>`;
+    }).join('');
+    const aa = box.querySelector('[data-m-auto-all]');
+    if(aa) aa.addEventListener('click', async ()=>{
+      try{ let n=0; for(const x of siap){ n += await simpanRincianOtomatis(x, bmap) ? 1 : 0; } renderModal(); if(!n) alertFix('Tidak ada data yang bisa dirinci otomatis.'); }
+      catch(err){ alertFix('Gagal menyimpan: '+(err.message||err)); }
+    });
+    box.querySelectorAll('[data-mkey]').forEach(card=>{
+      const key = card.dataset.mkey, x = its.find(i=>modalKey(i)===key);
+      const nm = card.querySelector('[data-m-nama]');
+      if(nm) nm.addEventListener('click', ()=>{
+        const judul = card.querySelector('.rekon-m-judul');
+        judul.innerHTML = `<input class="rekon-m-nama-input w-full rounded border border-navy-200 px-2 py-1.5 text-sm font-semibold" value="${esc(RekonFill.clean(x.uraian))}">
+          <span class="flex gap-2 justify-end mt-2"><button type="button" data-n-batal class="text-xs rounded border border-navy-100 px-3 py-1 bg-white font-normal">Batal</button><button type="button" data-n-simpan class="bg-navy text-white text-xs font-semibold rounded px-3 py-1">Simpan</button></span>
+          <span class="block text-[10px] font-normal text-navy-400 mt-1">Hanya mengubah nama di aplikasi &amp; Excel Rekon; data RAPBS asli tidak berubah. Kosongkan lalu simpan untuk mengembalikan nama asli.</span>`;
+        const inp = judul.querySelector('input'); inp.focus(); inp.select();
+        const selesai = ()=>{ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal(); };
+        judul.querySelector('[data-n-batal]').addEventListener('click', selesai);
+        inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); judul.querySelector('[data-n-simpan]').click(); } else if(e.key==='Escape') selesai(); });
+        judul.querySelector('[data-n-simpan]').addEventListener('click', async ()=>{
+          const baru = inp.value.trim().replace(/\s+/g,' ');
+          try{
+            const ref = db.ref(pRekon()+'/namaModal/'+key);
+            if(baru) await ref.set(baru); else await ref.remove();
+            logAudit('Rekon','ubah','Ubah nama belanja modal: '+(baru||'(dikembalikan ke nama RAPBS)'));
+            selesai();
+          }catch(err){ alertFix('Gagal menyimpan: '+(err.message||err)); }
+        });
+      });
+      const au = card.querySelector('[data-m-auto]');
+      if(au) au.addEventListener('click', async ()=>{
+        try{ await simpanRincianOtomatis(x, bmap); renderModal(); }catch(err){ alertFix('Gagal menyimpan: '+(err.message||err)); }
+      });
+      const e = card.querySelector('[data-m-edit]');
+      if(e) e.addEventListener('click', ()=>{
+        const ln = rincianOf(x).map(l=>Object.assign({},l));
+        modalEdit = {key, lines: ln.length ? ln : [{uraian:'',vol:'',sat:'',tarif:'',tahap:tahapDefault(x)},{uraian:'',vol:'',sat:'',tarif:'',tahap:tahapDefault(x)}]};
+        if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+        renderModal();
+      });
+      if(!(modalEdit && modalEdit.key===key)) return;
+      const upd = ()=>{
+        card.querySelectorAll('tr[data-r]').forEach(tr=>{
+          const l = modalEdit.lines[Number(tr.dataset.r)];
+          tr.querySelectorAll('[data-f]').forEach(inp=>{ l[inp.dataset.f] = inp.value; });
+          tr.querySelector('[data-jml]').textContent = fmt((Number(l.vol)||0)*(Number(l.tarif)||0));
+        });
+        const t = sumLines(modalEdit.lines), sel = (x.jumlah||0)-t;
+        card.querySelector('[data-m-total]').innerHTML = `Total rincian Rp ${fmt(t)} dari anggaran Rp ${fmt(x.jumlah)} — ${sel===0?'<span class="text-forest">sama ✓</span>':'<span class="text-rust">selisih Rp '+fmt(sel)+'</span>'}`;
+      };
+      card.querySelectorAll('[data-f]').forEach(inp=>{ inp.addEventListener('input', upd); inp.addEventListener('change', upd); });
+      card.querySelectorAll('[data-m-split]').forEach(b=>b.addEventListener('click', ()=>{
+        upd(); const i = Number(b.dataset.mSplit), l = modalEdit.lines[i];
+        const q = cariKuantitas(x, l.uraian, (Number(l.vol)||0)*(Number(l.tarif)||0)), def = q ? q.n : (Number(l.vol)>1 ? Number(l.vol) : 2);
+        const v = prompt('Pecah baris ini menjadi berapa baris? (harga satuan dibagi rata dari total Rp '+fmt((Number(l.vol)||0)*(Number(l.tarif)||0))+')', String(def));
+        const n = Math.round(Number(v)); if(!v || !(n>=2) || n>1000) return;
+        if(!(Number(l.vol)>0) || !(Number(l.tarif)>0)){ alertFix('Isi volume dan harga satuan baris ini dulu.'); return; }
+        modalEdit.lines.splice(i,1,...pecahBaris(l, n, q ? q.sat : (n===Number(l.vol) ? l.sat : l.sat)));
+        if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal();
+      }));
+      card.querySelectorAll('[data-m-del]').forEach(b=>b.addEventListener('click', ()=>{ upd(); modalEdit.lines.splice(Number(b.dataset.mDel),1); if(!modalEdit.lines.length) modalEdit.lines.push({uraian:'',vol:'',sat:'',tarif:'',tahap:tahapDefault(x)}); if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal(); }));
+      card.querySelector('[data-m-add]').addEventListener('click', ()=>{ upd(); modalEdit.lines.push({uraian:'',vol:'',sat:'',tarif:'',tahap:tahapDefault(x)}); if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal(); });
+      card.querySelector('[data-m-batal]').addEventListener('click', ()=>{ modalEdit=null; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal(); });
+      const h = card.querySelector('[data-m-hapus]');
+      if(h) h.addEventListener('click', async ()=>{
+        if(!confirm('Hapus rincian dan kembalikan ke satu baris gelondongan?')) return;
+        try{ await db.ref(pRekon()+'/rincianModal/'+key).remove(); logAudit('Rekon','hapus','Hapus rincian belanja modal: '+RekonFill.clean(x.uraian)); modalEdit=null; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal(); }
+        catch(err){ alertFix('Gagal menghapus: '+(err.message||err)); }
+      });
+      card.querySelector('[data-m-simpan]').addEventListener('click', async ()=>{
+        upd();
+        const lines = modalEdit.lines.filter(l=>String(l.uraian||'').trim() || Number(l.vol) || Number(l.tarif));
+        if(!lines.length){ alertFix('Isi minimal satu barang.'); return; }
+        const bad = lines.findIndex(l=>!String(l.uraian||'').trim() || !(Number(l.vol)>0) || !(Number(l.tarif)>0));
+        if(bad>=0){ alertFix('Baris '+(bad+1)+' belum lengkap: uraian, volume, dan harga satuan wajib diisi (lebih dari 0).'); return; }
+        const t = sumLines(lines), sel = (x.jumlah||0)-t;
+        if(sel!==0 && !confirm('Total rincian Rp '+fmt(t)+' berbeda dengan anggaran RAPBS Rp '+fmt(x.jumlah)+' (selisih Rp '+fmt(sel)+'). Tetap simpan?')) return;
+        const data = lines.map(l=>({uraian:String(l.uraian).trim().replace(/\s+/g,' '), vol:Number(l.vol), sat:String(l.sat||'').trim(), tarif:Number(l.tarif), tahap:String(l.tahap)==='2'?'2':'1'}));
+        try{
+          await db.ref(pRekon()+'/rincianModal/'+key).set(data);
+          logAudit('Rekon','ubah','Rincikan belanja modal: '+RekonFill.clean(x.uraian)+' — '+data.length+' barang, total Rp '+fmt(t));
+          modalEdit=null; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal();
+        }catch(err){ alertFix('Gagal menyimpan: '+(err.message||err)); }
+      });
+    });
+  }
+  /* Ganti baris belanja modal gelondongan dengan rinciannya (hanya untuk Excel) */
+  function ekspansiModal(items){
+    const map = rincianMap(), out = [];
+    items.forEach(x=>{
+      const a = x._manual ? null : map[modalKey(x)];
+      const ln = Array.isArray(a) ? a : (a ? Object.keys(a).sort((m,n)=>m-n).map(k=>a[k]) : []);
+      if(!ln.length){ const n = x._manual ? null : namaModalMap()[modalKey(x)]; out.push(n ? Object.assign({}, x, {uraian:n}) : x); return; }
+      const kat = x.kategori || RekonFill.classify(x);
+      ln.forEach(l=>{ const j=(Number(l.vol)||0)*(Number(l.tarif)||0), t2=String(l.tahap)==='2';
+        out.push({rek:x.rek, prog:x.prog, kegiatan:x.kegiatan, uraian:l.uraian, vol:Number(l.vol)||0, sat:l.sat||'', tarif:Number(l.tarif)||0, jumlah:j, t1:t2?0:j, t2:t2?j:0, kategori:kat}); });
+    });
+    return out;
+  }
+  /* ===== Pembanding anggaran vs hasil Excel per kelompok ===== */
+  function renderPembanding(){
+    const box = $('rekon-banding'); if(!box) return;
+    if(!rapbsItems().length){ box.innerHTML = '<p class="text-xs text-navy-300">Impor data RAPBS terlebih dahulu.</p>'; return; }
+    let d; try{ d = bangunData(); }catch(err){ box.innerHTML = '<p class="text-xs text-rust">Tidak dapat menghitung pembanding: '+esc(err.message||err)+'</p>'; return; }
+    const GR = [['bj','Belanja Barang & Jasa (termasuk Perjalanan Dinas)'],['mesin','Belanja Modal — Peralatan & Mesin'],['asetLain','Belanja Modal — Aset Tetap Lainnya']];
+    const grp = it=>{ const k = it.kategori || RekonFill.classify(it); return k==='mesin' ? 'mesin' : (k==='asetLain' ? 'asetLain' : 'bj'); };
+    const hit = (arr)=>{ const r={bj:{j:0,t1:0,t2:0},mesin:{j:0,t1:0,t2:0},asetLain:{j:0,t1:0,t2:0}}; arr.forEach(it=>{ const g=r[grp(it)]; g.j+=Number(it.jumlah)||0; g.t1+=Number(it.t1)||0; g.t2+=Number(it.t2)||0; }); return r; };
+    const A = hit(semuaItems()), E = hit(d.items), R = n=>fmt(n);
+    const sel = n => n===0 ? '<span class="text-navy-300">0</span>' : `<span class="font-semibold ${n>0?'text-rust':'text-forest'}">${n>0?'+':''}${R(n)}</span>`;
+    const tot = o=>({j:o.bj.j+o.mesin.j+o.asetLain.j,t1:o.bj.t1+o.mesin.t1+o.asetLain.t1,t2:o.bj.t2+o.mesin.t2+o.asetLain.t2});
+    const row = (lab,a,e,b)=>`<tr class="border-b border-navy-100 ${b?'font-semibold bg-navy-50':''}"><td class="py-1.5 px-2 font-sans">${lab}</td>
+      ${['t1','t2','j'].map(k=>`<td class="py-1.5 px-2 text-right">${R(a[k])}</td><td class="py-1.5 px-2 text-right">${R(e[k])}</td><td class="py-1.5 px-2 text-right">${sel(e[k]-a[k])}</td>`).join('')}</tr>`;
+    const TA = tot(A), TE = tot(E), saldo = Number(d.saldoAwal)||0, p1 = Number(d.penerimaanT1)||0, p2 = Number(d.penerimaanT2)||0;
+    const s1 = saldo + p1 - TE.t1, s2 = s1 + p2 - TE.t2;
+    box.innerHTML = `<table class="w-full text-[12px] font-mono"><thead><tr class="text-[11px] text-navy-400 font-sans">
+        <th rowspan="2" class="text-left px-2 py-1">Kelompok</th><th colspan="3" class="px-2 py-1 border-l border-navy-100">Tahap I</th><th colspan="3" class="px-2 py-1 border-l border-navy-100">Tahap II</th><th colspan="3" class="px-2 py-1 border-l border-navy-100">Jumlah</th></tr>
+        <tr class="text-[10px] text-navy-300 font-sans">${'<th class="px-2 text-right font-normal border-l border-navy-100">Anggaran</th><th class="px-2 text-right font-normal">Excel</th><th class="px-2 text-right font-normal">Selisih</th>'.repeat(3)}</tr></thead>
+      <tbody>${GR.map(([k,l])=>row(l,A[k],E[k])).join('')}${row('Total Belanja',TA,TE,true)}</tbody></table>
+      <table class="mt-3 text-[12px] font-mono"><tbody>
+        <tr><td class="pr-4 py-0.5 font-sans text-navy-400">Saldo awal</td><td class="text-right">${R(saldo)}</td></tr>
+        <tr><td class="pr-4 py-0.5 font-sans text-navy-400">Penerimaan Tahap I / Tahap II</td><td class="text-right">${R(p1)} / ${R(p2)}</td></tr>
+        <tr><td class="pr-4 py-0.5 font-sans text-navy-400">Surplus/(Defisit) Tahap I</td><td class="text-right ${s1<0?'text-rust font-semibold':''}">${R(s1)}</td></tr>
+        <tr><td class="pr-4 py-0.5 font-sans text-navy-400">Surplus/(Defisit) akhir (Tahap II)</td><td class="text-right ${s2<0?'text-rust font-semibold':''}">${R(s2)}</td></tr></tbody></table>
+      ${(TE.j-TA.j)>0?`<p class="mt-2 text-xs text-rust">Belanja di Excel melebihi anggaran Rp ${R(TE.j-TA.j)}. Kelompok dengan selisih merah di atas adalah sumbernya; untuk Belanja Modal, periksa kartu 6 di atas.</p>`:'<p class="mt-2 text-xs text-forest">Total belanja di Excel sama dengan anggaran.</p>'}`;
+  }
   function bangunData(){
     const s = state.schoolData || {}, c = rekonCfg(), items = semuaItems(), meta = (rapbsData()||{}).meta || {};
     const tot = items.reduce((a,x)=>({j:a.j+(x.jumlah||0),t1:a.t1+(x.t1||0),t2:a.t2+(x.t2||0)}),{j:0,t1:0,t2:0});
@@ -10139,7 +10433,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
       peserta: c.peserta||{},
       penerimaanT1: (c.penerimaanT1===undefined||c.penerimaanT1===null) ? tot.t1 : c.penerimaanT1,
       penerimaanT2: (c.penerimaanT2===undefined||c.penerimaanT2===null) ? tot.t2 : c.penerimaanT2,
-      items: items.map(x=>({rek:x.rek,prog:x.prog,kegiatan:x.kegiatan,uraian:x.uraian,vol:x.vol,sat:x.sat,tarif:x.tarif,jumlah:x.jumlah,t1:x.t1,t2:x.t2,kategori:x.kategori||RekonFill.classify(x)}))
+      items: ekspansiModal(items).map(x=>({rek:x.rek,prog:x.prog,kegiatan:x.kegiatan,uraian:x.uraian,vol:x.vol,sat:x.sat,tarif:x.tarif,jumlah:x.jumlah,t1:x.t1,t2:x.t2,kategori:x.kategori||RekonFill.classify(x)}))
     };
   }
   $('btn-rekon-unduh').addEventListener('click', async ()=>{
