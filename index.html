@@ -121,6 +121,70 @@
 
   /* ---- Print isolation: only #print-root is visible when printing ---- */
   #print-root{ display:none; }
+  /* ---- Desain halaman Cetak Dokumen (modern & profesional) ---- */
+  #page-cetak{ --acc:#3F759C; --acc2:#1F4A73; --line:#E3E9F0; --mute:#64748B; --navy:#16324F; }
+  #page-cetak[data-fund="reguler"]{ --acc:#3F8CC8; --acc2:#1F4A73; }
+  #page-cetak[data-fund="kinerja"]{ --acc:#E0A030; --acc2:#8A5A12; }
+  #page-cetak[data-fund="afirmasi"]{ --acc:#2FA37A; --acc2:#17624A; }
+  .cx-hero{ background:linear-gradient(120deg,#0B1A29 0%,#16324F 50%,var(--acc2) 120%); color:#fff; border-radius:22px; padding:30px 32px; position:relative; overflow:hidden; box-shadow:0 18px 40px -16px rgba(11,26,41,.7); transition:background .4s; }
+  .cx-hero::before{ content:''; position:absolute; inset:0; background:radial-gradient(500px 260px at 90% 0%,color-mix(in srgb,var(--acc) 45%,transparent),transparent 70%),radial-gradient(300px 200px at 0% 110%,rgba(200,150,62,.25),transparent 70%); }
+  .cx-deco{ position:absolute; right:-30px; top:-40px; width:340px; height:340px; }
+  .cx-hero-in{ position:relative; display:flex; flex-wrap:wrap; gap:26px; align-items:center; justify-content:space-between; }
+  .cx-hero-l{ flex:1 1 320px; }
+  .cx-hero h2{ font-size:34px; line-height:1.15; font-weight:700; margin-top:8px; }
+  .cx-hero-sub{ font-size:13px; color:#B9C9D8; margin:8px 0 18px; max-width:460px; line-height:1.55; }
+  .cx-eyebrow{ display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#E9C885; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); padding:5px 12px; border-radius:999px; }
+  .cx-dot{ width:7px; height:7px; border-radius:50%; background:var(--acc); box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 30%,transparent); }
+  .cx-tiles{ display:grid; grid-template-columns:repeat(3,minmax(130px,1fr)); gap:12px; flex:1 1 380px; max-width:560px; }
+  .cx-tile{ display:flex; align-items:center; gap:12px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); backdrop-filter:blur(8px); border-radius:16px; padding:14px; }
+  .cx-tico{ width:38px; height:38px; flex:none; border-radius:12px; background:linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 55%,#fff)); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 14px -4px color-mix(in srgb,var(--acc) 70%,transparent); }
+  .cx-tico svg{ width:19px; height:19px; }
+  .cx-tv{ font-size:20px; font-weight:700; line-height:1.1; font-family:'JetBrains Mono',monospace; letter-spacing:-.02em; }
+  .cx-tl{ font-size:11px; color:#B9C9D8; margin-top:3px; }
+  .cx-btn-print{ display:inline-flex; align-items:center; gap:10px; background:linear-gradient(180deg,#E3B35A,#C8963E); color:#fff; font-weight:700; font-size:14px; border-radius:14px; padding:13px 22px; box-shadow:0 12px 24px -8px rgba(200,150,62,.75), inset 0 1px 0 rgba(255,255,255,.35); transition:all .18s; white-space:nowrap; }
+  .cx-btn-print svg{ width:18px; height:18px; }
+  .cx-btn-print svg:last-child{ transition:transform .18s; }
+  .cx-btn-print:hover{ transform:translateY(-2px); filter:brightness(1.06); }
+  .cx-btn-print:hover svg:last-child{ transform:translateX(4px); }
+  .cx-card{ background:#fff; border:1px solid var(--line); border-radius:22px; padding:8px 28px; box-shadow:0 1px 2px rgba(15,35,54,.04),0 14px 34px -18px rgba(15,35,54,.2); }
+  .cx-sec{ padding:22px 0; border-bottom:1px dashed var(--line); } .cx-sec:last-child{ border-bottom:0; }
+  .cx-step{ display:flex; align-items:center; gap:10px; font-size:15px; font-weight:700; color:var(--navy); margin-bottom:14px; }
+  .cx-step i{ font-style:normal; width:26px; height:26px; border-radius:9px; background:linear-gradient(135deg,var(--navy),#1F4A73); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .cx-step small{ font-weight:500; font-size:12px; color:var(--mute); margin-left:4px; }
+  .cx-dana-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; }
+  .cx-dana{ --c:#3F8CC8; --c2:#1F4A73; display:flex; align-items:center; gap:14px; text-align:left; border:1.5px solid var(--line); background:linear-gradient(135deg,color-mix(in srgb,var(--c) 9%,#fff),#fff 70%); border-radius:18px; padding:16px; transition:all .2s; cursor:pointer; position:relative; overflow:hidden; }
+  .cx-f-kinerja{ --c:#E0A030; --c2:#8A5A12; } .cx-f-afirmasi{ --c:#2FA37A; --c2:#17624A; }
+  .cx-ico{ width:50px; height:50px; border-radius:15px; display:flex; align-items:center; justify-content:center; background:color-mix(in srgb,var(--c) 18%,#fff); color:var(--c2); flex:none; transition:all .2s; }
+  .cx-ico svg{ width:25px; height:25px; }
+  .cx-ft{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .cx-ft b{ font-size:15px; color:var(--navy); } .cx-ft em{ font-style:normal; font-size:12px; color:var(--mute); }
+  .cx-ft u{ text-decoration:none; margin-top:5px; align-self:flex-start; font-size:11px; font-weight:600; color:var(--c2); background:color-mix(in srgb,var(--c) 16%,#fff); border-radius:999px; padding:2px 9px; }
+  .cx-dana:hover{ border-color:var(--c); transform:translateY(-3px); box-shadow:0 16px 28px -14px color-mix(in srgb,var(--c) 70%,#000); }
+  .cx-dana.aktif{ background:linear-gradient(135deg,var(--c2),var(--c)); border-color:transparent; box-shadow:0 18px 32px -14px color-mix(in srgb,var(--c) 80%,#000); }
+  .cx-dana.aktif .cx-ft b,.cx-dana.aktif .cx-ft em{ color:#fff; } .cx-dana.aktif .cx-ft em{ opacity:.85; }
+  .cx-dana.aktif .cx-ico{ background:rgba(255,255,255,.22); color:#fff; }
+  .cx-dana.aktif .cx-ft u{ background:rgba(255,255,255,.22); color:#fff; }
+  .cx-dana.aktif::after{ content:''; position:absolute; top:12px; right:12px; width:22px; height:22px; border-radius:50%; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2316324F' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/12px no-repeat; }
+  .cx-seg{ display:inline-flex; background:#EEF2F7; border-radius:16px; padding:5px; gap:4px; }
+  .cx-seg button{ display:flex; flex-direction:column; align-items:flex-start; border-radius:12px; padding:10px 22px; color:var(--mute); transition:all .2s; text-align:left; }
+  .cx-seg button b{ font-size:14px; } .cx-seg button span{ font-size:11px; opacity:.8; }
+  .cx-seg button:hover{ color:var(--navy); }
+  .cx-seg button.aktif{ background:linear-gradient(135deg,var(--navy),#1F4A73); color:#fff; box-shadow:0 8px 16px -6px rgba(22,50,79,.6); }
+  .cx-sub-title{ display:flex; align-items:center; gap:9px; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--mute); margin:20px 0 10px; }
+  .cx-sub-title span{ width:4px; height:14px; border-radius:2px; background:var(--g); }
+  .cx-g-t{ --g:#3F8CC8; --gs:#E6F0FA; --gd:#1F4A73; } .cx-g-l{ --g:#2FA37A; --gs:#E4F5EE; --gd:#17624A; } .cx-g-s{ --g:#E0A030; --gs:#FBF1DC; --gd:#8A5A12; }
+  .cx-docs{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
+  .cx-doc{ display:flex; align-items:center; gap:13px; text-align:left; background:#fff; border:1.5px solid var(--line); border-radius:16px; padding:13px 14px; cursor:pointer; transition:all .2s; position:relative; }
+  .cx-di{ width:42px; height:42px; display:flex; align-items:center; justify-content:center; background:var(--gs); color:var(--gd); border-radius:13px; flex:none; transition:all .2s; }
+  .cx-di svg{ width:21px; height:21px; }
+  .cx-dt{ display:flex; flex-direction:column; flex:1; min-width:0; } .cx-dt b{ font-size:13.5px; color:var(--navy); } .cx-dt em{ font-style:normal; font-size:11.5px; color:var(--mute); line-height:1.35; margin-top:1px; }
+  .cx-go{ width:28px; height:28px; border-radius:50%; background:var(--gs); color:var(--gd); display:flex; align-items:center; justify-content:center; opacity:0; transform:translateX(-6px); transition:all .2s; flex:none; } .cx-go svg{ width:14px; height:14px; }
+  .cx-doc:hover{ border-color:var(--g); transform:translateY(-3px); box-shadow:0 16px 26px -14px color-mix(in srgb,var(--g) 80%,#000); } .cx-doc:hover .cx-go{ opacity:1; transform:none; }
+  .cx-doc.aktif{ background:linear-gradient(135deg,var(--gd),var(--g)); border-color:transparent; box-shadow:0 16px 28px -14px color-mix(in srgb,var(--g) 85%,#000); }
+  .cx-doc.aktif .cx-dt b{ color:#fff; } .cx-doc.aktif .cx-dt em{ color:rgba(255,255,255,.85); }
+  .cx-doc.aktif .cx-di{ background:rgba(255,255,255,.22); color:#fff; } .cx-doc.aktif .cx-go{ opacity:1; transform:none; background:rgba(255,255,255,.25); color:#fff; }
+  @media (max-width:640px){ .cx-hero{ padding:22px 18px; } .cx-hero h2{ font-size:26px; } .cx-card{ padding:4px 16px; } }
+  @media print{ .cx-hero,.cx-card{ display:none !important; } }
   /* Pemilih jenis dokumen cetak kini berupa dropdown; deretan tombol tab disembunyikan */
   #cetak-tabs .cetak-tab{ display:none; }
   #cetak-tabs:not(:has(#cetak-gabung-wrap:not(.hidden))){ display:none; }
@@ -135,6 +199,75 @@
     #print-root tfoot{ display:table-row-group; }
     #print-root tr{ page-break-inside:avoid; break-inside:avoid; }
   }
+
+  /* ================= Tema "Cetak Dokumen" untuk SEMUA menu (kecuali tabel BKU & halaman Cetak) ================= */
+  #app-content .page:not(#page-cetak){ --acc:#3F8CC8; --acc2:#1F4A73; --line:#E3E9F0; --mute:#64748B; --navy:#16324F; }
+  #app-content .page:not(#page-cetak) .cx-hero{ margin-bottom:4px; }
+  #app-content .page:not(#page-cetak) .cx-hero h2{ font-size:28px; line-height:1.15; margin:6px 0 0; position:relative; }
+  #app-content .page:not(#page-cetak) .cx-hero-sub{ position:relative; margin-top:8px; max-width:640px; color:#B9C9D8; font-size:13.5px; }
+  #app-content .page:not(#page-cetak) .cx-eyebrow{ position:relative; display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:#E3B35A; }
+  #app-content .page:not(#page-cetak) .cx-dot{ width:8px; height:8px; border-radius:50%; background:#E3B35A; box-shadow:0 0 0 4px rgba(227,179,90,.25); }
+  /* Kartu */
+  #app-content .page:not(#page-cetak) :is(.bg-white.rounded-lg,.bg-white.rounded-xl,.bg-white.rounded){ border:1px solid var(--line) !important; border-radius:22px !important; box-shadow:0 1px 2px rgba(15,35,54,.04),0 14px 34px -18px rgba(15,35,54,.2) !important; }
+  #app-content .page:not(#page-cetak) :is(.bg-white.rounded-lg,.bg-white.rounded-xl).p-6,
+  #app-content .page:not(#page-cetak) :is(.bg-white.rounded-lg,.bg-white.rounded-xl).p-5{ padding:26px 28px !important; }
+  /* Judul bagian seperti .cx-step */
+  #app-content .page:not(#page-cetak) h3.font-serif{ display:flex; align-items:center; gap:10px; font-family:'Inter',sans-serif; font-size:15px; font-weight:700; color:var(--navy); }
+  #app-content .page:not(#page-cetak) h3.font-serif::before{ content:''; flex:none; width:4px; height:16px; border-radius:2px; background:linear-gradient(180deg,#E3B35A,#C8963E); }
+  #app-content .page:not(#page-cetak) .border-t.border-navy-100,
+  #app-content .page:not(#page-cetak) .border-b.border-navy-100{ border-style:dashed !important; border-color:var(--line) !important; }
+  /* Label & isian */
+  #app-content .page:not(#page-cetak) label.block{ font-size:11px !important; font-weight:700 !important; letter-spacing:.08em; text-transform:uppercase; color:var(--mute) !important; margin-bottom:6px !important; }
+  #app-content .page:not(#page-cetak) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]),select,textarea){ background:#F8FAFC; border:1.5px solid var(--line) !important; border-radius:12px !important; padding:.6rem .85rem !important; color:var(--navy); transition:all .18s; }
+  #app-content .page:not(#page-cetak) :is(input,select,textarea):hover{ border-color:#C5D3E2 !important; }
+  #app-content .page:not(#page-cetak) :is(input,select,textarea):focus{ background:#fff; border-color:var(--acc) !important; outline:0; box-shadow:0 0 0 4px color-mix(in srgb,var(--acc) 20%,transparent); }
+  #app-content .page:not(#page-cetak) input[type=checkbox],#app-content .page:not(#page-cetak) input[type=radio]{ accent-color:#16324F; }
+  /* Tombol */
+  #app-content .page:not(#page-cetak) button.bg-navy,#app-content .page:not(#page-cetak) button[class*="bg-navy "]:not([class*="bg-navy-"]){ background:linear-gradient(135deg,#16324F,#1F4A73) !important; border-radius:12px !important; font-weight:700; box-shadow:0 8px 16px -8px rgba(22,50,79,.7); transition:all .18s; }
+  #app-content .page:not(#page-cetak) :is(button,a).bg-gold,#app-content .page:not(#page-cetak) button[class*="bg-gold-4"],#app-content .page:not(#page-cetak) button[class*="bg-gold-5"]{ background:linear-gradient(180deg,#E3B35A,#C8963E) !important; color:#fff !important; border-radius:12px !important; font-weight:700; box-shadow:0 10px 20px -8px rgba(200,150,62,.75),inset 0 1px 0 rgba(255,255,255,.35); }
+  #app-content .page:not(#page-cetak) button.bg-white.border,#app-content .page:not(#page-cetak) button[class*="border-navy-"][class*="bg-white"]{ border:1.5px solid var(--line) !important; border-radius:12px !important; font-weight:600; transition:all .18s; }
+  #app-content .page:not(#page-cetak) button:not(:disabled):is(.bg-navy,.bg-white,[class*="bg-gold"]):hover{ transform:translateY(-2px); filter:brightness(1.05); }
+  /* Tabel (selain BKU) */
+  #app-content .page:not(#page-bku):not(#page-cetak) .overflow-x-auto{ border:1px solid var(--line); border-radius:16px; }
+  #app-content .page:not(#page-bku):not(#page-cetak) table{ border-collapse:separate; border-spacing:0; width:100%; }
+  #app-content .page:not(#page-bku):not(#page-cetak) thead th{ background:#F1F5F9 !important; color:var(--mute) !important; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:.8rem 1rem !important; border-bottom:1px solid var(--line) !important; }
+  #app-content .page:not(#page-bku):not(#page-cetak) tbody td{ padding:.75rem 1rem !important; border-bottom:1px dashed var(--line) !important; }
+  #app-content .page:not(#page-bku):not(#page-cetak) tbody tr:last-child td{ border-bottom:0 !important; }
+  #app-content .page:not(#page-bku):not(#page-cetak) tbody tr:hover{ background:color-mix(in srgb,var(--acc) 6%,#fff); }
+  /* Banner/peringatan & ringkasan */
+  #app-content .page:not(#page-cetak) :is(.bg-gold-50,.bg-navy-50,.bg-forest-100,.bg-rust-100).rounded-lg,
+  #app-content .page:not(#page-cetak) :is(.bg-gold-50,.bg-navy-50,.bg-forest-100,.bg-rust-100).rounded{ border-radius:16px !important; }
+  #app-content .page:not(#page-cetak) :is(.bg-navy-50,.bg-paper).rounded-lg{ border:1px solid var(--line); }
+  @media (max-width:640px){ #app-content .page:not(#page-cetak) :is(.bg-white.rounded-lg,.bg-white.rounded-xl).p-6{ padding:18px !important; } #app-content .page:not(#page-cetak) .cx-hero h2{ font-size:22px; } }
+  @media print{ #app-content .cx-hero[data-auto]{ display:none !important; } }
+
+  /* ===== Header tabel tetap terlihat (sticky) + geser kiri/kanan di bagian bawah tabel ===== */
+  #app-content .page .overflow-x-auto:has(> table){
+    overflow:auto; max-height:min(68vh,640px); overscroll-behavior:contain;
+    scrollbar-gutter:stable; -webkit-overflow-scrolling:touch;
+  }
+  #app-content .page .overflow-x-auto > table > thead > tr > th{
+    position:sticky; top:0; z-index:5; white-space:nowrap;
+    background:#FAF8F2; box-shadow:0 1px 0 #D5DEE8, 0 6px 8px -6px rgba(15,35,54,.25);
+  }
+  #app-content #page-bku .overflow-x-auto > table > thead > tr > th{ background:#FAF8F2; box-shadow:inset 0 -1px 0 #000, 0 6px 8px -6px rgba(15,35,54,.3); }
+  #app-content .page .overflow-x-auto > table > tfoot > tr > td{ position:sticky; bottom:0; z-index:4; background:#FAF8F2; box-shadow:0 -1px 0 #D5DEE8; }
+  /* Bilah geser selalu tampil & mudah diraih */
+  #app-content .overflow-x-auto::-webkit-scrollbar{ width:12px; height:12px; }
+  #app-content .overflow-x-auto::-webkit-scrollbar-track{ background:#EEF2F7; border-radius:8px; }
+  #app-content .overflow-x-auto::-webkit-scrollbar-thumb{ background:#9DB9CE; border-radius:8px; border:2px solid #EEF2F7; }
+  #app-content .overflow-x-auto::-webkit-scrollbar-thumb:hover{ background:#3F759C; }
+  @supports not selector(::-webkit-scrollbar){ #app-content .overflow-x-auto{ scrollbar-width:auto; scrollbar-color:#9DB9CE #EEF2F7; } }
+  @media print{ #app-content .overflow-x-auto:has(> table){ overflow:visible !important; max-height:none !important; } #app-content .overflow-x-auto > table > thead > tr > th, #app-content .overflow-x-auto > table > tfoot > tr > td{ position:static !important; box-shadow:none !important; } }
+
+  /* ===== Banner judul menu: versi ringkas ===== */
+  #app-content .page:not(#page-cetak) .cx-hero[data-auto]{ padding:12px 20px; border-radius:16px; margin-bottom:0; box-shadow:0 10px 24px -14px rgba(11,26,41,.6); }
+  #app-content .page:not(#page-cetak) .cx-hero[data-auto] .cx-deco{ width:150px; height:150px; right:-20px; top:-45px; }
+  #app-content .page:not(#page-cetak) .cx-hero[data-auto] .cx-hero-l{ display:flex; flex-wrap:wrap; align-items:center; gap:2px 14px; }
+  #app-content .page:not(#page-cetak) .cx-hero[data-auto] .cx-eyebrow{ order:2; font-size:10px; letter-spacing:.12em; }
+  #app-content .page:not(#page-cetak) .cx-hero[data-auto] h2{ order:1; font-size:19px; margin:0; }
+  #app-content .page:not(#page-cetak) .cx-hero[data-auto] .cx-hero-sub{ order:3; flex-basis:100%; margin:0; font-size:12px; line-height:1.35; }
+  @media (max-width:640px){ #app-content .page:not(#page-cetak) .cx-hero[data-auto] h2{ font-size:17px; } #app-content .page:not(#page-cetak) .cx-hero[data-auto]{ padding:10px 16px; } }
 </style>
 </head>
 <body class="text-ink antialiased">
@@ -1142,12 +1275,44 @@
 
         <!-- CETAK: KWITANSI / NOTA / BAST -->
         <section id="page-cetak" class="page hidden space-y-4">
-          <div class="bg-forest-100 border border-forest/30 rounded-lg p-4 no-print flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p class="text-sm font-semibold text-forest">Cetak Lembar SPJ Lengkap (Bundel)</p>
-              <p class="text-xs text-navy-400 mt-0.5">Menggabungkan BKU, ringkasan penggunaan per kegiatan, dan seluruh kuitansi pengeluaran (yang sudah memiliki No. Bukti) dalam satu bundel siap jilid — mengikuti data pada Buku Kas Umum saat ini.</p>
+          <div class="cx-hero no-print">
+            <svg class="cx-deco" viewBox="0 0 200 200" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"><circle cx="150" cy="60" r="90"/><circle cx="150" cy="60" r="60"/><circle cx="150" cy="60" r="30"/></svg>
+            <div class="cx-hero-in">
+              <div class="cx-hero-l">
+                <p class="cx-eyebrow"><span class="cx-dot"></span>Pusat Cetak Dokumen</p>
+                <h2 class="font-serif tracking-tight" id="cx-hero-judul">BOSP Reguler — Tahap 1</h2>
+                <p class="cx-hero-sub">Semua dokumen yang dicetak hanya memuat data dana &amp; tahap yang sedang dipilih — tidak tercampur.</p>
+                <button id="btn-cetak-spj-lengkap" class="cx-btn-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M7 14h10v7H7z"/></svg>Cetak SPJ Lengkap (Bundel)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+              </div>
+              <div class="cx-tiles">
+                <div class="cx-tile"><span class="cx-tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><div><div class="cx-tv" id="cx-chip-trx">0</div><div class="cx-tl">Total transaksi</div></div></div>
+                <div class="cx-tile"><span class="cx-tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span><div><div class="cx-tv" id="cx-chip-keluar">0</div><div class="cx-tl">Pengeluaran</div></div></div>
+                <div class="cx-tile"><span class="cx-tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM3 11h18M7 15h3"/></svg></span><div><div class="cx-tv" id="cx-chip-rp">0</div><div class="cx-tl">Total belanja</div></div></div>
+              </div>
             </div>
-            <button id="btn-cetak-spj-lengkap" class="bg-forest hover:bg-forest/90 text-white text-sm font-semibold rounded px-5 py-2.5 whitespace-nowrap">Cetak SPJ Lengkap</button>
+          </div>
+
+          <div class="no-print cx-card">
+            <div class="cx-sec">
+              <p class="cx-step"><i>1</i>Pilih Jenis Dana BOSP</p>
+              <div class="cx-dana-row" id="cx-dana-wrap"><button type="button" data-cxdana="reguler" class="cx-dana cx-f-reguler"><span class="cx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg></span><span class="cx-ft"><b>BOSP Reguler</b><em>Dana operasional rutin sekolah</em><u data-cxcount="reguler">0 transaksi</u></span></button><button type="button" data-cxdana="kinerja" class="cx-dana cx-f-kinerja"><span class="cx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0V4zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3"/></svg></span><span class="cx-ft"><b>BOS Kinerja</b><em>Dana penghargaan kinerja</em><u data-cxcount="kinerja">0 transaksi</u></span></button><button type="button" data-cxdana="afirmasi" class="cx-dana cx-f-afirmasi"><span class="cx-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9-9a5 5 0 019-3 5 5 0 019 3c-2 4.5-9 9-9 9z"/></svg></span><span class="cx-ft"><b>BOS Afirmasi</b><em>Dana afirmasi pendidikan</em><u data-cxcount="afirmasi">0 transaksi</u></span></button></div>
+            </div>
+            <div class="cx-sec">
+              <p class="cx-step"><i>2</i>Pilih Tahap Laporan</p>
+              <div class="cx-seg" id="cx-tahap-wrap">
+                <button type="button" data-cxtahap="1"><b>Tahap 1</b><span>Januari – Juni</span></button>
+                <button type="button" data-cxtahap="2"><b>Tahap 2</b><span>Juli – Desember</span></button>
+              </div>
+            </div>
+            <div class="cx-sec">
+              <p class="cx-step"><i>3</i>Pilih Dokumen <small>dokumen transaksi mengikuti dana &amp; tahap di atas</small></p>
+              <p class="cx-sub-title cx-g-t"><span></span>Dokumen Transaksi</p>
+              <div class="cx-docs"><button type="button" data-cxdoc="kwitansi" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3zM9 8h6M9 12h6"/></svg></span><span class="cx-dt"><b>Kwitansi</b><em>Bukti pembayaran per transaksi</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="nota" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"/></svg></span><span class="cx-dt"><b>Nota Pesan</b><em>Pemesanan barang & jasa</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="bast" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11l4 4 5-5M4 4h16v16H4z"/></svg></span><span class="cx-dt"><b>BAST</b><em>Berita acara serah terima</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="lampiran" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11l-8.5 8.5a5 5 0 01-7-7L14 4a3.5 3.5 0 015 5l-8.5 8.5a2 2 0 01-3-3L15 7"/></svg></span><span class="cx-dt"><b>Daftar Lampiran</b><em>Rekap lampiran kwitansi</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>
+              <p class="cx-sub-title cx-g-l"><span></span>Laporan</p>
+              <div class="cx-docs"><button type="button" data-cxdoc="kafer" class="cx-doc cx-g-l"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a2 2 0 012-2h11v18H7a2 2 0 00-2 2V4zM9 7h6"/></svg></span><span class="cx-dt"><b>Kafer Laporan</b><em>Sampul laporan penggunaan dana</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="sptjm" class="cx-doc cx-g-l"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16v4zM13 7l4 4"/></svg></span><span class="cx-dt"><b>SPTJM</b><em>Surat pernyataan tanggung jawab mutlak</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>
+              <p class="cx-sub-title cx-g-s"><span></span>SK &amp; Surat</p>
+              <div class="cx-docs"><button type="button" data-cxdoc="skguru" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5L2 9zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></span><span class="cx-dt"><b>SK Guru</b><em>Surat keputusan pembagian tugas</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="hadir" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"/></svg></span><span class="cx-dt"><b>Daftar Hadir</b><em>Presensi kegiatan / rapat</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="skrkas" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6V3zM14 3v5h5M9 13h7M9 17h7"/></svg></span><span class="cx-dt"><b>SK Panitia RKAS</b><em>Panitia penyusun RKAS</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="sktimbos" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9M19 21V9M9 21V9M15 21V9M2 9l10-6 10 6H2z"/></svg></span><span class="cx-dt"><b>SK Tim BOS</b><em>Surat keputusan tim BOS sekolah</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="pengantar" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3zM3 7l9 7 9-7"/></svg></span><span class="cx-dt"><b>Surat Pengantar</b><em>Pengantar pengiriman laporan</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>
+            </div>
           </div>
 
           <!-- Baris tab dokumen. Toggle "Gabungkan No. Bukti sama" diletakkan sebagai
@@ -1156,7 +1321,7 @@
                satu baris dengan tombol Kwitansi selama masih ada tempat, alih-alih
                "dilempar" ke baris baru saat ruang sempit seperti sebelumnya. Penjelasan
                lengkapnya tetap ada, dipindah ke baris kecil di bawah (tidak dihapus). -->
-          <div class="no-print bg-white rounded-lg border border-navy-100 p-4 flex flex-wrap items-center gap-3">
+          <div class="hidden">
             <label for="cetak-doc-select" class="text-xs font-semibold text-navy-400 uppercase tracking-wide">Jenis Dokumen</label>
             <select id="cetak-doc-select" class="rounded border border-navy-200 px-3 py-2 text-sm font-semibold text-navy bg-white min-w-[220px]"><option value="kwitansi">Kwitansi</option><option value="nota">Nota Pesan</option><option value="bast">BAST</option><option value="lampiran">Daftar Lampiran</option><option value="skguru">SK Guru</option><option value="hadir">Daftar Hadir</option><option value="kafer">Kafer Laporan</option><option value="sptjm">SPTJM</option><option value="skrkas">SK Panitia RKAS</option><option value="sktimbos">SK Tim BOS</option><option value="pengantar">Surat Pengantar</option></select>
           </div>
@@ -2185,6 +2350,26 @@
   </div>
 </div>
 
+<!-- ========================= MODAL KONFIRMASI KETIK (HTML, tanpa dialog bawaan) =========================
+     Menggantikan urutan confirm() + prompt() pada Reset BKU. confirm()/alert() bawaan di Electron
+     merebut fokus keyboard window sehingga kotak input sesudahnya tidak bisa diketik. Modal ini murni
+     HTML: peringatan + kotak ketik kata kunci dalam satu layar, tanpa dialog native sebelumnya. -->
+<div id="ketik-modal" class="hidden fixed inset-0 z-[70] bg-ink/50 flex items-center justify-center p-4 no-print">
+  <div class="bg-white rounded-2xl shadow-lg max-w-md w-full p-6">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="w-10 h-10 rounded-xl bg-rust-100 text-rust flex items-center justify-center font-bold text-lg">!</span>
+      <h3 id="ketik-modal-judul" class="font-serif text-lg font-semibold text-navy">Konfirmasi</h3>
+    </div>
+    <p id="ketik-modal-pesan" class="text-sm text-ink/80 mb-4 whitespace-pre-line"></p>
+    <label class="block text-xs font-semibold text-navy-400 mb-1">Ketik <b id="ketik-modal-kata" class="font-mono text-rust"></b> untuk melanjutkan</label>
+    <input id="ketik-modal-input" type="text" autocomplete="off" spellcheck="false" class="w-full rounded-lg border border-navy-200 px-3 py-2 text-sm font-mono mb-4">
+    <div class="flex justify-end gap-2">
+      <button id="ketik-modal-batal" type="button" class="px-4 py-2 rounded-lg text-sm border border-navy-200 text-navy-600 hover:bg-paper">Batal</button>
+      <button id="ketik-modal-ok" type="button" disabled class="px-4 py-2 rounded-lg text-sm font-semibold bg-rust text-white disabled:opacity-40 disabled:cursor-not-allowed">Ya, Reset</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========================= MODAL NOTIFIKASI KE SEKOLAH (Admin Utama) =========================
      Dipakai Admin Utama untuk mengirim notifikasi terarah ke satu sekolah, mis.
      pemberitahuan akun demo selesai & instruksi pembayaran trial. Teks pesan
@@ -2355,7 +2540,7 @@ function confirmFix(pesan){
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.2.0"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.1.6"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -2951,7 +3136,24 @@ function buildNav(role){
 }
 
 const CETAK_DOC_LABEL = { kwitansi:'Kwitansi', nota:'Nota Pesan', bast:'BAST', lampiran:'Daftar Lampiran', skguru:'SK Guru', hadir:'Daftar Hadir', kafer:'Kafer Laporan', sptjm:'SPTJM', skrkas:'SK Panitia RKAS', sktimbos:'SK Tim BOS', pengantar:'Surat Pengantar' };
+function syncCetakDesign(){
+  const jd = state.jenisDanaAktif||getDefaultJenisDana(), th = state.tahapAktif||getDefaultTahap(), doc = state.cetakDoc||'kwitansi';
+  const pg = document.getElementById('page-cetak'); if(pg) pg.dataset.fund = jd;
+  document.querySelectorAll('[data-cxdana]').forEach(b=>b.classList.toggle('aktif', b.dataset.cxdana===jd));
+  document.querySelectorAll('[data-cxtahap]').forEach(b=>b.classList.toggle('aktif', b.dataset.cxtahap===th));
+  document.querySelectorAll('[data-cxdoc]').forEach(b=>b.classList.toggle('aktif', b.dataset.cxdoc===doc));
+  const j = document.getElementById('cx-hero-judul'); if(j) j.textContent = labelDanaTahapAktif();
+  const tr = getTransaksiDanaAktif(), keluar = tr.filter(t=>t.jenis==='pengeluaran');
+  const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('cx-chip-trx', tr.length); set('cx-chip-keluar', keluar.length);
+  set('cx-chip-rp', fmtRupiah(keluar.reduce((a,t)=>a+(Number(t.jumlah)||0),0)));
+  ['reguler','kinerja','afirmasi'].forEach(k=>{
+    const n = state.transactions.filter(t=>bulanDalamTahap(t.tanggal, th) && jenisDanaTransaksi(t)===k).length;
+    const e = document.querySelector(`[data-cxcount="${k}"]`); if(e) e.textContent = n+' transaksi · Tahap '+th;
+  });
+}
 function updateCetakSubActive(){
+  syncCetakDesign();
   const sel = document.getElementById('cetak-doc-select');
   const doc = state.cetakDoc || 'kwitansi';
   if(sel) sel.value = doc;
@@ -2961,7 +3163,7 @@ function updateCetakSubActive(){
   if(gw) gw.classList.toggle('hidden', doc !== 'kwitansi');
   if(gd) gd.classList.toggle('hidden', doc !== 'kwitansi');
   if(state.currentView === 'cetak'){
-    document.getElementById('page-title').textContent = 'Cetak Dokumen — ' + (CETAK_DOC_LABEL[state.cetakDoc||'kwitansi'] || '');
+    document.getElementById('page-title').textContent = 'Cetak Dokumen — ' + (CETAK_DOC_LABEL[state.cetakDoc||'kwitansi'] || '') + ' · ' + labelDanaTahapAktif();
   }
 }
 /* ---- Menu SPPD hanya tampil ketika ada transaksi (kwitansi) yang ditandai
@@ -3714,7 +3916,7 @@ function attachSchoolListeners(npsn){
     if(state.currentView==='profil') fillProfilForm();
     if(state.currentView==='pejabat') fillPejabatForm();
     if(state.currentView==='pegawai') renderPegawai();
-    if(state.currentView==='cetak') renderSemuaDaftarSK();
+    if(state.currentView==='cetak'){ renderSemuaDaftarSK(); updateCetakSubActive(); }
     if(!document.getElementById('lp-pegawai-panel').classList.contains('hidden')) renderPilihPegawaiList();
     refreshPanelPegawaiCetak();
     if(state.currentView==='bku') renderBKU();
@@ -4745,15 +4947,12 @@ document.getElementById('btn-reset-bku').addEventListener('click', async ()=>{
     return;
   }
   const label = `${JENIS_DANA[jenisDana].label} — ${TAHAP_PERIODE[tahap].label}`;
-  const konfirmasiAwal = confirmFix(`Reset seluruh data Buku Kas Umum pada ${label}?\n\nTindakan ini akan menghapus SEMUA ${txTahapIni.length} transaksi pada bagian jenis dana & periode ini sekaligus dan TIDAK DAPAT DIBATALKAN. Transaksi pada jenis dana lain dan tahap lain TIDAK akan terpengaruh.`);
-  if(!konfirmasiAwal) return;
-  const ketikan = await showPromptModal(
-    `Untuk melanjutkan, ketik RESET (huruf besar) untuk menghapus ${txTahapIni.length} transaksi pada ${label}:`
+  const setuju = await showKonfirmasiKetik(
+    `Reset Buku Kas Umum`,
+    `Reset seluruh data Buku Kas Umum pada ${label}?\n\nTindakan ini akan menghapus SEMUA ${txTahapIni.length} transaksi pada bagian jenis dana & periode ini sekaligus dan TIDAK DAPAT DIBATALKAN. Transaksi pada jenis dana lain dan tahap lain TIDAK akan terpengaruh.`,
+    'RESET', 'Ya, Reset'
   );
-  if(ketikan !== 'RESET'){
-    alertFix('Reset dibatalkan karena teks konfirmasi tidak sesuai.');
-    return;
-  }
+  if(!setuju) return;
   const npsn = state.userData.npsn;
   try{
     const updates = {};
@@ -4784,6 +4983,7 @@ document.querySelectorAll('.tahap-tab').forEach(btn=>{
     // SPPD, Grafik Pengelompokan Belanja (Dashboard), & Kertas Kerja 2.2.1
     // juga mengikuti Tahap Laporan BOSP aktif — muat ulang bila sedang dibuka
     // supaya tidak menampilkan data tahap sebelumnya.
+    if(state.currentView === 'cetak') updateCetakSubActive();
     if(state.currentView === 'sppd') renderSppd();
     if(state.currentView === 'dashboard-sekolah') renderDashboardSekolah();
     if(state.currentView === 'kk221') renderKk221Table();
@@ -4827,6 +5027,7 @@ document.querySelectorAll('.jenisdana-tab').forEach(btn=>{
     if(selKaferJenisDana){ selKaferJenisDana.value = jenisDana; selKaferJenisDana.dataset.inited = '1'; }
     const selSptjmJenisDana = document.getElementById('sptjm-jenisdana');
     if(selSptjmJenisDana){ selSptjmJenisDana.value = jenisDana; selSptjmJenisDana.dataset.inited = '1'; }
+    if(state.currentView === 'cetak') updateCetakSubActive();
     if(state.currentView === 'sppd') renderSppd();
     if(state.currentView === 'dashboard-sekolah') renderDashboardSekolah();
     if(state.currentView === 'kk221') renderKk221Table();
@@ -7470,6 +7671,41 @@ function deriveUraianUmum(group){
   return prefix || uraians[0];
 }
 
+// Modal konfirmasi dengan ketik kata kunci (pengganti confirm()+prompt()).
+// Resolve true bila pengguna mengetik kata kunci persis lalu menekan tombol/Enter, false bila batal.
+function showKonfirmasiKetik(judul, pesan, kataKunci, labelOk){
+  return new Promise(resolve=>{
+    const modal=document.getElementById('ketik-modal');
+    const inp=document.getElementById('ketik-modal-input');
+    const ok=document.getElementById('ketik-modal-ok');
+    const batal=document.getElementById('ketik-modal-batal');
+    document.getElementById('ketik-modal-judul').textContent=judul;
+    document.getElementById('ketik-modal-pesan').textContent=pesan;
+    document.getElementById('ketik-modal-kata').textContent=kataKunci;
+    ok.textContent=labelOk||'Lanjutkan';
+    inp.value=''; ok.disabled=true;
+    modal.classList.remove('hidden');
+    const fokus=()=>{ try{ window.focus(); }catch(e){} inp.focus(); };
+    fokus(); requestAnimationFrame(fokus); setTimeout(fokus,80); setTimeout(fokus,250);
+    function bersih(h){
+      modal.classList.add('hidden');
+      ok.removeEventListener('click',onOk); batal.removeEventListener('click',onBatal);
+      inp.removeEventListener('input',onInput); inp.removeEventListener('keydown',onKey);
+      modal.removeEventListener('click',onBackdrop);
+      resolve(h);
+    }
+    function cocok(){ return inp.value.trim()===kataKunci; }
+    function onInput(){ ok.disabled=!cocok(); }
+    function onOk(){ if(cocok()) bersih(true); }
+    function onBatal(){ bersih(false); }
+    function onKey(e){ if(e.key==='Enter'){ e.preventDefault(); onOk(); } else if(e.key==='Escape'){ e.preventDefault(); onBatal(); } }
+    function onBackdrop(e){ if(e.target===modal) inp.focus(); }
+    ok.addEventListener('click',onOk); batal.addEventListener('click',onBatal);
+    inp.addEventListener('input',onInput); inp.addEventListener('keydown',onKey);
+    modal.addEventListener('click',onBackdrop);
+  });
+}
+
 // Pengganti window.prompt() (tidak didukung Electron) — menampilkan modal
 // HTML dan mengembalikan Promise yang resolve dengan teks yang diketik user,
 // atau null jika dibatalkan (klik Batal/Esc), sama seperti perilaku prompt().
@@ -7902,7 +8138,7 @@ document.getElementById('btn-cetak-print').addEventListener('click', async ()=>{
   const chkGabung = document.getElementById('chk-gabung-kwitansi');
   if(state.cetakDoc === 'kwitansi' && chkGabung && chkGabung.checked){
     const noBuktiTerpilih = new Set(items.map(t=>normalisasiNoBukti(t.noBukti)).filter(Boolean));
-    const semuaPengeluaran = state.transactions.filter(t=>t.jenis==='pengeluaran');
+    const semuaPengeluaran = getTransaksiDanaAktif().filter(t=>t.jenis==='pengeluaran');
     const anggotaGabungan = semuaPengeluaran.filter(t=>noBuktiTerpilih.has(normalisasiNoBukti(t.noBukti)));
     // Transaksi tercentang yang tidak punya No. Bukti tetap disertakan apa adanya
     // (tidak mungkin ikut digabung karena tidak ada kunci No. Bukti untuk dicocokkan).
@@ -8071,12 +8307,26 @@ function buildKk221Document(kelompok, items){
 
 /* ---- Cetak SPJ Lengkap: bundel BKU + ringkasan per kegiatan + seluruh kuitansi pengeluaran ---- */
 document.getElementById('btn-cetak-spj-lengkap').addEventListener('click', ()=>{
-  if(state.transactions.length===0){ alertFix('Belum ada transaksi pada Buku Kas Umum untuk dicetak.'); return; }
+  if(getTransaksiDanaAktif().length===0){ alertFix('Belum ada transaksi pada Buku Kas Umum untuk '+labelDanaTahapAktif()+' yang dapat dicetak.'); return; }
   buildSpjLengkapDocument();
   window.print();
 });
 
+function getTransaksiDanaAktif(){
+  const th = state.tahapAktif||getDefaultTahap();
+  const jd = state.jenisDanaAktif||getDefaultJenisDana();
+  return state.transactions.filter(t=>bulanDalamTahap(t.tanggal, th) && jenisDanaTransaksi(t)===jd);
+}
+function labelDanaTahapAktif(){
+  const jd = state.jenisDanaAktif||getDefaultJenisDana();
+  const th = state.tahapAktif||getDefaultTahap();
+  const lbl = (typeof JENIS_DANA!=='undefined' && JENIS_DANA[jd] && (JENIS_DANA[jd].label||JENIS_DANA[jd].nama)) || jd;
+  return lbl+' — Tahap '+th;
+}
 function buildSpjLengkapDocument(){
+  const trxAktif = getTransaksiDanaAktif();
+  let saldoLokal = 0;
+  trxAktif.forEach(t=>{ saldoLokal += (t.jenis==='penerimaan'?1:-1)*(Number(t.jumlah)||0); t._saldoDana = saldoLokal; });
   const s = state.schoolData || {};
   const kepsek = s.kepsek || {}; const bendahara = s.bendahara || {};
   const root = document.getElementById('print-root');
@@ -8084,11 +8334,11 @@ function buildSpjLengkapDocument(){
   const box = 'border:1px solid #16324F; padding:20px; margin-bottom:16px; page-break-inside:avoid; font-family:Inter,sans-serif; font-size:13px; color:#23262B;';
   const boxBreak = 'border:1px solid #16324F; padding:20px; margin-bottom:16px; page-break-before:always; font-family:Inter,sans-serif; font-size:13px; color:#23262B;';
 
-  const totalPenerimaan = state.transactions.filter(t=>t.jenis==='penerimaan').reduce((s2,t)=>s2+(Number(t.jumlah)||0),0);
-  const totalPengeluaran = state.transactions.filter(t=>t.jenis==='pengeluaran').reduce((s2,t)=>s2+(Number(t.jumlah)||0),0);
+  const totalPenerimaan = trxAktif.filter(t=>t.jenis==='penerimaan').reduce((s2,t)=>s2+(Number(t.jumlah)||0),0);
+  const totalPengeluaran = trxAktif.filter(t=>t.jenis==='pengeluaran').reduce((s2,t)=>s2+(Number(t.jumlah)||0),0);
 
   // ---- Bagian 1: Buku Kas Umum (BKU) lengkap ----
-  const bkuRows = state.transactions.map(t=>{
+  const bkuRows = trxAktif.map(t=>{
     const isPenerimaan = t.jenis==='penerimaan';
     return `<tr>
       <td style="border:1px solid #16324F; padding:4px 5px; white-space:nowrap;">${formatTanggal(t.tanggal)}</td>
@@ -8096,14 +8346,14 @@ function buildSpjLengkapDocument(){
       <td style="border:1px solid #16324F; padding:4px 5px;">${escapeHtml(t.uraian||'')}</td>
       <td style="border:1px solid #16324F; padding:4px 5px; text-align:right;">${isPenerimaan? fmtRupiah(t.jumlah):''}</td>
       <td style="border:1px solid #16324F; padding:4px 5px; text-align:right;">${!isPenerimaan? fmtRupiah(t.jumlah):''}</td>
-      <td style="border:1px solid #16324F; padding:4px 5px; text-align:right;">${fmtRupiah(t._saldo)}</td>
+      <td style="border:1px solid #16324F; padding:4px 5px; text-align:right;">${fmtRupiah(t._saldoDana)}</td>
     </tr>`;
   }).join('');
 
   let bodyHtml = `
     <div style="${box}">
       <div style="text-align:center; font-family:Lora,serif; font-weight:700; font-size:15px; letter-spacing:1px;">SURAT PERTANGGUNGJAWABAN (SPJ) LENGKAP</div>
-      <div style="text-align:center; font-size:12px; margin-bottom:14px;">${escapeHtml(s.namaSekolah||'')} — Tahun Anggaran ${escapeHtml(s.tahunAnggaran||'-')}</div>
+      <div style="text-align:center; font-size:12px; margin-bottom:14px;">${escapeHtml(s.namaSekolah||'')} — Tahun Anggaran ${escapeHtml(s.tahunAnggaran||'-')}<br><b>${escapeHtml(labelDanaTahapAktif())}</b></div>
       <div style="font-weight:700; font-size:13px; margin-bottom:6px;">1. Buku Kas Umum</div>
       <table style="width:100%; border-collapse:collapse; font-size:11px;">
         <thead><tr>
@@ -8141,7 +8391,7 @@ function buildSpjLengkapDocument(){
 
   // ---- Bagian 2: Ringkasan Penggunaan per Kegiatan ----
   const perKegiatan = {};
-  state.transactions.filter(t=>t.jenis==='pengeluaran').forEach(t=>{
+  trxAktif.filter(t=>t.jenis==='pengeluaran').forEach(t=>{
     const kode = t.kode || '(Tanpa Kode Kegiatan)';
     if(!perKegiatan[kode]) perKegiatan[kode] = { jumlahTransaksi:0, total:0 };
     perKegiatan[kode].jumlahTransaksi += 1;
@@ -8174,7 +8424,7 @@ function buildSpjLengkapDocument(){
     </div>`;
 
   // ---- Bagian 3: Kuitansi untuk setiap transaksi pengeluaran yang sudah memiliki No. Bukti ----
-  const itemsKuitansi = state.transactions.filter(t=>t.jenis==='pengeluaran' && t.noBukti);
+  const itemsKuitansi = trxAktif.filter(t=>t.jenis==='pengeluaran' && t.noBukti);
   bodyHtml += `<div style="${boxBreak}"><div style="font-weight:700; font-size:13px;">3. Kuitansi Pendukung (${itemsKuitansi.length} lembar)</div></div>`;
   itemsKuitansi.forEach((t)=>{
     bodyHtml += `
@@ -9387,6 +9637,18 @@ function editSKTersimpan(rec){
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
+(function setupCetakDesign(){
+  document.querySelectorAll('[data-cxdana]').forEach(b=>b.addEventListener('click', ()=>{
+    const t = document.querySelector(`.jenisdana-tab[data-jenisdana="${b.dataset.cxdana}"]`); if(t) t.click(); syncCetakDesign();
+  }));
+  document.querySelectorAll('[data-cxtahap]').forEach(b=>b.addEventListener('click', ()=>{
+    const t = document.querySelector(`.tahap-tab[data-tahap="${b.dataset.cxtahap}"]`); if(t) t.click(); syncCetakDesign();
+  }));
+  document.querySelectorAll('[data-cxdoc]').forEach(b=>b.addEventListener('click', ()=>{
+    const sel = document.getElementById('cetak-doc-select'); sel.value = b.dataset.cxdoc;
+    sel.dispatchEvent(new Event('change'));
+  }));
+})();
 (function setupSkTersimpan(){
   document.getElementById('btn-simpan-skguru').addEventListener('click', ()=>simpanSK('skguru'));
   Object.keys(KEPUTUSAN_CFG).forEach(key=>{
@@ -9687,11 +9949,47 @@ function perluasBelanjaModal(BM, LR, nMesin, nAset){
   return {mesin, aset, extraM, extraA};
 }
 
+// Mengisi semua hari/tanggal/bulan/tahun pada template secara otomatis (tidak ada lagi titik-titik/tahun lama yang harus diedit manual).
+function isiTanggalOtomatis(wb, t){
+  if(!t) return;
+  const teks=v=> v==null ? '' : (v.richText ? v.richText.map(r=>r.text).join('') : (typeof v==='string' ? v : ''));
+  const set=(sh,addr,val)=>{ const ws=wb.getWorksheet(sh); if(ws) ws.getCell(addr).value=val; };
+  const tglPanjang=/\d{1,2}\s+(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember)\s+20\d\d/;
+  // 1) Tahun anggaran pada teks template: 2026 -> tahun anggaran, 2025 -> tahun sebelumnya, "T.A 2024" di SP2B -> tahun anggaran
+  const tahunCells={
+    'PROFIL SEKOLAH':['B11'],'Belanja Barang dan Jasa':['A1'],'Belanja Modal':['A1'],
+    'Lap. REALISASI':['C4','C10','D10'],
+    'SPTJ':['D14','B15','B25','B26','B28'],
+    'BA rekon 2024':['A3','B15','B16','B19'],
+    'register kas':['B8','B12','B13','B14','B15','C9','C10'],
+    'SP2B':['A14']
+  };
+  Object.keys(tahunCells).forEach(sh=>{ const ws=wb.getWorksheet(sh); if(!ws) return;
+    tahunCells[sh].forEach(ad=>{ const c=ws.getCell(ad), x=teks(c.value); if(!x) return;
+      const y=x.replace(/20(24|25|26)/g,m=> (sh==='SP2B' || m==='2026') ? String(t.ta) : String(t.taLalu));
+      if(y!==x) c.value=y; }); });
+  // 2) Berita Acara Rekonsiliasi: hari / tanggal / bulan / tahun
+  set('BA rekon 2024','E4',t.hari); set('BA rekon 2024','E5',t.tanggal); set('BA rekon 2024','E6',t.bulan); set('BA rekon 2024','E7',t.tahun);
+  // 3) Register Penutupan Kas
+  set('register kas','G5',t.panjang); set('register kas','G7',t.akhirTahunLalu);
+  // 4) Berita Acara Pemeriksaan Kas
+  { const ws=wb.getWorksheet('ba kas'); if(ws){ const x=teks(ws.getCell('A8').value);
+      ws.getCell('A8').value = x.replace(/^Pada hari ini.*?(,\s*saya)/s, `Pada hari ini ${t.hari} Tanggal ${t.tanggalKata} Bulan ${t.bulan} Tahun ${t.tahunKata}$1`); } }
+  // 5) Tanda tangan SPTJ / SPTMH / SP2B
+  set('SPTJ','F36',', '+t.panjang);
+  set('SPTMH','F23',', '+t.panjang);
+  { const ws=wb.getWorksheet('SPTMH'); if(ws) ws.getCell('A8').value='Tanggal, '+t.panjang; }
+  { const ws=wb.getWorksheet('SP2B'); if(ws){
+      ws.getCell('A4').value='Tanggal: '+t.panjang+'     Nomor:........................';
+      const x=teks(ws.getCell('D26').value); ws.getCell('D26').value = tglPanjang.test(x) ? x.replace(tglPanjang,t.panjang) : '                   Borong, '+t.panjang; } }
+}
+
 function fillRekon(wb, d){
   const warn=[];
   const P=wb.getWorksheet('PROFIL SEKOLAH'), BJ=wb.getWorksheet('Belanja Barang dan Jasa'),
         BM=wb.getWorksheet('Belanja Modal'), LR=wb.getWorksheet('Lap. REALISASI');
   const p=d.profil||{};
+  isiTanggalOtomatis(wb, d.tgl);
   const pv=[p.nama,p.npsn,p.alamat,p.desa,p.kabupaten,p.provinsi,p.kepsek,p.nipKepsek,p.bendahara,p.nipBendahara,p.pagu];
   pv.forEach((v,i)=>{ if(v!==undefined && v!==null && v!=='') P.getCell(i+1,3).value = (i===10? Number(v): String(v)); });
   P.getCell('C11').numFmt = '#,##0';
@@ -10419,6 +10717,14 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
         <tr><td class="pr-4 py-0.5 font-sans text-navy-400">Surplus/(Defisit) akhir (Tahap II)</td><td class="text-right ${s2<0?'text-rust font-semibold':''}">${R(s2)}</td></tr></tbody></table>
       ${(TE.j-TA.j)>0?`<p class="mt-2 text-xs text-rust">Belanja di Excel melebihi anggaran Rp ${R(TE.j-TA.j)}. Kelompok dengan selisih merah di atas adalah sumbernya; untuk Belanja Modal, periksa kartu 6 di atas.</p>`:'<p class="mt-2 text-xs text-forest">Total belanja di Excel sama dengan anggaran.</p>'}`;
   }
+  // Tanggal/hari/tahun Rekon terisi otomatis: tanggal hari ini (zona waktu perangkat) kecuali c.tanggalRekon diisi manual (YYYY-MM-DD).
+  function tanggalRekonOtomatis(c){
+    const n = new Date(), lokal = `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+    const iso = (c && /^\d{4}-\d{2}-\d{2}$/.test(c.tanggalRekon||'')) ? c.tanggalRekon : lokal;
+    const k = tanggalDalamKata(iso), [y,m,d] = iso.split('-').map(Number), ta = tahunAnggaranAktif();
+    return { iso, hari:k.hari, tanggal:String(d), tanggalKata:k.tanggalKata, bulan:k.bulan, tahun:String(y), tahunKata:k.tahunKata,
+             panjang:`${d} ${k.bulan} ${y}`, ta, taLalu:ta-1, akhirTahunLalu:`31 Desember ${ta-1}` };
+  }
   function bangunData(){
     const s = state.schoolData || {}, c = rekonCfg(), items = semuaItems(), meta = (rapbsData()||{}).meta || {};
     const tot = items.reduce((a,x)=>({j:a.j+(x.jumlah||0),t1:a.t1+(x.t1||0),t2:a.t2+(x.t2||0)}),{j:0,t1:0,t2:0});
@@ -10428,6 +10734,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
         desa: c.desaKec!==undefined ? c.desaKec : (meta.alamat||''), kabupaten: c.kabupaten!==undefined ? c.kabupaten : stripPrefix(meta.kabupaten,/^Kab(upaten)?\.?\s*/i),
         provinsi: c.provinsi!==undefined ? c.provinsi : stripPrefix(meta.provinsi,/^Prov(insi)?\.?\s*/i),
         kepsek:kp.nama||'', nipKepsek:kp.nip||'', bendahara:bd.nama||'', nipBendahara:bd.nip||'', pagu:tot.j },
+      tgl: tanggalRekonOtomatis(c),
       saldoAwal: c.saldoAwal!==undefined ? c.saldoAwal : (jdRekon==='kinerja' ? 0 : (s.saldoAwal||0)),
       pagu: tot.j,
       peserta: c.peserta||{},
@@ -10462,6 +10769,50 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
   });
 })();
 
+</script>
+
+<script>
+/* Banner judul otomatis bergaya Cetak Dokumen di setiap menu */
+(function(){
+  const SUB={
+    'dashboard-utama':'Ringkasan seluruh sekolah dan aktivitas terbaru.',
+    'dashboard-sekolah':'Pantau saldo, transaksi, dan kelengkapan laporan sekolah.',
+    'manajemen-sekolah':'Kelola data sekolah yang terdaftar.',
+    'verifikasi':'Tinjau dan setujui akun serta sekolah baru.',
+    'monitoring':'Pantau progres laporan lintas sekolah.',
+    'rekapitulasi':'Rekap dan unduh laporan seluruh sekolah.',
+    'maintenance':'Atur mode perbaikan server.',
+    'profil':'Identitas sekolah yang dipakai di seluruh dokumen.',
+    'pejabat':'Data Kepala Sekolah dan Bendahara untuk tanda tangan dokumen.',
+    'pegawai':'Daftar guru dan tenaga kependidikan.',
+    'bku':'Catat dan telusuri seluruh transaksi kas.',
+    'buku-pembantu':'Buku pembantu penunjang SPJ.',
+    'rekon':'Rekonsiliasi dana BOS sesuai format BPK.',
+    'kk221':'Kertas kerja belanja ATK, jasa, modal, dan honor.',
+    'sppd':'Surat tugas, SPD, dan laporan perjalanan dinas.',
+    'audit-trail':'Riwayat aktivitas sistem.',
+    'backup':'Cadangkan dan pulihkan database sekolah.',
+    'persetujuan':'Validasi laporan oleh Kepala Sekolah.',
+    'realisasi':'Laporan realisasi belanja (hanya baca).',
+    'akun':'Pengaturan akun dan bantuan.'
+  };
+  function inject(id){
+    if(id==='cetak') return;
+    const pg=document.getElementById('page-'+id); if(!pg) return;
+    const item=((typeof NAV!=='undefined'?NAV:{})[state.userData&&state.userData.role]||[]).find(n=>n.id===id)||{label:id,title:id};
+    let h=pg.querySelector(':scope > .cx-hero[data-auto]');
+    if(!h){
+      h=document.createElement('div'); h.className='cx-hero no-print'; h.setAttribute('data-auto','');
+      h.innerHTML='<svg class="cx-deco" viewBox="0 0 200 200" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"><circle cx="150" cy="60" r="90"/><circle cx="150" cy="60" r="60"/><circle cx="150" cy="60" r="30"/></svg><div class="cx-hero-l" style="position:relative"><p class="cx-eyebrow"><span class="cx-dot"></span><span data-e></span></p><h2 class="font-serif tracking-tight" data-t></h2><p class="cx-hero-sub" data-s></p></div>';
+      pg.insertBefore(h,pg.firstChild);
+    }
+    h.querySelector('[data-e]').textContent='SIKEBOS · '+item.label;
+    h.querySelector('[data-t]').textContent=item.title;
+    h.querySelector('[data-s]').textContent=SUB[id]||'';
+  }
+  const orig=navigateTo;
+  navigateTo=function(id){ orig.apply(this,arguments); try{ inject(id); }catch(e){} };
+})();
 </script>
 </body>
 </html>
