@@ -268,6 +268,18 @@
   #app-content .page:not(#page-cetak) .cx-hero[data-auto] h2{ order:1; font-size:19px; margin:0; }
   #app-content .page:not(#page-cetak) .cx-hero[data-auto] .cx-hero-sub{ order:3; flex-basis:100%; margin:0; font-size:12px; line-height:1.35; }
   @media (max-width:640px){ #app-content .page:not(#page-cetak) .cx-hero[data-auto] h2{ font-size:17px; } #app-content .page:not(#page-cetak) .cx-hero[data-auto]{ padding:10px 16px; } }
+
+  /* ===== Pratinjau cetak di dalam aplikasi (Electron/Windows tidak menampilkan print preview) ===== */
+  @media screen{
+    #print-root.pv-on{ display:block !important; position:fixed; top:56px; left:0; right:0; bottom:0; overflow:auto; z-index:190; background:#fff; padding:28px max(16px, calc((100% - 900px)/2)); box-shadow:inset 0 8px 12px -10px rgba(0,0,0,.35); }
+  }
+  #pv-bar{ display:none; }
+  @media screen{ #pv-bar.pv-on{ display:flex; position:fixed; top:0; left:0; right:0; height:56px; z-index:200; align-items:center; justify-content:space-between; gap:12px; padding:0 18px; background:linear-gradient(120deg,#0B1A29,#16324F); color:#fff; box-shadow:0 6px 18px -8px rgba(0,0,0,.6); } }
+  #pv-bar b{ font-family:'Lora',Georgia,serif; font-size:16px; } #pv-bar small{ color:#B9C9D8; margin-left:10px; font-size:12px; }
+  #pv-bar button{ border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; }
+  #pv-cetak{ background:linear-gradient(180deg,#E3B35A,#C8963E); color:#fff; box-shadow:0 8px 18px -8px rgba(200,150,62,.8); }
+  #pv-tutup{ background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25); }
+  @media print{ #pv-bar{ display:none !important; } }
 </style>
 </head>
 <body class="text-ink antialiased">
@@ -2540,7 +2552,7 @@ function confirmFix(pesan){
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.1.6"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.1.7"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -10812,6 +10824,29 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
   }
   const orig=navigateTo;
   navigateTo=function(id){ orig.apply(this,arguments); try{ inject(id); }catch(e){} };
+})();
+</script>
+
+<script>
+/* Pratinjau Cetak internal: window.print() diganti agar dokumen tampil dulu di layar, baru dicetak lewat tombol */
+(function(){
+  const asli = window.print.bind(window);
+  const bar = document.createElement('div');
+  bar.id='pv-bar'; bar.className='no-print';
+  bar.innerHTML='<div><b>Pratinjau Cetak</b><small>Periksa dokumen, lalu klik Cetak</small></div><div style="display:flex;gap:8px"><button id="pv-tutup" type="button">Tutup (Esc)</button><button id="pv-cetak" type="button">Cetak / Simpan PDF</button></div>';
+  document.body.appendChild(bar);
+  const root=()=>document.getElementById('print-root');
+  function tutup(){ bar.classList.remove('pv-on'); const r=root(); if(r) r.classList.remove('pv-on'); document.removeEventListener('keydown',onKey,true); }
+  function onKey(e){ if(e.key==='Escape'){ e.preventDefault(); tutup(); } }
+  window.print=function(){
+    const r=root();
+    if(!r || !r.innerHTML.trim()){ return asli(); }
+    r.classList.add('pv-on'); bar.classList.add('pv-on'); r.scrollTop=0;
+    document.addEventListener('keydown',onKey,true);
+  };
+  document.getElementById('pv-tutup').addEventListener('click',tutup);
+  document.getElementById('pv-cetak').addEventListener('click',()=>{ try{ window.focus(); }catch(e){} setTimeout(asli,60); });
+  window.addEventListener('afterprint',()=>{ /* pratinjau tetap terbuka agar bisa cetak ulang */ });
 })();
 </script>
 </body>
