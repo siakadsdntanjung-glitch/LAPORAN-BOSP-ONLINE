@@ -292,6 +292,51 @@
   #pv-cetak{ background:linear-gradient(180deg,#E3B35A,#C8963E); color:#fff; box-shadow:0 8px 18px -8px rgba(200,150,62,.8); }
   #pv-tutup{ background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25); }
   @media print{ #pv-bar{ display:none !important; } }
+
+  /* ---- Animasi Panduan & Video Panduan ---- */
+  #tut{position:fixed;inset:0;z-index:70;background:#0b1b2b;display:none;flex-direction:column;color:#fff}
+  #tut.on{display:flex}
+  #tut-top{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;background:#16324F}
+  #tut-top button,#tut-top select{background:rgba(255,255,255,.13);color:#fff;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600}
+  #tut-top button.on{background:#C8963E;color:#16324F}
+  #tut-top select option{color:#000}
+  #tut-main{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0}
+  #tut-box{width:960px;height:540px;position:relative;transform-origin:0 0;border-radius:10px;overflow:hidden;background:#FAF8F2}
+  #tut-stage{position:absolute;inset:0;color:#16324F;font:13px Inter,sans-serif}
+  #tut-cur{position:absolute;z-index:9;width:26px;height:26px;left:480px;top:270px;opacity:0;transition:left .75s ease,top .75s ease,transform .15s;pointer-events:none}
+  #tut-cur.dn{transform:scale(.78)}
+  #tut-sub{padding:12px 18px 14px;text-align:center;font-size:16px;line-height:1.5;min-height:76px}
+  #tut-stage .sd{position:absolute;left:0;top:0;bottom:0;width:190px;background:#16324F;color:#fff;padding:12px 0}
+  #tut-stage .sd i{display:block;font-style:normal;padding:5px 14px;font-size:12px;border-left:3px solid transparent}
+  #tut-stage .sd i.hl{background:rgba(255,255,255,.15);border-color:#C8963E}
+  #tut-stage .tm{position:absolute;left:190px;right:0;top:0;bottom:0;padding:18px 20px}
+  #tut-stage h2{font:600 19px Lora,serif;margin-bottom:12px}
+  #tut-stage h3{font:600 20px Lora,serif}
+  #tut-stage h4{font:600 15px Lora,serif;margin-bottom:8px}
+  #tut-stage label{display:block;font-size:11px;font-weight:600;color:#6B7F94;margin:8px 0 3px}
+  #tut-stage .cd{background:#fff;border:1px solid #CBDBE7;border-radius:8px;padding:12px}
+  #tut-stage .st{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  #tut-stage .st b{display:block;font-size:18px;margin-top:6px}
+  #tut-stage .two{display:grid;grid-template-columns:240px 1fr;gap:14px;align-items:start}
+  #tut-stage .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+  #tut-stage .pill,#tut-stage .bt{border:1px solid #AFC4D6;background:#fff;border-radius:6px;padding:5px 11px;font-weight:600;font-size:12px}
+  #tut-stage .pill.on,#tut-stage .bn{background:#16324F;color:#fff;border-radius:6px;padding:6px 14px;font-weight:600;font-size:12px;display:inline-block}
+  #tut-stage .pill.on{padding:5px 11px;border:1px solid #16324F}
+  #tut-stage .rd{color:#B23A2E;border-color:#B23A2E}
+  #tut-stage .fl{min-height:27px;border:1px solid #CBDBE7;border-radius:5px;background:#fff;padding:5px 8px;font-size:12px}
+  #tut-stage .tt{width:100%;border-collapse:collapse;font-size:12px}
+  #tut-stage .tt th{text-align:left;font-size:10px;text-transform:uppercase;color:#6B7F94;border-bottom:1px solid #16324F;padding:6px}
+  #tut-stage .tt td{padding:7px 6px;border-bottom:1px solid #E1E8EF}
+  #tut-stage .tt b{font-weight:600;font-size:11px;cursor:pointer}
+  #tut-stage .rg{box-shadow:0 0 0 3px #C8963E,0 0 14px 4px rgba(200,150,62,.55)}
+  #tut-stage .ov{position:absolute;inset:0;background:rgba(11,27,43,.5);display:flex;align-items:center;justify-content:center;z-index:5;animation:tutf .25s}
+  #tut-stage .mc{background:#fff;border-radius:10px;padding:16px;width:380px}
+  #tut-stage .ban{background:#E4F1EA;color:#2F6F4E;border-radius:6px;padding:7px 10px;margin-bottom:10px;font-weight:600}
+  #tut-stage .lg{position:absolute;left:300px;top:90px;width:360px;background:#fff;border:1px solid #CBDBE7;border-radius:10px;padding:22px}
+  #tut-stage tr.new td{animation:tutn 1.6s}
+  #tut-stage tr.gone{transition:all .6s;opacity:0;transform:translateX(50px)}
+  @keyframes tutf{from{opacity:0}}
+  @keyframes tutn{from{background:#F3DEB0}to{background:transparent}}
 </style>
 <link rel="icon" type="image/png" href="data:image/png;base64,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">
 
@@ -991,6 +1036,29 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
               Aktifkan Mode Perbaikan Server
             </button>
           </div>
+        </section>
+
+        <!-- VIDEO PANDUAN: dikelola Admin Utama, dibaca semua akun sekolah (config/videoPanduan) -->
+        <section id="page-video-admin" class="page hidden space-y-4">
+          <p class="text-xs text-navy-400 max-w-2xl">Tempel link video (YouTube, Google Drive, Vimeo, atau tautan langsung .mp4). Video yang disimpan di sini langsung tampil di menu "Video &amp; Animasi Panduan" pada seluruh akun Admin Sekolah dan Kepala Sekolah, tanpa perlu update aplikasi.</p>
+          <div class="bg-white rounded-lg border border-navy-100 p-5 space-y-3 max-w-2xl">
+            <h3 id="vp-form-title" class="font-serif font-semibold text-navy">Tambah Video</h3>
+            <input type="hidden" id="vp-id">
+            <div><label class="block text-xs font-semibold text-navy-400 mb-1">Judul Video</label><input id="vp-judul" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Contoh: Cara Import Data BKU"></div>
+            <div><label class="block text-xs font-semibold text-navy-400 mb-1">Link Video</label><input id="vp-url" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono" placeholder="https://www.youtube.com/watch?v=..."></div>
+            <div><label class="block text-xs font-semibold text-navy-400 mb-1">Keterangan (opsional)</label><input id="vp-desc" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
+            <div class="flex gap-2"><button id="btn-vp-simpan" type="button" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan Video</button><button id="btn-vp-batal" type="button" class="px-4 text-sm font-semibold text-navy-400 hover:text-navy">Batal</button><button type="button" class="js-tut ml-auto bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">▶ Lihat Animasi Panduan</button></div>
+            <div id="vp-msg" class="hidden text-sm rounded px-3 py-2"></div>
+          </div>
+          <div class="bg-white rounded-lg border border-navy-100 p-5 max-w-2xl"><h3 class="font-serif font-semibold text-navy mb-2">Daftar Video</h3><div id="vp-admin-list"></div></div>
+        </section>
+        <section id="page-video-panduan" class="page hidden space-y-4">
+          <div class="bg-white rounded-lg border border-navy-100 p-5 flex flex-wrap items-center justify-between gap-3">
+            <div><h3 class="font-serif font-semibold text-navy">Animasi Panduan Penggunaan SIKEBOS</h3><p class="text-xs text-navy-400 mt-1">Dari mengenal menu sampai tambah, ubah, hapus, dan import data. Dilengkapi suara dan teks.</p></div>
+            <button type="button" class="js-tut bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">▶ Putar Animasi</button>
+          </div>
+          <h3 class="font-serif font-semibold text-navy">Video dari Admin Utama</h3>
+          <div id="vp-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </section>
 
         <!-- DASHBOARD ADMIN SEKOLAH / KEPSEK -->
@@ -2367,6 +2435,26 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
 </div>
 
 <!-- ========================= MODAL: TRANSAKSI ========================= -->
+<div id="modal-video" class="hidden fixed inset-0 z-50 bg-navy-900/60 flex items-center justify-center p-4 no-print">
+  <div class="bg-white rounded-lg max-w-3xl w-full p-4">
+    <div class="flex items-start justify-between gap-3 mb-3"><h3 id="vp-title" class="font-serif font-semibold text-navy"></h3><button id="vp-close" type="button" class="text-navy-300 hover:text-navy text-xl leading-none" aria-label="Tutup">&times;</button></div>
+    <div id="vp-body"></div>
+    <a id="vp-open" target="_blank" rel="noopener" class="inline-block mt-3 text-xs font-semibold text-navy hover:underline">Buka di tab baru ↗</a>
+  </div>
+</div>
+<div id="tut" class="no-print">
+  <div id="tut-top">
+    <button id="tut-prev" title="Bab sebelumnya">⏮</button><button id="tut-pp" title="Jeda / putar">⏸</button><button id="tut-next" title="Bab berikutnya">⏭</button>
+    <button id="tut-vo" class="on">🔊 Suara</button><button id="tut-fx" class="on">🔔 Efek</button>
+    <select id="tut-rt" title="Kecepatan"><option value="0.85">Lambat</option><option value="1" selected>Normal</option><option value="1.2">Cepat</option></select>
+    <span id="tut-ch" class="flex flex-wrap gap-1"></span>
+    <button id="tut-x" class="ml-auto">✕ Tutup</button>
+  </div>
+  <div id="tut-main"><div id="tut-fit"><div id="tut-box"><div id="tut-stage"></div><svg id="tut-cur" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#000" stroke-width="1.5" stroke-linejoin="round"/></svg></div></div></div>
+  <div id="tut-sub"></div>
+  <div id="tut-hint" class="hidden" style="text-align:center;font-size:12px;color:#EACB89;padding:0 12px 10px">Suara Bahasa Indonesia tidak ditemukan di perangkat ini. Animasi tetap berjalan dengan teks; pasang suara Indonesia di pengaturan perangkat agar narasi terdengar.</div>
+</div>
+
 <div id="modal-transaksi" class="hidden fixed inset-0 z-50 bg-navy-900/50 flex items-center justify-center p-4 no-print">
   <div class="bg-white rounded-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
     <h3 class="font-serif text-lg font-semibold text-navy mb-1" id="modal-transaksi-title">Tambah Transaksi</h3>
@@ -2942,7 +3030,7 @@ function confirmFix(pesan){
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.1.8"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.1.9"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -3141,6 +3229,7 @@ const NAV = {
     { id:'monitoring', label:'Monitoring Laporan', title:'Monitoring Laporan (Lintas Sekolah)' },
     { id:'rekapitulasi', label:'Rekapitulasi & Unduh', title:'Rekapitulasi & Unduh Laporan' },
     { id:'maintenance', label:'Mode Perbaikan Server', title:'Mode Perbaikan Server' },
+    { id:'video-admin', label:'Video Panduan', title:'Kelola Video Panduan untuk Akun Sekolah' },
     { id:'pengaturan', label:'Pengaturan', title:'Pengaturan Tampilan & Tema' },
     { id:'akun', label:'Akun & Bantuan', title:'Akun Saya & Bantuan' },
   ],
@@ -3157,6 +3246,7 @@ const NAV = {
     { id:'sppd', label:'SPPD', title:'SPPD (Surat Tugas, SPD, Format SPPD & Laporan Perjalanan Dinas)', conditional:true },
     { id:'audit-trail', label:'Audit Trail', title:'Audit Trail — Riwayat Aktivitas Sistem' },
     { id:'backup', label:'Backup Database', title:'Backup Database Sekolah' },
+    { id:'video-panduan', label:'Video & Animasi Panduan', title:'Video & Animasi Panduan Penggunaan' },
     { id:'pengaturan', label:'Pengaturan', title:'Pengaturan Tampilan & Tema' },
     { id:'akun', label:'Akun & Bantuan', title:'Akun Saya & Bantuan' },
   ],
@@ -3166,6 +3256,7 @@ const NAV = {
     { id:'realisasi', label:'Laporan Realisasi', title:'Laporan Realisasi Belanja (Read-Only)' },
     { id:'bku', label:'Buku Kas Umum', title:'Buku Kas Umum (BKU) — Tampilan' },
     { id:'audit-trail', label:'Audit Trail', title:'Audit Trail — Riwayat Aktivitas Sistem' },
+    { id:'video-panduan', label:'Video & Animasi Panduan', title:'Video & Animasi Panduan Penggunaan' },
     { id:'pengaturan', label:'Pengaturan', title:'Pengaturan Tampilan & Tema' },
     { id:'akun', label:'Akun & Bantuan', title:'Akun Saya & Bantuan' },
   ]
@@ -3543,7 +3634,9 @@ const NAV_ICONS = {
   'audit-trail': '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
   'backup': '<ellipse cx="12" cy="5.5" rx="8" ry="3"/><path d="M4 5.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6M4 11.5v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
   'persetujuan': '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
-  'realisasi': '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>'
+  'realisasi': '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>',
+  'video-admin': '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>',
+  'video-panduan': '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M10 9l5 3-5 3z"/>'
 };
 function navIcon(id){
   const p = NAV_ICONS[id] || '<circle cx="12" cy="12" r="3"/>';
@@ -3654,6 +3747,7 @@ function navigateTo(pageId){
   if(pageId === 'audit-trail') renderAuditTrail();
   if(pageId === 'backup') renderBackupInfo();
   if(pageId === 'akun') renderAkun();
+  if(pageId === 'video-admin' || pageId === 'video-panduan') renderVideoPanduan();
 }
 
 /* =========================================================================
@@ -4557,6 +4651,7 @@ function attachMaintenanceListener(){
     // config/panduanUrl (sama seperti config/downloadUrl untuk update
     // banner), berlaku untuk semua role, realtime tanpa perlu reload.
     updatePanduanLink(cfg);
+    if(typeof updateVideoPanduan==='function') updateVideoPanduan(cfg);
 
     if(state.userData && state.userData.role === 'admin_utama'){
       renderMaintenancePanel(cfg);
@@ -11363,6 +11458,229 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
   window.SikebosTema={ get:function(){ return JSON.parse(JSON.stringify(cur)); }, set:set };
   apply(); syncUI();
 })();
+</script>
+<script>
+(function(){
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms)),E=s=>escapeHtml(String(s==null?'':s));
+state.videos=[];
+
+/* ================= VIDEO PANDUAN (config/videoPanduan) ================= */
+function vpEmbed(u){
+  u=(u||'').trim();let m;
+  if(m=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/))return{k:'f',s:'https://www.youtube.com/embed/'+m[1]+'?rel=0',th:'https://img.youtube.com/vi/'+m[1]+'/hqdefault.jpg'};
+  if(m=u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/))return{k:'f',s:'https://drive.google.com/file/d/'+m[1]+'/preview'};
+  if(m=u.match(/vimeo\.com\/(?:video\/)?(\d+)/))return{k:'f',s:'https://player.vimeo.com/video/'+m[1]};
+  if(/\.(mp4|webm|ogg)(\?|#|$)/i.test(u))return{k:'v',s:u};
+  return{k:'l',s:u};
+}
+window.updateVideoPanduan=function(cfg){
+  const o=(cfg&&cfg.videoPanduan)||{};
+  state.videos=Object.keys(o).map(k=>Object.assign({id:k},o[k])).sort((a,b)=>(a.waktu||0)-(b.waktu||0));
+  renderVideoPanduan();
+};
+window.renderVideoPanduan=function(){
+  const L=state.videos||[],g=$('#vp-grid'),a=$('#vp-admin-list');
+  if(g)g.innerHTML=L.length?L.map(v=>{const x=vpEmbed(v.url);
+    return `<button type="button" data-play="${E(v.id)}" class="text-left bg-white rounded-lg border border-navy-100 overflow-hidden hover:shadow transition"><div class="aspect-video bg-navy flex items-center justify-center text-white text-4xl" ${x.th?`style="background:url(${E(x.th)}) center/cover"`:''}>${x.th?'':'▶'}</div><div class="p-3"><p class="text-sm font-semibold text-navy">${E(v.judul)}</p><p class="text-xs text-navy-400 mt-1">${E(v.deskripsi||'')}</p></div></button>`}).join('')
+    :'<p class="text-sm text-navy-400">Belum ada video dari Admin Utama.</p>';
+  if(a)a.innerHTML=L.length?L.map(v=>`<div class="flex items-center gap-3 py-2 border-b border-navy-100"><div class="min-w-0 flex-1"><p class="text-sm font-semibold text-navy truncate">${E(v.judul)}</p><p class="text-xs font-mono text-navy-300 truncate">${E(v.url)}</p></div><button type="button" data-play="${E(v.id)}" class="text-xs font-semibold text-navy hover:underline">Putar</button><button type="button" data-vedit="${E(v.id)}" class="text-xs font-semibold text-navy hover:underline">Ubah</button><button type="button" data-vdel="${E(v.id)}" class="text-xs font-semibold text-rust hover:underline">Hapus</button></div>`).join('')
+    :'<p class="text-sm text-navy-400">Belum ada video. Tambahkan lewat form di atas.</p>';
+};
+function vpMsg(t,ok){const m=$('#vp-msg');m.textContent=t;m.className='text-sm rounded px-3 py-2 '+(ok?'bg-forest-100 text-forest':'bg-rust-100 text-rust');}
+function vpReset(){['vp-id','vp-judul','vp-url','vp-desc'].forEach(i=>$('#'+i).value='');$('#vp-form-title').textContent='Tambah Video';}
+function vpPlay(v){
+  const x=vpEmbed(v.url);
+  $('#vp-title').textContent=v.judul;
+  $('#vp-body').innerHTML=x.k==='f'?`<iframe src="${E(x.s)}" class="w-full aspect-video rounded" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`
+    :x.k==='v'?`<video src="${E(x.s)}" controls autoplay class="w-full rounded"></video>`
+    :'<p class="text-sm text-navy-400">Link ini tidak bisa diputar di dalam aplikasi. Gunakan tombol "Buka di tab baru".</p>';
+  $('#vp-open').href=v.url;$('#modal-video').classList.remove('hidden');
+}
+$('#vp-close').onclick=()=>{$('#vp-body').innerHTML='';$('#modal-video').classList.add('hidden');};
+$('#btn-vp-batal').onclick=()=>{vpReset();$('#vp-msg').className='hidden';};
+$('#btn-vp-simpan').onclick=async()=>{
+  const j=$('#vp-judul').value.trim(),u=$('#vp-url').value.trim(),d=$('#vp-desc').value.trim(),id=$('#vp-id').value;
+  if(!j||!/^https?:\/\/\S+$/i.test(u))return vpMsg('Isi judul dan link video yang diawali http:// atau https://',false);
+  try{
+    const r=db.ref('config/videoPanduan');
+    if(id)await r.child(id).update({judul:j,url:u,deskripsi:d});
+    else await r.push({judul:j,url:u,deskripsi:d,waktu:firebase.database.ServerValue.TIMESTAMP,oleh:(state.user&&state.user.email)||''});
+    vpReset();vpMsg('Video tersimpan dan langsung terbaca di akun sekolah.',true);
+  }catch(err){vpMsg('Gagal menyimpan: '+(err.message||err),false);}
+};
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-play],[data-vedit],[data-vdel],.js-tut');if(!b)return;
+  const f=id=>(state.videos||[]).find(v=>v.id===id);
+  if(b.classList.contains('js-tut'))return tutOpen(0);
+  if(b.dataset.play){const v=f(b.dataset.play);if(v)vpPlay(v);}
+  else if(b.dataset.vedit){const v=f(b.dataset.vedit);if(!v)return;$('#vp-id').value=v.id;$('#vp-judul').value=v.judul||'';$('#vp-url').value=v.url||'';$('#vp-desc').value=v.deskripsi||'';$('#vp-form-title').textContent='Ubah Video';$('#vp-judul').scrollIntoView({behavior:'smooth',block:'center'});}
+  else if(b.dataset.vdel){
+    if(!confirmFix('Hapus video ini dari daftar? Video tidak akan tampil lagi di akun sekolah.'))return;
+    try{await db.ref('config/videoPanduan/'+b.dataset.vdel).remove();}catch(err){alertFix('Gagal menghapus video: '+(err.message||err));}
+  }
+});
+
+/* ================= ANIMASI PANDUAN + SUARA ================= */
+const TUT={run:0,pause:false,intr:false,again:null,voice:true,sfx:true,rate:1,i:0,vc:null};
+let AC;
+function beep(f,d,ty,v){
+  if(!TUT.sfx)return;
+  try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime,fs=[].concat(f),o=AC.createOscillator(),g=AC.createGain();
+    o.type=ty;fs.forEach((x,i)=>o.frequency.setValueAtTime(x,t+i*d/fs.length));g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+d);}catch(e){}
+}
+const SFX={click:()=>beep(900,.06,'square',.05),pop:()=>beep([500,720],.16,'sine',.12),ok:()=>beep([660,880,1180],.42,'sine',.14),del:()=>beep([320,140],.3,'sawtooth',.07),tick:()=>beep(1500,.02,'square',.02)};
+function pickVoice(){
+  if(!window.speechSynthesis)return;
+  const v=speechSynthesis.getVoices().filter(x=>/^id/i.test(x.lang));
+  TUT.vc=v.find(x=>/natural|google/i.test(x.name))||v[0]||null;
+  const h=$('#tut-hint');if(h)h.classList.toggle('hidden',!!TUT.vc||!TUT.voice);
+}
+if(window.speechSynthesis)speechSynthesis.onvoiceschanged=pickVoice;
+function speakP(txt,id){
+  return new Promise(res=>{
+    const go=()=>{
+      if(id!==TUT.run)return res();
+      const u=new SpeechSynthesisUtterance(txt);let started=false;
+      u.lang='id-ID';if(TUT.vc)u.voice=TUT.vc;u.rate=TUT.rate;
+      u.onstart=()=>{started=true;};
+      u.onend=u.onerror=()=>{if(TUT.intr){TUT.again=go;return;}res();};
+      speechSynthesis.speak(u);
+      setTimeout(()=>{if(!started&&!TUT.intr)res();},4000);
+    };go();
+  });
+}
+
+/* ---- data & tampilan tiruan ---- */
+const f=n=>n?n.toLocaleString('id-ID'):'';
+const SIDE=['Dashboard','Profil Sekolah','Kepsek & Bendahara','Data Pegawai','Buku Kas Umum','Buku Pembantu','Cetak Dokumen','Rekon','Kertas Kerja 2.2.1','SPPD','Audit Trail','Backup Database','Pengaturan','Akun & Bantuan','Video & Animasi Panduan'];
+const pg=(a,m)=>`<div class="sd">${SIDE.map((x,i)=>`<i class="${i==a?'hl':''}">${x}</i>`).join('')}</div><div class="tm" id="m">${m}</div>`;
+const dash='<h2>Dashboard Sekolah</h2><div class="st"><div class="cd"><small>Saldo Kas</small><b>Rp 88.750.000</b></div><div class="cd"><small>Penerimaan</small><b>Rp 90.000.000</b></div><div class="cd"><small>Pengeluaran</small><b>Rp 1.250.000</b></div></div>';
+const R0=()=>[['02/01','Terima Dana BOSP Tahap 1',90000000,0],['08/01','Belanja ATK Kantor',0,1250000]];
+let rows=[];
+const tbl=rs=>{let s=0;return `<table class="tt"><tr><th>Tanggal</th><th>Uraian</th><th>Penerimaan</th><th>Pengeluaran</th><th>Saldo</th><th>Aksi</th></tr>${rs.map((r,i)=>{s+=r[2]-r[3];return `<tr class="${r[4]||''}"><td>${r[0]}</td><td>${r[1]}</td><td>${f(r[2])}</td><td>${f(r[3])}</td><td>${f(s)}</td><td><b class="e${i}">Ubah</b> <b class="d${i} rd">Hapus</b></td></tr>`}).join('')}</table>`;};
+const BK=()=>`<h2>Buku Kas Umum</h2><div class="bar"><span class="pill on" id="t1">Tahap 1</span><span class="pill" id="t2">Tahap 2</span>&nbsp;<span class="pill on" id="j1">BOSP Reguler</span><span class="pill" id="j2">BOS Kinerja</span><span class="pill" id="j3">BOS Afirmasi</span></div><div class="bar"><span class="bn" id="bt">+ Transaksi</span><span class="bt" id="bi">Import Data</span><span class="bt" id="bd">Unduh Template</span><span class="bt">Export</span><span class="bt rd" id="bz">Reset Data</span></div><div id="fb"></div><div class="cd" id="tb">${tbl(rows)}</div>`;
+const PG='<h2>Data Pegawai</h2><div class="two"><div class="cd"><label>Nama Lengkap</label><div class="fl" id="f0"></div><label>NIP</label><div class="fl" id="f1"></div><label>Jabatan</label><div class="fl" id="f2"></div><label>Tugas / Kelas</label><div class="fl" id="f3"></div><p style="margin-top:10px"><span class="bn" id="sv">Simpan</span></p></div><div class="cd"><table class="tt" id="pt"><tr><th>Nama</th><th>Jabatan</th><th>Aksi</th></tr><tr><td>Siti Aminah, S.Pd</td><td>Kepala Sekolah</td><td><b>Ubah</b> <b class="rd">Hapus</b></td></tr></table></div></div>';
+const mdl=(t,fs)=>`<div class="ov" id="ov"><div class="mc"><h4>${t}</h4>${fs.map((x,i)=>`<label>${x[0]}</label><div class="fl" id="f${i}">${x[1]||''}</div>`).join('')}<div class="bar" style="margin-top:12px"><span class="bn" id="sv">Simpan</span><span class="bt">Batal</span></div></div></div>`;
+const FORM=[['Tanggal'],['Uraian'],['Jenis Transaksi'],['Jumlah (Rp)']];
+
+function mk(id){
+  const st=$('#tut-stage'),cur=$('#tut-cur');
+  const ok=async()=>{if(id!==TUT.run)throw 0;while(TUT.pause){await sleep(120);if(id!==TUT.run)throw 0;}};
+  const T={
+    q:s=>st.querySelector(s),
+    w:async ms=>{const n=Math.ceil(ms/TUT.rate/100);for(let i=0;i<n;i++){await ok();await sleep(100);}await ok();},
+    mv:async s=>{await ok();const e=st.querySelector(s);if(!e)return;const r=e.getBoundingClientRect(),b=$('#tut-box').getBoundingClientRect(),k=b.width/960;
+      cur.style.left=((r.left+r.width*.55-b.left)/k)+'px';cur.style.top=((r.top+r.height*.55-b.top)/k)+'px';cur.style.opacity=1;await T.w(780);},
+    clk:async s=>{await T.mv(s);cur.classList.add('dn');SFX.click();await T.w(180);cur.classList.remove('dn');},
+    typ:async(s,t)=>{const e=st.querySelector(s);e.textContent='';for(let i=0;i<t.length;i++){e.textContent+=t[i];if(i%2==0)SFX.tick();await T.w(50);}},
+    fill:async(s,t)=>{await T.mv(s);await T.typ(s,t);},
+    rg:(s,on=1)=>{const e=st.querySelector(s);if(e)e.classList.toggle('rg',!!on);},
+    page:(a,h)=>{st.innerHTML=pg(a,h);},
+    nav:async n=>{const it=st.querySelectorAll('.sd i');it.forEach(x=>x.classList.remove('hl'));await T.mv('.sd i:nth-child('+(n+1)+')');it[n].classList.add('hl');SFX.click();},
+    go:async(n,h)=>{await T.nav(n);await T.w(250);T.q('#m').innerHTML=h;},
+    modal:(t,fs)=>{st.insertAdjacentHTML('beforeend',mdl(t,fs));SFX.pop();},
+    unmodal:()=>{const o=T.q('#ov');if(o)o.remove();},
+    draw:()=>{T.q('#tb').innerHTML=tbl(rows);},
+    say:async(h,ms=1500)=>{T.q('#fb').innerHTML=h;await T.w(ms);}
+  };
+  return T;
+}
+
+const SC=[
+{n:'Masuk',init:()=>'<div class="lg"><h3>SIKEBOS</h3><small>Sistem Keuangan BOSP Lintas Sekolah</small><label>Email</label><div class="fl" id="em"></div><label>Password</label><div class="fl" id="pw"></div><p style="margin-top:12px"><span class="bn" id="ms">Masuk</span></p></div>',steps:[
+  ['Selamat datang di panduan SIKEBOS, Sistem Keuangan BOSP Lintas Sekolah. Anda akan belajar dari mengenal menu, sampai menambah, mengubah, menghapus, dan mengimpor data.',async T=>{await T.w(1000);}],
+  ['Mulailah dengan masuk memakai email dan password akun sekolah, lalu tekan tombol Masuk.',async T=>{await T.fill('#em','admin@sdnegeri.sch.id');await T.fill('#pw','••••••••');await T.clk('#ms');SFX.ok();T.page(0,dash);}]
+]},
+{n:'Menu',init:()=>pg(0,dash),steps:[
+  ['Di sisi kiri ada menu utama. Dashboard menampilkan ringkasan saldo, penerimaan, dan pengeluaran sekolah.',async T=>{await T.nav(0);}],
+  ['Profil Sekolah, Kepsek dan Bendahara, serta Data Pegawai adalah data dasar. Isi menu ini lebih dulu.',async T=>{for(const n of[1,2,3])await T.nav(n);}],
+  ['Buku Kas Umum adalah menu utama untuk mencatat transaksi. Buku Pembantu, Cetak Dokumen, Rekon, dan Kertas Kerja membantu menyusun laporan pertanggungjawaban.',async T=>{for(const n of[4,5,6,7,8])await T.nav(n);}],
+  ['Menu SPPD muncul otomatis bila ada transaksi perjalanan dinas. Audit Trail mencatat riwayat perubahan, dan Backup Database menyimpan cadangan data.',async T=>{for(const n of[9,10,11])await T.nav(n);}]
+]},
+{n:'Data Pegawai',init:()=>pg(0,dash),steps:[
+  ['Buka menu Data Pegawai untuk mendaftarkan guru dan tenaga kependidikan.',async T=>{await T.go(3,PG);}],
+  ['Isi nama, NIP, jabatan, dan tugas, lalu tekan Simpan.',async T=>{await T.fill('#f0','Budi Santoso, S.Pd');await T.fill('#f1','198001012005011001');await T.fill('#f2','Guru');await T.fill('#f3','Guru Kelas VI');await T.clk('#sv');SFX.ok();T.q('#pt').insertAdjacentHTML('beforeend','<tr class="new"><td>Budi Santoso, S.Pd</td><td>Guru</td><td><b>Ubah</b> <b class="rd">Hapus</b></td></tr>');}],
+  ['Data pegawai nanti muncul sebagai daftar centang pada form transaksi. Untuk data banyak, gunakan tempel banyak pegawai sekaligus.',async T=>{await T.w(800);}]
+]},
+{n:'Tahap & Dana',init:()=>{rows=R0();return pg(0,dash);},steps:[
+  ['Buku Kas Umum, disingkat BKU, adalah menu utama pencatatan. Klik Buku Kas Umum pada menu.',async T=>{await T.go(4,BK());}],
+  ['Pilih tahap laporan yang aktif: Tahap 1 untuk Januari sampai Juni, atau Tahap 2 untuk Juli sampai Desember.',async T=>{await T.clk('#t1');T.rg('#t1');await T.w(600);T.rg('#t1',0);}],
+  ['Lalu pilih jenis dana: BOSP Reguler, BOS Kinerja, atau BOS Afirmasi. Tabel hanya menampilkan data sesuai pilihan, supaya tidak tercampur.',async T=>{await T.clk('#j2');await T.clk('#j1');T.rg('#j1');await T.w(500);}]
+]},
+{n:'Tambah',init:()=>{rows=R0();return pg(4,BK());},steps:[
+  ['Untuk mencatat transaksi baru, tekan tombol Plus Transaksi.',async T=>{await T.clk('#bt');T.modal('Tambah Transaksi',FORM);}],
+  ['Isi tanggal, uraian, jenis transaksi, dan jumlah. Kolom lain, seperti kode kegiatan dan nomor bukti, dilengkapi sesuai kebutuhan.',async T=>{await T.fill('#f0','15/01/2026');await T.fill('#f1','Belanja Alat Kebersihan');await T.fill('#f2','Pengeluaran');await T.fill('#f3','450000');}],
+  ['Tekan Simpan. Transaksi langsung masuk ke tabel, dan saldo dihitung otomatis.',async T=>{await T.clk('#sv');T.unmodal();rows.push(['15/01','Belanja Alat Kebersihan',0,450000,'new']);T.draw();SFX.ok();await T.w(800);}]
+]},
+{n:'Ubah',init:()=>{rows=R0();rows.push(['15/01','Belanja Alat Kebersihan',0,450000]);return pg(4,BK());},steps:[
+  ['Untuk mengubah data, tekan Ubah pada kolom Aksi di baris transaksi yang dimaksud.',async T=>{await T.clk('.e2');T.modal('Ubah Transaksi',[['Tanggal','15/01/2026'],['Uraian','Belanja Alat Kebersihan'],['Jenis Transaksi','Pengeluaran'],['Jumlah (Rp)','450000']]);}],
+  ['Formulir terbuka berisi data lama. Perbaiki uraian atau jumlah yang keliru.',async T=>{await T.mv('#f1');await T.typ('#f1','Belanja Alat Kebersihan Kelas');await T.fill('#f3','475000');}],
+  ['Tekan Simpan. Baris langsung diperbarui, dan perubahan tercatat otomatis di Audit Trail.',async T=>{await T.clk('#sv');T.unmodal();rows[2]=['15/01','Belanja Alat Kebersihan Kelas',0,475000,'new'];T.draw();SFX.ok();await T.w(800);}]
+]},
+{n:'Hapus',init:()=>{rows=R0();rows.push(['15/01','Belanja Alat Kebersihan',0,450000],['20/01','Salah input (dobel)',0,450000]);return pg(4,BK());},steps:[
+  ['Untuk menghapus, tekan Hapus pada baris transaksi yang dimaksud.',async T=>{await T.clk('.d3');T.q('#tut-stage');$('#tut-stage').insertAdjacentHTML('beforeend','<div class="ov" id="ov"><div class="mc" style="width:300px"><h4>Hapus transaksi ini?</h4><div class="bar" style="margin-top:14px;justify-content:flex-end"><span class="bt">Batal</span><span class="bn" id="ok">OK</span></div></div></div>');SFX.pop();}],
+  ['Aplikasi meminta konfirmasi lebih dulu. Tekan OK bila yakin. Data yang sudah dihapus tidak bisa dibatalkan.',async T=>{await T.clk('#ok');T.unmodal();const tr=T.q('#tb tr:last-child');if(tr)tr.classList.add('gone');SFX.del();await T.w(700);rows.pop();T.draw();}],
+  ['Perlu diingat, bila tahap sedang terkunci, tombol hapus, tambah, dan import dinonaktifkan. Buka kunci tahap terlebih dahulu.',async T=>{await T.say('<div class="ban" style="background:#F6E3E0;color:#B23A2E">Tahap terkunci: buka kunci tahap untuk mengubah data.</div>',1800);}]
+]},
+{n:'Import',init:()=>{rows=R0();return pg(4,BK());},steps:[
+  ['Untuk memasukkan banyak transaksi sekaligus, gunakan Import Data. Pertama, tekan Unduh Template agar format kolom sesuai.',async T=>{await T.clk('#bd');SFX.pop();await T.say('<div class="ban">📄 template-bku.xlsx berhasil diunduh</div>',900);}],
+  ['Buka template di Excel, lalu isi tanggal, uraian, jenis transaksi, dan jumlah, satu transaksi per baris. File CSV, XLSX, dan XLS bisa diimpor.',async T=>{$('#tut-stage').insertAdjacentHTML('beforeend','<div class="ov" id="ov"><div class="mc" style="width:520px"><h4>template-bku.xlsx</h4><table class="tt"><tr><th>Tanggal</th><th>Uraian</th><th>Jenis</th><th>Jumlah</th></tr><tr class="new"><td>10/02</td><td>Honor Kegiatan</td><td>pengeluaran</td><td>600.000</td></tr><tr class="new"><td>12/02</td><td>Beli Buku Perpustakaan</td><td>pengeluaran</td><td>1.500.000</td></tr><tr class="new"><td>15/02</td><td>Biaya Listrik</td><td>pengeluaran</td><td>800.000</td></tr></table></div></div>');SFX.pop();await T.w(2800);T.unmodal();}],
+  ['Kembali ke aplikasi, tekan Import Data, pilih file tadi, lalu tekan Buka.',async T=>{await T.clk('#bi');$('#tut-stage').insertAdjacentHTML('beforeend','<div class="ov" id="ov"><div class="mc" style="width:320px"><h4>Pilih File</h4><div class="fl" id="fl">📄 bku-februari.xlsx</div><div class="bar" style="margin-top:12px;justify-content:flex-end"><span class="bn" id="ok">Buka</span></div></div></div>');SFX.pop();await T.clk('#fl');T.rg('#fl');await T.clk('#ok');T.unmodal();rows.push(['10/02','Honor Kegiatan',0,600000,'new'],['12/02','Beli Buku Perpustakaan',0,1500000,'new'],['15/02','Biaya Listrik',0,800000,'new']);T.draw();SFX.ok();T.q('#fb').innerHTML='<div class="ban">Import berhasil: 3 transaksi ditambahkan</div>';await T.w(900);}],
+  ['Data BKU juga bisa diekspor ke CSV, Excel, atau PDF. Hati-hati dengan Reset Data, karena menghapus data bagian yang sedang aktif.',async T=>{await T.mv('#bz');T.rg('#bz');await T.w(1200);}]
+]},
+{n:'Cetak & Selesai',init:()=>pg(4,'<h2>Buku Kas Umum</h2>'),steps:[
+  ['Setelah data lengkap, buka Cetak Dokumen untuk membuat kwitansi, nota pesan, BAST, dan dokumen SPJ langsung dari data BKU.',async T=>{await T.go(6,'<h2>Cetak Dokumen</h2><div class="bar"><span class="bt">Kwitansi</span><span class="bt">Nota Pesan</span><span class="bt">BAST</span><span class="bt">SPJ Lengkap</span></div><div class="cd">Pilih transaksi, lalu tekan Cetak.</div>');}],
+  ['Lakukan Backup Database secara berkala, dan periksa Audit Trail untuk melihat siapa mengubah apa.',async T=>{await T.nav(11);await T.nav(10);}],
+  ['Video panduan tambahan dari Admin Utama, serta animasi ini, bisa dibuka kapan saja lewat menu Video dan Animasi Panduan. Selamat bekerja!',async T=>{await T.nav(14);SFX.ok();}]
+]}
+];
+
+/* ---- kontrol ---- */
+async function tutPlay(i){
+  const id=++TUT.run;TUT.i=i;TUT.pause=false;TUT.intr=false;TUT.again=null;
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  $('#tut-pp').textContent='⏸';
+  document.querySelectorAll('#tut-ch button').forEach((b,k)=>b.classList.toggle('on',k===i));
+  const S=SC[i],T=mk(id);
+  try{
+    $('#tut-stage').innerHTML=S.init();$('#tut-cur').style.opacity=0;$('#tut-sub').textContent='';
+    for(const[say,fn]of S.steps){
+      if(id!==TUT.run)return;
+      $('#tut-sub').textContent=say;
+      await Promise.all([TUT.voice&&window.speechSynthesis?speakP(say,id):T.w(say.length*62),fn(T)]);
+      await T.w(450);
+    }
+    if(i<SC.length-1)tutPlay(i+1);else $('#tut-sub').textContent='Selesai. Pilih bab mana pun di atas untuk mengulang.';
+  }catch(e){if(e!==0)console.error(e);}
+}
+function tutPause(p){
+  TUT.pause=p;TUT.intr=p;
+  if(p){if(window.speechSynthesis)speechSynthesis.cancel();}
+  else if(TUT.again){const g=TUT.again;TUT.again=null;g();}
+  $('#tut-pp').textContent=p?'▶':'⏸';
+}
+function tutFit(){
+  const s=Math.min((innerWidth-16)/960,(innerHeight-150)/540),fit=$('#tut-fit');
+  $('#tut-box').style.transform='scale('+s+')';fit.style.width=960*s+'px';fit.style.height=540*s+'px';
+}
+window.tutOpen=function(i){
+  if(!$('#tut-ch').children.length)$('#tut-ch').innerHTML=SC.map((s,k)=>`<button type="button" data-c="${k}">${k+1}. ${s.n}</button>`).join('');
+  $('#tut').classList.add('on');tutFit();pickVoice();tutPlay(i||0);
+};
+function tutClose(){TUT.run++;TUT.intr=false;if(window.speechSynthesis)speechSynthesis.cancel();$('#tut').classList.remove('on');}
+$('#tut-x').onclick=tutClose;
+$('#tut-pp').onclick=()=>tutPause(!TUT.pause);
+$('#tut-prev').onclick=()=>tutPlay(Math.max(0,TUT.i-1));
+$('#tut-next').onclick=()=>tutPlay(Math.min(SC.length-1,TUT.i+1));
+$('#tut-ch').addEventListener('click',e=>{const b=e.target.closest('[data-c]');if(b)tutPlay(+b.dataset.c);});
+$('#tut-vo').onclick=e=>{TUT.voice=!TUT.voice;e.currentTarget.classList.toggle('on',TUT.voice);if(!TUT.voice&&window.speechSynthesis)speechSynthesis.cancel();pickVoice();};
+$('#tut-fx').onclick=e=>{TUT.sfx=!TUT.sfx;e.currentTarget.classList.toggle('on',TUT.sfx);};
+$('#tut-rt').onchange=e=>{TUT.rate=+e.target.value;};
+window.addEventListener('resize',tutFit);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#tut').classList.contains('on'))tutClose();});
+})();
+
 </script>
 </body>
 </html>
