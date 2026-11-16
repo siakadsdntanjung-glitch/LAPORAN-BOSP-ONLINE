@@ -3210,12 +3210,12 @@ const secondaryAuth = secondaryApp.auth();
 
 /* =========================================================================
    PERBAIKAN FOKUS UNTUK DIALOG NATIVE (alert/confirm)
-   Di Electron, alertFix()/confirmFix() bawaan browser memicu dialog native Windows
+   Di Electron, alertFix()/await confirmFix() bawaan browser memicu dialog native Windows
    yang levelnya di luar halaman web. Setelah dialog itu ditutup, fokus
    keyboard kadang TIDAK otomatis kembali ke jendela aplikasi, sehingga kolom
    input di halaman terlihat aktif tapi tidak bisa diketik sampai pengguna
-   mengklik sesuatu secara manual. alertFix()/confirmFix() di bawah ini
-   berperilaku identik dengan alertFix()/confirmFix() bawaan (pesan & nilai
+   mengklik sesuatu secara manual. alertFix()/await confirmFix() di bawah ini
+   berperilaku identik dengan alertFix()/await confirmFix() bawaan (pesan & nilai
    kembalian sama persis), hanya ditambah pemulihan fokus otomatis setelah
    dialog ditutup — meniru pola yang sudah dipakai di showPromptModal().
    ========================================================================= */
@@ -3236,16 +3236,46 @@ function pulihkanFokusSetelahDialog(){
   setTimeout(cobaFokus, 60);
   setTimeout(cobaFokus, 200);
 }
-function alertFix(pesan){
-  const hasil = alert(pesan);
-  pulihkanFokusSetelahDialog();
-  return hasil;
+/* Dialog HTML (pengganti alert()/confirm() bawaan). Dialog native di Electron merebut fokus keyboard jendela
+   sehingga semua kolom ketik terkunci sesudahnya. Modal ini murni HTML, jadi fokus tidak pernah hilang. */
+function _dlgBuka(pesan, konfirmasi, selesai){
+  const prev = document.activeElement;
+  const ov = document.createElement('div');
+  ov.className = 'no-print';
+  ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:2000;background:rgba(10,20,30,.5);display:flex;align-items:center;justify-content:center;padding:16px';
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;color:#1b2733;border-radius:14px;max-width:440px;width:100%;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3);font:14px/1.5 Inter,system-ui,sans-serif';
+  const p = document.createElement('div');
+  p.style.cssText = 'white-space:pre-line;margin-bottom:16px;max-height:60vh;overflow:auto;word-break:break-word';
+  p.textContent = String(pesan == null ? '' : pesan);
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;justify-content:flex-end;gap:8px';
+  let selesaiFlag = false;
+  function tutup(v){
+    if(selesaiFlag) return; selesaiFlag = true;
+    document.removeEventListener('keydown', kd, true);
+    ov.remove();
+    try{ if(prev && prev.focus && document.contains(prev)) prev.focus(); }catch(e){}
+    selesai(v);
+  }
+  function kd(e){ if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); tutup(false); } }
+  function tombol(teks, utama, nilai){
+    const bt = document.createElement('button'); bt.type = 'button'; bt.textContent = teks;
+    bt.style.cssText = 'padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;border:1px solid #c5d0db;' + (utama ? 'background:#1d6fd6;color:#fff;border-color:#1d6fd6;font-weight:600' : 'background:#fff;color:#1b2733');
+    bt.addEventListener('click', ()=>tutup(nilai));
+    return bt;
+  }
+  let okBtn;
+  if(konfirmasi){ row.appendChild(tombol('Batal', false, false)); }
+  okBtn = tombol('OK', true, true); row.appendChild(okBtn);
+  box.appendChild(p); box.appendChild(row); ov.appendChild(box);
+  document.body.appendChild(ov);
+  document.addEventListener('keydown', kd, true);
+  okBtn.focus();
 }
-function confirmFix(pesan){
-  const hasil = confirm(pesan);
-  pulihkanFokusSetelahDialog();
-  return hasil;
-}
+function alertFix(pesan){ _dlgBuka(pesan, false, ()=>{}); }
+function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res)); }
 
 /* =========================================================================
    VERSION GATE
@@ -3254,7 +3284,7 @@ function confirmFix(pesan){
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.1.10"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.1.11"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -3707,7 +3737,7 @@ document.getElementById('btn-lupa-password').addEventListener('click', async ()=
   const emailField = document.getElementById('login-email');
   let email = emailField.value.trim();
   if(!email){
-    email = prompt('Masukkan email akun Anda untuk menerima tautan reset kata sandi:') || '';
+    email = (await showPromptModal('Masukkan email akun Anda untuk menerima tautan reset kata sandi:', '')) || '';
     email = email.trim();
   }
   if(!email){ return; }
@@ -4437,7 +4467,7 @@ function renderVerifikasiTable(){
   document.getElementById('tbl-verifikasi').innerHTML = rows || `<tr><td colspan="5" class="py-6 text-center text-navy-300">Belum ada pendaftaran.</td></tr>`;
 
   document.querySelectorAll('.btn-kunci-akses').forEach(b=>b.addEventListener('click', async ()=>{
-    if(!confirmFix('Kunci akses menu untuk Admin Sekolah ini? Ia tidak akan bisa mengakses menu apa pun sampai Anda membuka kuncinya kembali. Kepala Sekolah (jika ada) tidak terpengaruh.')) return;
+    if(!await confirmFix('Kunci akses menu untuk Admin Sekolah ini? Ia tidak akan bisa mengakses menu apa pun sampai Anda membuka kuncinya kembali. Kepala Sekolah (jika ada) tidak terpengaruh.')) return;
     try{
       await db.ref('sekolah/'+b.dataset.npsn).update({
         aksesDikunci: true,
@@ -4477,7 +4507,7 @@ function renderVerifikasiTable(){
     }
   }));
   document.querySelectorAll('.btn-nonaktifkan').forEach(b=>b.addEventListener('click', async ()=>{
-    if(confirmFix('Non-aktifkan akun ini? Admin Sekolah tidak akan bisa mengakses sistem.')){
+    if(await confirmFix('Non-aktifkan akun ini? Admin Sekolah tidak akan bisa mengakses sistem.')){
       try{
         await db.ref('users/'+b.dataset.uid+'/status').set('nonaktif');
       }catch(err){
@@ -4565,7 +4595,7 @@ document.getElementById('btn-toggle-maintenance').addEventListener('click', asyn
   const pesan = document.getElementById('maintenance-pesan-input').value.trim();
 
   if(!aktifSekarang){
-    const yakin = confirmFix('Aktifkan Mode Perbaikan Server?\n\nSeluruh Admin Sekolah & Kepala Sekolah TIDAK akan bisa mengakses SIKEBOS (baik lewat aplikasi maupun website) sampai Anda menonaktifkannya kembali dari menu ini.');
+    const yakin = await confirmFix('Aktifkan Mode Perbaikan Server?\n\nSeluruh Admin Sekolah & Kepala Sekolah TIDAK akan bisa mengakses SIKEBOS (baik lewat aplikasi maupun website) sampai Anda menonaktifkannya kembali dari menu ini.');
     if(!yakin) return;
   }
 
@@ -4621,7 +4651,7 @@ document.getElementById('modal-notif-demo-kirim').addEventListener('click', asyn
 
   // ---- Mode massal: kirim ke setiap NPSN satu per satu, catat gagal jika ada ----
   if(npsnMassal){
-    if(!confirmFix(`Kirim notifikasi ini ke SEMUA ${npsnMassal.length} sekolah?` + (kunciAkses ? '\nAkses menu Admin Sekolah akan DIKUNCI untuk semua sekolah tersebut.' : ''))) return;
+    if(!await confirmFix(`Kirim notifikasi ini ke SEMUA ${npsnMassal.length} sekolah?` + (kunciAkses ? '\nAkses menu Admin Sekolah akan DIKUNCI untuk semua sekolah tersebut.' : ''))) return;
     kirimBtn.disabled = true;
     let sukses = 0;
     const gagal = [];
@@ -5632,7 +5662,7 @@ function renderBKU(){
       alertFix(`${TAHAP_PERIODE[state.tahapAktif].label} sedang terkunci. Buka kunci tahap terlebih dahulu untuk menghapus transaksi.`);
       return;
     }
-    if(confirmFix('Hapus transaksi ini?')){
+    if(await confirmFix('Hapus transaksi ini?')){
       try{
         const txHapus = state.transactions.find(x=>x.id===b.dataset.id);
         await db.ref('transaksi_bku/'+state.userData.npsn+'/'+b.dataset.id).remove();
@@ -5846,8 +5876,8 @@ document.getElementById('btn-toggle-kunci-tahap').addEventListener('click', asyn
   const sedangTerkunci = isTahapTerkunci(tahap);
   const label = TAHAP_PERIODE[tahap].label;
   const konfirmasi = sedangTerkunci
-    ? confirmFix(`Buka kunci laporan ${label}? Data Buku Kas Umum pada periode ini akan bisa ditambah/diubah/dihapus kembali.`)
-    : confirmFix(`Kunci laporan ${label} sekarang? Setelah dikunci, transaksi BKU pada periode ini tidak dapat ditambah, diubah, maupun dihapus sampai kunci dibuka kembali. Ini membantu memastikan data ${label} tidak tercampur dengan tahap lainnya.`);
+    ? await confirmFix(`Buka kunci laporan ${label}? Data Buku Kas Umum pada periode ini akan bisa ditambah/diubah/dihapus kembali.`)
+    : await confirmFix(`Kunci laporan ${label} sekarang? Setelah dikunci, transaksi BKU pada periode ini tidak dapat ditambah, diubah, maupun dihapus sampai kunci dibuka kembali. Ini membantu memastikan data ${label} tidak tercampur dengan tahap lainnya.`);
   if(!konfirmasi) return;
   try{
     await db.ref(`sekolah/${npsn}/tahapKunci/${tahap}`).set({
@@ -5972,7 +6002,7 @@ function renderPegawai(){
   tbody.querySelectorAll('.btn-hapus-pg').forEach(b=>b.addEventListener('click', async ()=>{
     const p = getPegawaiList().find(x=>x.id===b.dataset.id);
     if(!p) return;
-    if(!confirmFix(`Hapus ${p.nama} dari Data Pegawai?\n\n(Transaksi lama yang sudah memakai nama ini tidak ikut berubah.)`)) return;
+    if(!await confirmFix(`Hapus ${p.nama} dari Data Pegawai?\n\n(Transaksi lama yang sudah memakai nama ini tidak ikut berubah.)`)) return;
     try{
       await db.ref('sekolah/'+state.userData.npsn+'/pegawai/'+p.id).remove();
       logAudit('Data Pegawai', 'hapus', `Hapus pegawai ${p.nama}`);
@@ -6261,7 +6291,7 @@ function renderBukuBank(){
   document.getElementById('tbl-bank').innerHTML = rows || `<tr><td colspan="7" class="py-8 text-center text-navy-300 font-sans">Belum ada catatan bank.</td></tr>`;
   document.querySelectorAll('.btn-edit-bank').forEach(b=>b.addEventListener('click', ()=>openBankModal(b.dataset.id)));
   document.querySelectorAll('.btn-hapus-bank').forEach(b=>b.addEventListener('click', async ()=>{
-    if(confirmFix('Hapus catatan bank ini?')){
+    if(await confirmFix('Hapus catatan bank ini?')){
       try{
         const bHapus = state.bukuBank.find(x=>x.id===b.dataset.id);
         await db.ref('buku_bank/'+state.userData.npsn+'/'+b.dataset.id).remove();
@@ -6347,7 +6377,7 @@ function renderBukuPajak(){
   document.getElementById('tbl-pajak').innerHTML = rows || `<tr><td colspan="8" class="py-8 text-center text-navy-300 font-sans">Belum ada catatan pajak.</td></tr>`;
   document.querySelectorAll('.btn-edit-pajak').forEach(b=>b.addEventListener('click', ()=>openPajakModal(b.dataset.id)));
   document.querySelectorAll('.btn-hapus-pajak').forEach(b=>b.addEventListener('click', async ()=>{
-    if(confirmFix('Hapus catatan pajak ini?')){
+    if(await confirmFix('Hapus catatan pajak ini?')){
       try{
         const pHapus = state.bukuPajak.find(x=>x.id===b.dataset.id);
         await db.ref('buku_pajak/'+state.userData.npsn+'/'+b.dataset.id).remove();
@@ -6436,7 +6466,7 @@ function renderRekonsiliasi(){
 
   document.querySelectorAll('.btn-edit-rekon').forEach(b=>b.addEventListener('click', ()=>openRekonModal(b.dataset.id)));
   document.querySelectorAll('.btn-hapus-rekon').forEach(b=>b.addEventListener('click', async ()=>{
-    if(confirmFix('Hapus mutasi rekening koran ini?')){
+    if(await confirmFix('Hapus mutasi rekening koran ini?')){
       try{
         const rHapus = state.rekeningKoran.find(x=>x.id===b.dataset.id);
         await db.ref('rekening_koran/'+state.userData.npsn+'/'+b.dataset.id).remove();
@@ -6691,7 +6721,7 @@ function renderRkas(){
 
   document.querySelectorAll('.btn-edit-rkas').forEach(b=>b.addEventListener('click', ()=>openRkasModal(b.dataset.id)));
   document.querySelectorAll('.btn-hapus-rkas').forEach(b=>b.addEventListener('click', async ()=>{
-    if(confirmFix('Hapus Kegiatan RKAS ini? Data realisasi pada Buku Kas Umum tidak akan terhapus.')){
+    if(await confirmFix('Hapus Kegiatan RKAS ini? Data realisasi pada Buku Kas Umum tidak akan terhapus.')){
       try{
         const rkHapus = state.rkas.find(x=>x.id===b.dataset.id);
         await db.ref('rkas/'+state.userData.npsn+'/'+b.dataset.id).remove();
@@ -7043,7 +7073,7 @@ function renderOpnameKas(){
     if(t){ buildOpnameKasDocument(t); window.print(); }
   }));
   document.querySelectorAll('.btn-hapus-opname').forEach(b=>b.addEventListener('click', async ()=>{
-    if(confirmFix('Hapus catatan pemeriksaan kas ini?')){
+    if(await confirmFix('Hapus catatan pemeriksaan kas ini?')){
       try{
         const oHapus = state.opnameKas.find(x=>x.id===b.dataset.id);
         await db.ref('opname_kas/'+state.userData.npsn+'/'+b.dataset.id).remove();
@@ -7808,7 +7838,7 @@ document.getElementById('btn-impor-mulai').addEventListener('click', async ()=>{
   const pesan = mode === 'ganti'
     ? 'Mode GANTI SELURUHNYA: data sekolah saat ini akan diganti persis sama dengan isi berkas, dan data yang tidak ada di berkas akan TERHAPUS.\n\nSalinan backup data saat ini akan diunduh lebih dulu. Lanjutkan?'
     : 'Mode GABUNGKAN: semua data dari berkas akan dimasukkan, data yang sudah ada tetap dipertahankan.\n\nSalinan backup data saat ini akan diunduh lebih dulu. Lanjutkan?';
-  if(!confirmFix(pesan)) return;
+  if(!await confirmFix(pesan)) return;
   const btn = document.getElementById('btn-impor-mulai');
   btn.disabled = true;
   document.getElementById('impor-hasil').classList.add('hidden');
@@ -7924,7 +7954,7 @@ function renderPersetujuan(){
 
   if(isKepsek && !sudahDisetujui){
     document.getElementById('btn-setujui-bulan-ini').addEventListener('click', async ()=>{
-      if(!confirmFix(`Setujui laporan BKU bulan ${labelBulan(bulanIni)}? Tindakan ini berlaku sebagai paraf virtual dan tidak dapat ditarik kembali dari halaman ini.`)) return;
+      if(!await confirmFix(`Setujui laporan BKU bulan ${labelBulan(bulanIni)}? Tindakan ini berlaku sebagai paraf virtual dan tidak dapat ditarik kembali dari halaman ini.`)) return;
       const kepsek = (state.schoolData||{}).kepsek || {};
       try{
         await db.ref('persetujuan/'+state.userData.npsn+'/'+bulanIni).set({
@@ -8526,7 +8556,7 @@ function showPromptModal(message, defaultValue){
 
     // Ambil fokus jendela lebih dulu, lalu coba fokuskan kotak input beberapa
     // kali dengan jeda singkat. Ini diperlukan karena bila modal dipanggil
-    // tepat setelah dialog native (confirmFix()/alertFix()) ditutup, jendela Electron
+    // tepat setelah dialog native (await confirmFix()/alertFix()) ditutup, jendela Electron
     // kadang belum benar-benar mengembalikan fokus keyboard ke halaman pada
     // saat itu juga, sehingga panggilan focus() tunggal bisa gagal "diam-diam"
     // (kotak terlihat tapi ketikan tidak masuk).
@@ -10436,8 +10466,8 @@ function nsRefreshHints(dariTab){
     el.insertAdjacentHTML('afterend', `<div class="ns-hint no-print flex items-center justify-between gap-2 mt-1 text-[11px] text-navy-300" data-ns-for="${f.input}"><span class="ns-next truncate"></span><button type="button" class="ns-btn shrink-0 font-semibold text-gold-500 hover:text-gold-600">Ambil nomor baru</button></div>`);
     const btn = el.parentNode.querySelector('.ns-btn');
     btn.addEventListener('click', async ()=>{
-      if(nsTerpakai(el) && !confirmFix('Nomor ini sudah dipakai untuk dokumen sebelumnya. Ambil nomor baru?')) return;
-      if(el.value.trim() && !nsTerpakai(el) && !nsMasihPratinjau(el) && !confirmFix('Kolom nomor berisi isian manual. Ganti dengan nomor otomatis?')) return;
+      if(nsTerpakai(el) && !await confirmFix('Nomor ini sudah dipakai untuk dokumen sebelumnya. Ambil nomor baru?')) return;
+      if(el.value.trim() && !nsTerpakai(el) && !nsMasihPratinjau(el) && !await confirmFix('Kolom nomor berisi isian manual. Ganti dengan nomor otomatis?')) return;
       btn.disabled = true;
       try{ await nsAmbilUntuk(f); }catch(err){ alertFix('Gagal mengambil nomor otomatis: '+(err.message||'periksa koneksi internet.')); }
       btn.disabled = false;
@@ -10542,7 +10572,7 @@ function nsRenderRiwayat(){
 }
 async function nsBatalkan(id){
   const r = (nsData().riwayat||{})[id]; if(!r) return;
-  if(!confirmFix('Batalkan nomor '+r.nomor+'?\n\nNomor urut '+r.urut+' akan dipakai lagi untuk surat berikutnya. Pastikan nomor ini belum dipakai pada surat yang sudah dicetak/dikirim.')) return;
+  if(!await confirmFix('Batalkan nomor '+r.nomor+'?\n\nNomor urut '+r.urut+' akan dipakai lagi untuk surat berikutnya. Pastikan nomor ini belum dipakai pada surat yang sudah dicetak/dikirim.')) return;
   try{
     const res = await db.ref(nsBase()+'/counter/'+r.periode+'/'+r.ck).transaction(v=>{ if(v===null) return null; return Number(v)===Number(r.urut) ? Number(v)-1 : undefined; });
     if(!res.committed){ alertFix('Nomor ini tidak bisa dibatalkan karena sudah ada nomor yang lebih baru.'); return; }
@@ -10576,7 +10606,7 @@ function renderNomorSurat(){
           const c = nsCfg(), th = Number(nsEl('ns-tahun').value), pk = nsPK(c, th);
           const val = Math.max(0, Math.floor(Number(nsEl('ns-last-semua').value)||0));
           const cur = Number(((nsData().counter||{})[pk]||{}).semua) || 0;
-          if(val < cur && !confirmFix('Nomor terakhir diturunkan dari '+cur+' ke '+val+'. Ini bisa menyebabkan nomor ganda dengan surat yang sudah terbit. Lanjutkan?')) return;
+          if(val < cur && !await confirmFix('Nomor terakhir diturunkan dari '+cur+' ke '+val+'. Ini bisa menyebabkan nomor ganda dengan surat yang sudah terbit. Lanjutkan?')) return;
           const up = { kode: nsEl('ns-kode-utama').value.trim() || '420' };
           NS_JENIS.forEach(j=>{ up['jenis/'+j.key+'/kode'] = nsEl('ns-kode-'+j.key).value.trim() || null; });
           await db.ref(nsBase()+'/pengaturan').update(up);
@@ -10810,7 +10840,7 @@ function editSKTersimpan(rec){
       if(btn.dataset.act === 'cetak') return cetakSKTersimpan(rec);
       if(btn.dataset.act === 'edit') return editSKTersimpan(rec);
       if(btn.dataset.act === 'hapus'){
-        if(!confirmFix(`Hapus ${SK_LABEL[rec.jenis]||'SK'} No. ${rec.nomor||'-'}?\n\nSK yang dihapus tidak dapat dikembalikan.`)) return;
+        if(!await confirmFix(`Hapus ${SK_LABEL[rec.jenis]||'SK'} No. ${rec.nomor||'-'}?\n\nSK yang dihapus tidak dapat dikembalikan.`)) return;
         try{
           await db.ref('sekolah/'+state.userData.npsn+'/dokumenSK/'+rec.id).remove();
           logAudit('Cetak SK', 'hapus', `Hapus ${SK_LABEL[rec.jenis]||'SK'} No. ${rec.nomor||'-'}`);
@@ -11524,7 +11554,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     }));
     box.querySelectorAll('[data-pd-hapus]').forEach(b=>b.addEventListener('click', async ()=>{
       const id = b.dataset.pdHapus, e = arr.find(x=>x.id===id); if(!e) return;
-      if(!confirmFix(`Hapus perjalanan dinas "${e.nama}"?`)) return;
+      if(!await confirmFix(`Hapus perjalanan dinas "${e.nama}"?`)) return;
       try{
         const base = pRekon()+'/';
         await db.ref(base+'perjadinManual/'+id).remove();
@@ -11547,7 +11577,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     [harian,transport].forEach(t=>{ if(t>0){ const j=vol*t; tambah.push({jumlah:j,t1:tahap==='1'?j:0,t2:tahap==='2'?j:0}); } });
     const cek = cekAnggaranPd(tambah, pdEditId);
     if(cek.msg.length){
-      if(!confirmFix('PERINGATAN: dana melebihi anggaran RAPBS.\n\n- '+cek.msg.join('\n- ')+'\n\nTetap simpan?')) return;
+      if(!await confirmFix('PERINGATAN: dana melebihi anggaran RAPBS.\n\n- '+cek.msg.join('\n- ')+'\n\nTetap simpan?')) return;
     }
     try{
       if(pdEditId){
@@ -11583,9 +11613,9 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
       if(!hasil.items.length) throw new Error('Tidak ditemukan rincian belanja. Pastikan berkas adalah “Kertas Kerja RKAS” (Per Tahap atau Per Triwulan) dari aplikasi RKAS.');
       const npsn = state.userData.npsn;
       if(hasil.meta.npsn && String(hasil.meta.npsn)!==String(npsn)){
-        if(!confirmFix(`NPSN pada PDF (${hasil.meta.npsn}) berbeda dari NPSN sekolah ini (${npsn}). Tetap impor?`)){ setPesan('',''); return; }
+        if(!await confirmFix(`NPSN pada PDF (${hasil.meta.npsn}) berbeda dari NPSN sekolah ini (${npsn}). Tetap impor?`)){ setPesan('',''); return; }
       }
-      if(rapbsItems().length && !confirmFix('Data RAPBS yang sudah ada akan diganti dengan isi berkas ini. Lanjutkan?')){ setPesan('',''); return; }
+      if(rapbsItems().length && !await confirmFix('Data RAPBS yang sudah ada akan diganti dengan isi berkas ini. Lanjutkan?')){ setPesan('',''); return; }
       const total = hasil.items.reduce((a,x)=>a+x.jumlah,0);
       const items = hasil.items.map(x=>{ const o=Object.assign({},x); o.kategori = RekonFill.classify(o); return o; });
       const payload = JSON.parse(JSON.stringify({ meta:hasil.meta, items, namaBerkas:f.name, diimporPada:Date.now() }));
@@ -11598,7 +11628,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     }
   });
   $('btn-rekon-hapus').addEventListener('click', async ()=>{
-    if(!confirmFix('Hapus seluruh data RAPBS (data induk rekon) sekolah ini? Pengaturan data pelengkap tidak ikut terhapus.')) return;
+    if(!await confirmFix('Hapus seluruh data RAPBS (data induk rekon) sekolah ini? Pengaturan data pelengkap tidak ikut terhapus.')) return;
     try{ await db.ref(pRapbs()).remove(); logAudit('Rekon','hapus','['+labelJd()+'] Hapus data induk RAPBS'); setPesan('Data RAPBS dihapus.','info'); }
     catch(err){ alertFix('Gagal menghapus: '+(err.message||err)); }
   });
@@ -11777,10 +11807,10 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
         card.querySelector('[data-m-total]').innerHTML = `Total rincian Rp ${fmt(t)} dari anggaran Rp ${fmt(x.jumlah)} — ${sel===0?'<span class="text-forest">sama ✓</span>':'<span class="text-rust">selisih Rp '+fmt(sel)+'</span>'}`;
       };
       card.querySelectorAll('[data-f]').forEach(inp=>{ inp.addEventListener('input', upd); inp.addEventListener('change', upd); });
-      card.querySelectorAll('[data-m-split]').forEach(b=>b.addEventListener('click', ()=>{
+      card.querySelectorAll('[data-m-split]').forEach(b=>b.addEventListener('click', async ()=>{
         upd(); const i = Number(b.dataset.mSplit), l = modalEdit.lines[i];
         const q = cariKuantitas(x, l.uraian, (Number(l.vol)||0)*(Number(l.tarif)||0)), def = q ? q.n : (Number(l.vol)>1 ? Number(l.vol) : 2);
-        const v = prompt('Pecah baris ini menjadi berapa baris? (harga satuan dibagi rata dari total Rp '+fmt((Number(l.vol)||0)*(Number(l.tarif)||0))+')', String(def));
+        const v = await showPromptModal('Pecah baris ini menjadi berapa baris? (harga satuan dibagi rata dari total Rp '+fmt((Number(l.vol)||0)*(Number(l.tarif)||0))+')', String(def));
         const n = Math.round(Number(v)); if(!v || !(n>=2) || n>1000) return;
         if(!(Number(l.vol)>0) || !(Number(l.tarif)>0)){ alertFix('Isi volume dan harga satuan baris ini dulu.'); return; }
         modalEdit.lines.splice(i,1,...pecahBaris(l, n, q ? q.sat : (n===Number(l.vol) ? l.sat : l.sat)));
@@ -11791,7 +11821,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
       card.querySelector('[data-m-batal]').addEventListener('click', ()=>{ modalEdit=null; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal(); });
       const h = card.querySelector('[data-m-hapus]');
       if(h) h.addEventListener('click', async ()=>{
-        if(!confirm('Hapus rincian dan kembalikan ke satu baris gelondongan?')) return;
+        if(!await confirmFix('Hapus rincian dan kembalikan ke satu baris gelondongan?')) return;
         try{ await db.ref(pRekon()+'/rincianModal/'+key).remove(); logAudit('Rekon','hapus','Hapus rincian belanja modal: '+RekonFill.clean(x.uraian)); modalEdit=null; if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); renderModal(); }
         catch(err){ alertFix('Gagal menghapus: '+(err.message||err)); }
       });
@@ -11802,7 +11832,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
         const bad = lines.findIndex(l=>!String(l.uraian||'').trim() || !(Number(l.vol)>0) || !(Number(l.tarif)>0));
         if(bad>=0){ alertFix('Baris '+(bad+1)+' belum lengkap: uraian, volume, dan harga satuan wajib diisi (lebih dari 0).'); return; }
         const t = sumLines(lines), sel = (x.jumlah||0)-t;
-        if(sel!==0 && !confirm('Total rincian Rp '+fmt(t)+' berbeda dengan anggaran RAPBS Rp '+fmt(x.jumlah)+' (selisih Rp '+fmt(sel)+'). Tetap simpan?')) return;
+        if(sel!==0 && !await confirmFix('Total rincian Rp '+fmt(t)+' berbeda dengan anggaran RAPBS Rp '+fmt(x.jumlah)+' (selisih Rp '+fmt(sel)+'). Tetap simpan?')) return;
         const data = lines.map(l=>({uraian:String(l.uraian).trim().replace(/\s+/g,' '), vol:Number(l.vol), sat:String(l.sat||'').trim(), tarif:Number(l.tarif), tahap:String(l.tahap)==='2'?'2':'1'}));
         try{
           await db.ref(pRekon()+'/rincianModal/'+key).set(data);
@@ -12128,7 +12158,7 @@ document.addEventListener('click',async e=>{
   if(b.dataset.play){const v=f(b.dataset.play);if(v)vpPlay(v);}
   else if(b.dataset.vedit){const v=f(b.dataset.vedit);if(!v)return;$('#vp-id').value=v.id;$('#vp-judul').value=v.judul||'';$('#vp-url').value=v.url||'';$('#vp-desc').value=v.deskripsi||'';$('#vp-form-title').textContent='Ubah Video';$('#vp-judul').scrollIntoView({behavior:'smooth',block:'center'});}
   else if(b.dataset.vdel){
-    if(!confirmFix('Hapus video ini dari daftar? Video tidak akan tampil lagi di akun sekolah.'))return;
+    if(!await confirmFix('Hapus video ini dari daftar? Video tidak akan tampil lagi di akun sekolah.'))return;
     try{await db.ref('config/videoPanduan/'+b.dataset.vdel).remove();}catch(err){alertFix('Gagal menghapus video: '+(err.message||err));}
   }
 });
