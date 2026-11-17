@@ -211,15 +211,26 @@
   #cetak-tabs .cetak-tab{ display:none; }
   #cetak-tabs:not(:has(#cetak-gabung-wrap:not(.hidden))){ display:none; }
   @media print{
-    body *{ visibility:hidden; }
-    #print-root, #print-root *{ visibility:visible; }
-    #print-root{ display:block !important; position:absolute; inset:0; margin:0; padding:0; }
+    html, body{ height:auto !important; min-height:0 !important; overflow:visible !important; background:#fff !important; }
+    body > *:not(#print-root){ display:none !important; }
+    #print-root{ display:block !important; position:static !important; width:auto !important; height:auto !important; overflow:visible !important; margin:0; padding:0; }
     .no-print{ display:none !important; }
     /* Judul kolom tabel otomatis diulang di setiap halaman lanjutan; baris tidak
        terpotong di pergantian halaman; baris TOTAL (tfoot) hanya muncul di akhir. */
     #print-root thead{ display:table-header-group; }
     #print-root tfoot{ display:table-row-group; }
     #print-root tr{ page-break-inside:avoid; break-inside:avoid; }
+    /* --- Perbaikan hasil cetak/Simpan PDF (aplikasi desktop) ---
+       1) Padding pembungkus 24px dibuang: margin kertas sudah diatur lewat @page, jadi
+          padding itu hanya menyempitkan isi & menyisakan lebar kertas tidak terpakai.
+       2) Kotak/bingkai dokumen yang terpotong pergantian halaman digambar utuh (border
+          muncul di atas & bawah tiap potongan), tidak lagi terbuka/terpotong.
+       3) Isi selalu memenuhi lebar area cetak; tabel tidak melebihi kertas. */
+    #print-root table.pf > tbody > tr{ break-inside:auto !important; page-break-inside:auto !important; }
+    #print-root table.pf > thead{ display:table-header-group; } #print-root table.pf > tfoot{ display:table-footer-group; }
+    #print-root > div{ padding:0 !important; width:100% !important; max-width:none !important; margin:0 !important; box-sizing:border-box; }
+    #print-root div[style*="border:1px solid"], #print-root div[style*="border: 1px solid"]{
+      -webkit-box-decoration-break:clone; box-decoration-break:clone; box-sizing:border-box; width:100%; max-width:none; }
   }
 
   /* ================= Tema "Cetak Dokumen" untuk SEMUA menu (kecuali tabel BKU & halaman Cetak) ================= */
@@ -3284,7 +3295,7 @@ function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res));
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.1.11"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.1.16"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -9311,7 +9322,7 @@ function buildSpjLengkapDocument(){
           <div style="text-align:center; width:45%;">
             <div>Lunas dibayar</div>
             <div>Bendahara BOS,</div>
-            <div style="height:80px;"></div>
+            <div style="height:118px;"></div>
             <div style="padding-top:6px;"><b>${escapeHtml(bendahara.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(bendahara.nip||'-')}</div>
           </div>
           <div style="text-align:center; width:45%;">
@@ -9322,7 +9333,7 @@ function buildSpjLengkapDocument(){
         </div>
         <div style="text-align:center; margin-top:22px; font-size:13px;">
           Setuju dibayar,<br>Kepala Sekolah,
-          <div style="height:80px;"></div>
+          <div style="height:100px;"></div>
           <b>${escapeHtml(kepsek.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(kepsek.nip||'-')}
         </div>
       </div>`;
@@ -9344,7 +9355,7 @@ function buildSpjLengkapDocument(){
 function tglLaporan(){ try{ return localStorage.getItem('sikebos.tglLaporan')||todayStr(); }catch(e){ return todayStr(); } }
 function tglLapHtml(){ return '<span class="tgl-lap">'+formatTanggalPanjang(tglLaporan())+'</span>'; }
 /* 7. Kotak meterai untuk kuitansi di atas Rp5.000.000 */
-function meteraiBox(j){ return (Number(j)||0) > 5000000 ? '<div style="height:80px; display:flex; align-items:center; justify-content:center;"><div style="border:1px dashed #666; width:74px; height:48px; font-size:9px; display:flex; align-items:center; justify-content:center; text-align:center; color:#666;">Meterai<br>Rp10.000</div></div>' : '<div style="height:80px;"></div>'; }
+function meteraiBox(j){ return (Number(j)||0) > 5000000 ? '<div style="height:118px; display:flex; align-items:center; justify-content:center;"><div style="border:1px dashed #666; width:116px; height:90px; font-size:10px; display:flex; align-items:center; justify-content:center; text-align:center; color:#666;">Tempel<br>Meterai<br>Rp10.000</div></div>' : '<div style="height:118px;"></div>'; }
 /* ---- Kop surat: dipakai bersama oleh Kwitansi / Nota Pesan / BAST ---- */
 function buildKopSuratHtml(s){
   const kop = s.kopSurat || {};
@@ -9369,7 +9380,7 @@ function buildSkGuruDocument(skHeader, guru){
   const kepsek = s.kepsek || {};
   const root = document.getElementById('print-root');
   const kopHtml = buildKopSuratHtml(s);
-  const box = 'border:1px solid #16324F; padding:20px; margin-bottom:16px; page-break-inside:avoid; font-family:Inter,sans-serif; font-size:13px; color:#23262B;';
+  const box = 'border:1px solid #16324F; padding:20px; margin-bottom:16px; font-family:Inter,sans-serif; font-size:13px; color:#23262B;';
 
   const dasarList = (skHeader.dasar||'').split('\n').map(l=>l.trim()).filter(Boolean);
   // Daftar bernomor dirender dengan tabel (bukan <ol>) agar nomor urut selalu
@@ -9391,7 +9402,8 @@ function buildSkGuruDocument(skHeader, guru){
       <td style="border:1px solid #16324F; padding:5px 6px;">${escapeHtml(g.tugas||'-')}</td>
     </tr>`).join('');
 
-  const boxBreak = 'border:1px solid #16324F; padding:20px; margin-bottom:16px; page-break-before:always; page-break-inside:avoid; font-family:Inter,sans-serif; font-size:13px; color:#23262B;';
+  const boxBreak = 'border:1px solid #16324F; padding:20px; margin-bottom:16px; page-break-before:always; break-before:page; font-family:Inter,sans-serif; font-size:13px; color:#23262B;';
+  const ttd = 'page-break-inside:avoid; break-inside:avoid;';
 
   const bodyHtml = `
     <div style="${box}">
@@ -9418,7 +9430,7 @@ function buildSkGuruDocument(skHeader, guru){
         <tr><td style="vertical-align:top;">KETIGA</td><td style="vertical-align:top;">:</td><td style="vertical-align:top; text-align:justify;">Keputusan ini berlaku sejak tanggal ditetapkan dengan ketentuan apabila di kemudian hari terdapat kekeliruan dalam keputusan ini akan diadakan perbaikan sebagaimana mestinya.</td></tr>
       </table>
 
-      <div style="text-align:center; margin-top:26px; font-size:13px;">
+      <div style="text-align:center; margin-top:14px; font-size:13px; ${ttd}">
         Ditetapkan di ${escapeHtml(s.namaSekolah||'')}<br>
         Pada tanggal ${formatTanggalPanjang(skHeader.tanggal)}<br>
         Kepala ${escapeHtml(s.namaSekolah||'')},
@@ -9443,7 +9455,7 @@ function buildSkGuruDocument(skHeader, guru){
         <tbody>${guruRows}</tbody>
       </table>
 
-      <div style="text-align:center; margin-top:30px; font-size:13px;">
+      <div style="text-align:center; margin-top:30px; font-size:13px; ${ttd}">
         Ditetapkan di ${escapeHtml(s.namaSekolah||'')}<br>
         Pada tanggal ${formatTanggalPanjang(skHeader.tanggal)}<br>
         Kepala ${escapeHtml(s.namaSekolah||'')},
@@ -9622,7 +9634,7 @@ function buildPrintDocument(docType, items, docHeader){
             <div style="text-align:center; width:45%;">
               <div>Lunas dibayar</div>
               <div>Bendahara BOS,</div>
-              <div style="height:80px;"></div>
+              <div style="height:118px;"></div>
               <div style="padding-top:6px;"><b>${escapeHtml(bendahara.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(bendahara.nip||'-')}</div>
             </div>
             <div style="text-align:center; width:45%;">
@@ -9633,7 +9645,7 @@ function buildPrintDocument(docType, items, docHeader){
           </div>
           <div style="text-align:center; margin-top:22px; font-size:13px;">
             Setuju dibayar,<br>Kepala Sekolah,
-            <div style="height:80px;"></div>
+            <div style="height:100px;"></div>
             <b>${escapeHtml(kepsek.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(kepsek.nip||'-')}
           </div>
         </div>`;
@@ -11987,7 +11999,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
   const asli = window.print.bind(window);
   const bar = document.createElement('div');
   bar.id='pv-bar'; bar.className='no-print';
-  bar.innerHTML='<div><b>Pratinjau Cetak</b><small>Periksa dokumen, lalu klik Cetak</small></div><div style="display:flex;gap:8px;align-items:center"><label style="font-size:12px;color:#B9C9D8">Tgl. laporan <input type="date" id="pv-tgl" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"></label><label style="font-size:12px;color:#B9C9D8">Kertas <select id="pv-kertas" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"><option value="auto">Otomatis</option><option value="a4">A4</option><option value="f4">F4</option></select></label><button id="pv-tutup" type="button">Tutup (Esc)</button><button id="pv-cetak" type="button">Cetak / Simpan PDF</button></div>';
+  bar.innerHTML='<div><b>Pratinjau Cetak</b><small>Periksa dokumen, lalu klik Cetak</small></div><div style="display:flex;gap:8px;align-items:center"><label style="font-size:12px;color:#B9C9D8">Tgl. laporan <input type="date" id="pv-tgl" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"></label><label style="font-size:12px;color:#B9C9D8">Kertas <select id="pv-kertas" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"><option value="auto">Otomatis</option><option value="a4">A4</option><option value="f4">F4</option></select></label><button id="pv-tutup" type="button">Tutup (Esc)</button><button id="pv-simpan" type="button" style="display:none;background:#fff;color:#16324F">Simpan PDF</button><button id="pv-cetak" type="button">Cetak / Simpan PDF</button></div>';
   document.body.appendChild(bar);
   const root=()=>document.getElementById('print-root');
   function tutup(){ bar.classList.remove('pv-on'); const r=root(); if(r) r.classList.remove('pv-on'); document.removeEventListener('keydown',onKey,true); }
@@ -11999,8 +12011,29 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     document.addEventListener('keydown',onKey,true);
   };
   document.getElementById('pv-tutup').addEventListener('click',tutup);
+  /* Aplikasi desktop: "Simpan PDF" memakai printToPDF milik Electron dengan ukuran & margin
+     persis sesuai @page (A4/F4), sehingga hasil tidak terpotong dan lebar kertas terpakai penuh. */
+  const bSimpan=document.getElementById('pv-simpan');
+  if(window.sikebosDesktop && window.sikebosDesktop.simpanPdf){
+    bSimpan.style.display='';
+    /* Satu tombol saja: di aplikasi desktop tombol cetak lama disembunyikan; tombol ini menggantikannya. */
+    const bc=document.getElementById('pv-cetak'); if(bc) bc.style.display='none';
+    bSimpan.style.background='linear-gradient(180deg,#E3B35A,#C8963E)'; bSimpan.style.color='#fff'; bSimpan.textContent='Cetak / Simpan PDF';
+    bSimpan.addEventListener('click', async ()=>{
+      const lbl='Cetak / Simpan PDF'; bSimpan.disabled=true; bSimpan.textContent='Menyimpan...';
+      try{
+        if(window.__aturKertasOtomatis) window.__aturKertasOtomatis();
+        /* latar halaman PDF harus putih (jendela aplikasi berlatar krem) */
+        [document.documentElement,document.body].forEach(e=>e.style.setProperty('background','#fff','important'));
+        const nama=(document.title||'Dokumen').replace(/[\\/:*?"<>|]+/g,' ').trim();
+        const res=await window.sikebosDesktop.simpanPdf(nama);
+        if(res && res.error) (window.alertFix||window.alert)('Gagal menyimpan PDF: '+res.error);
+      }catch(e){ (window.alertFix||window.alert)('Gagal menyimpan PDF: '+(e&&e.message||e)); }
+      finally{ [document.documentElement,document.body].forEach(e=>e.style.removeProperty('background')); if(window.__pfLepas) window.__pfLepas(); bSimpan.disabled=false; bSimpan.textContent=lbl; }
+    });
+  }
   const tg=document.getElementById('pv-tgl'), kt=document.getElementById('pv-kertas');
-  try{ kt.value=localStorage.getItem('sikebos.kertas')||'auto'; }catch(e){}
+  try{ kt.value=localStorage.getItem('sikebos.kertas')||'a4'; }catch(e){}
   tg.addEventListener('change',()=>{ try{ if(tg.value) localStorage.setItem('sikebos.tglLaporan',tg.value); else localStorage.removeItem('sikebos.tglLaporan'); }catch(e){} const t=tg.value||todayStr(); const r=root(); if(r) r.querySelectorAll('.tgl-lap').forEach(x=>x.textContent=formatTanggalPanjang(t)); });
   kt.addEventListener('change',()=>{ try{ localStorage.setItem('sikebos.kertas',kt.value); }catch(e){} });
   document.getElementById('pv-cetak').addEventListener('click',()=>{ try{ window.focus(); }catch(e){} setTimeout(asli,60); });
@@ -12012,7 +12045,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
 /* Kertas otomatis: ukuran kertas mengikuti pilihan printer/dialog cetak (size tidak dipaksa),
    orientasi dipilih otomatis (potret/lanskap) dan isi diperkecil seperlunya agar tidak terpotong. */
 (function(){
-  const PX_PER_MM = 96/25.4, MT=15, MR=12, MB=18, ML=25; /* margin kiri lebih lebar untuk jilid */
+  const PX_PER_MM = 96/25.4, MT=15, MR=12, MB=15, ML=25; /* margin kiri lebih lebar untuk jilid */
   // Acuan terkecil (A4): lebar area cetak potret ~190mm, lanskap ~277mm
   const W_POTRET = (210-ML-MR)*PX_PER_MM, W_LANSKAP = (297-ML-MR)*PX_PER_MM;
   const st = document.createElement('style'); st.id='auto-page-style'; document.head.appendChild(st);
@@ -12029,9 +12062,77 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     [s.width, s.right, s.left, s.padding, s.boxSizing, s.zoom] = simpan;
     return w;
   }
+  /* Bingkai dokumen (kotak ber-border) yang terpotong pergantian halaman: Chromium di
+     Electron 31 belum mendukung box-decoration-break:clone pada pemecahan halaman, sehingga
+     garis bawah halaman 1 dan garis atas halaman 2 hilang. Solusi: saat cetak, kotak diubah
+     sementara menjadi tabel -- THEAD/TFOOT otomatis diulang di tiap halaman sehingga garis
+     atas & bawah selalu tergambar. Dikembalikan semula setelah cetak (afterprint). */
+  function pfPasang(r){
+    if(r.__pf) return; r.__pf = [];
+    const wrap = r.firstElementChild; if(!wrap) return;
+    Array.from(wrap.children).forEach(box=>{
+      if(box.tagName!=='DIV') return;
+      const st = box.getAttribute('style')||'';
+      if(!/(^|;|\s)border:\s*1px solid/.test(st)) return;
+      const cs = getComputedStyle(box), col = cs.borderTopColor, line = '1px solid '+col;
+      const tb = document.createElement('table'); tb.className = 'pf';
+      tb.style.cssText = 'width:100%;border-collapse:separate;border-spacing:0;margin:0 0 '+cs.marginBottom+';'+(/break-before:\s*page|page-break-before:\s*always/.test(st)?'break-before:page;page-break-before:always;':'');
+      const mk = (tag,css)=>{ const g=document.createElement(tag), tr=document.createElement('tr'), td=document.createElement('td'); td.style.cssText=css; tr.appendChild(td); g.appendChild(tr); tb.appendChild(g); return td; };
+      mk('thead','padding:0;height:'+cs.paddingTop+';line-height:0;font-size:0;border-top:'+line+';border-left:'+line+';border-right:'+line+';');
+      mk('tfoot','padding:0;height:'+cs.paddingBottom+';line-height:0;font-size:0;border-bottom:'+line+';border-left:'+line+';border-right:'+line+';');
+      const body = document.createElement('tbody'), tr = document.createElement('tr'), td = document.createElement('td');
+      td.style.cssText = st.replace(/border:[^;]+;?/,'').replace(/margin-bottom:[^;]+;?/,'').replace(/(page-)?break-before:[^;]+;?/g,'') + ';border-left:'+line+';border-right:'+line+';padding:0 '+cs.paddingRight+' 0 '+cs.paddingLeft+';vertical-align:top;';
+      while(box.firstChild) td.appendChild(box.firstChild);
+      tr.appendChild(td); body.appendChild(tr); tb.appendChild(body);
+      box.replaceWith(tb); r.__pf.push([tb,box,td]);
+    });
+  }
+  function pfLepas(r){
+    if(!r || !r.__pf) return;
+    r.__pf.forEach(([tb,box,td])=>{ while(td.firstChild) box.appendChild(td.firstChild); tb.replaceWith(box); });
+    r.__pf = null;
+  }
+  /* Muat-satu-halaman otomatis: bila isi kotak surat (SK, surat pengantar, dll.) terlalu panjang
+     sehingga tanda tangan terlempar ke halaman berikutnya, ukuran huruf & spasi di dalam kotak
+     diperkecil bersama-sama (zoom, minimum 72%) sampai muat satu halaman. Bila tetap tidak muat
+     pada 72% (mis. daftar sangat panjang), isi dibiarkan mengalir ke halaman berikutnya. */
+  function fitLepas(r){
+    if(!r || !r.__fit) return;
+    r.__fit.forEach(w=>{ if(!w.parentNode) return; while(w.firstChild) w.parentNode.insertBefore(w.firstChild,w); w.remove(); });
+    r.__fit = null;
+  }
+  function fitPasang(r, paperH){
+    const wrap = r.firstElementChild; if(!wrap) return;
+    r.__fit = [];
+    const s = r.style, simpan = [s.width, s.right, s.left, s.padding, s.boxSizing, s.zoom], wp = wrap.style.padding;
+    s.width = W_POTRET+'px'; s.right = 'auto'; s.left = '0'; s.padding = '0'; s.boxSizing = 'border-box'; s.zoom = '1';
+    wrap.style.padding = '0';
+    const pageH = (paperH - MT - MB) * PX_PER_MM - 6;
+    let pertama = true;
+    Array.from(wrap.children).forEach(box=>{
+      const st = box.getAttribute('style')||'';
+      if(box.tagName!=='DIV' || !/border:\s*1px solid/.test(st)) return;
+      const brk = /break-before:\s*page|page-break-before:\s*always/.test(st);
+      const awal = pertama && !brk; pertama = false;
+      if(!awal && !brk) return;
+      const w = document.createElement('div'); w.setAttribute('data-fit','1');
+      while(box.firstChild) w.appendChild(box.firstChild);
+      box.appendChild(w); r.__fit.push(w);
+      const off = awal ? (box.getBoundingClientRect().top - wrap.getBoundingClientRect().top) : 0;
+      const avail = pageH - off - (parseFloat(getComputedStyle(box).marginBottom)||0);
+      if(box.offsetHeight <= avail) return;
+      let lo = 0.72, hi = 1; w.style.zoom = lo;
+      if(box.offsetHeight > avail){ w.style.zoom = ''; return; }
+      for(let i=0;i<8;i++){ const mid=(lo+hi)/2; w.style.zoom = mid; if(box.offsetHeight <= avail) lo = mid; else hi = mid; }
+      w.style.zoom = String(Math.floor(lo*100)/100);
+    });
+    wrap.style.padding = wp;
+    [s.width, s.right, s.left, s.padding, s.boxSizing, s.zoom] = simpan;
+  }
   function atur(){
     const r = document.getElementById('print-root');
     if(!r || !r.innerHTML.trim()) return;
+    pfLepas(r); fitLepas(r);
     r.style.setProperty('--pz','1');
     let orient = 'portrait', zoom = 1;
     if(ukur(r, W_POTRET) > W_POTRET + 2){
@@ -12041,17 +12142,20 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     }
     zoom = Math.max(0.7, Math.floor(zoom*100)/100);
     r.style.setProperty('--pz', String(zoom));
-    let kt='auto'; try{ kt=localStorage.getItem('sikebos.kertas')||'auto'; }catch(e){}
+    let kt='a4'; try{ kt=localStorage.getItem('sikebos.kertas')||'a4'; }catch(e){}
     const dim={a4:[210,297],f4:[215,330]}[kt];
     const sz = dim ? (orient==='landscape' ? dim[1]+'mm '+dim[0]+'mm' : dim[0]+'mm '+dim[1]+'mm') : orient;
+    if(orient==='portrait') fitPasang(r, dim ? dim[1] : 279.4);
+    pfPasang(r);
     st.textContent = '@page{ size:' + sz + '; margin:' + MT + 'mm ' + MR + 'mm ' + MB + 'mm ' + ML + 'mm; @bottom-center{ content:"Halaman " counter(page) " dari " counter(pages); font:10px Inter,Arial,sans-serif; color:#444; } }';
   }
   window.addEventListener('beforeprint', atur);
   window.addEventListener('afterprint', ()=>{
-    const r = document.getElementById('print-root'); if(r) r.style.removeProperty('--pz');
+    const r = document.getElementById('print-root'); if(r){ r.style.removeProperty('--pz'); pfLepas(r); fitLepas(r); }
     st.textContent = '';
   });
   window.__aturKertasOtomatis = atur;
+  window.__pfLepas = ()=>{ const r=document.getElementById('print-root'); pfLepas(r); fitLepas(r); };
 })();
 </script>
 <script>
