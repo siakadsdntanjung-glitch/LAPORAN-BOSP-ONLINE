@@ -1927,9 +1927,9 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
           </div>
 
           <div id="sk-edit-banner" class="hidden no-print bg-gold-50 border border-gold-200 rounded-lg px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-            <p class="text-sm text-navy"><span class="font-semibold">Mode Edit:</span> <span id="sk-edit-banner-text"></span> — tombol <b>Simpan SK</b> akan memperbarui SK ini (bukan membuat yang baru).</p>
+            <p class="text-sm text-navy"><span class="font-semibold">Mode Edit:</span> <span id="sk-edit-banner-text"></span> — tombol <b>Simpan</b> akan memperbarui data ini (bukan membuat yang baru).</p>
             <div class="flex items-center gap-4">
-              <button type="button" id="btn-sk-edit-baru" class="text-xs font-semibold text-gold-600 hover:underline whitespace-nowrap">Buat SK Baru</button>
+              <button type="button" id="btn-sk-edit-baru" class="text-xs font-semibold text-gold-600 hover:underline whitespace-nowrap">Buat Baru</button>
             </div>
           </div>
 
@@ -2054,15 +2054,38 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
           <div id="cetak-panel-hadir" class="hidden space-y-4">
             <div class="bg-white rounded-lg border border-navy-100 p-4 no-print space-y-3">
               <p class="text-xs font-semibold text-navy-400 uppercase tracking-wide">Detail Kegiatan</p>
+              <div id="hadir-info" class="hidden text-xs rounded border border-gold-200 bg-gold-50 text-gold-700 px-3 py-2"></div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label class="block text-xs font-semibold text-navy-400 mb-1">Bulan</label>
+                  <select id="hadir-bulan" class="w-full rounded border border-navy-100 px-3 py-2 text-sm bg-white"></select></div>
+                <div><label class="block text-xs font-semibold text-navy-400 mb-1">Pilih dari Transaksi Kegiatan</label>
+                  <select id="hadir-kegiatan-pilih" class="w-full rounded border border-navy-100 px-3 py-2 text-sm bg-white"></select></div>
                 <div class="sm:col-span-2"><label class="block text-xs font-semibold text-navy-400 mb-1">Nama Kegiatan</label>
                   <input id="hadir-kegiatan" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Rapat Evaluasi Penggunaan Dana BOSP Tahap 1"></div>
-                <div><label class="block text-xs font-semibold text-navy-400 mb-1">Tanggal</label>
-                  <input type="date" id="hadir-tanggal" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
                 <div><label class="block text-xs font-semibold text-navy-400 mb-1">Waktu</label>
                   <input id="hadir-waktu" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="08.00 WITA – selesai"></div>
-                <div class="sm:col-span-2"><label class="block text-xs font-semibold text-navy-400 mb-1">Tempat</label>
+                <div><label class="block text-xs font-semibold text-navy-400 mb-1">Tempat</label>
                   <input id="hadir-tempat" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Ruang Guru"></div>
+                <div class="sm:col-span-2"><label class="block text-xs font-semibold text-navy-400 mb-1">Orientasi Kertas Daftar Hadir</label>
+                  <select id="hadir-orientasi" class="w-full sm:w-72 rounded border border-navy-100 px-3 py-2 text-sm bg-white">
+                    <option value="landscape">Lanskap (mendatar) — disarankan</option>
+                    <option value="portrait">Potret (tegak)</option>
+                    <option value="auto">Otomatis (menyesuaikan jumlah tanggal)</option>
+                  </select>
+                  <p class="text-[10px] text-navy-300 mt-1">Ukuran kertas (A4 / F4) diatur di Pratinjau Cetak. Pilihan ini hanya berlaku untuk Daftar Hadir dan diingat untuk pencetakan berikutnya.</p></div>
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                  <label class="block text-xs font-semibold text-navy-400">Pilih Tanggal <span id="hadir-jml-tgl" class="font-normal text-navy-300"></span></label>
+                  <div class="flex flex-wrap gap-1.5 text-[11px] font-semibold">
+                    <button type="button" id="hadir-tgl-semua" class="px-2.5 py-1 rounded border border-navy-200 text-navy hover:bg-paper">Semua tanggal</button>
+                    <button type="button" id="hadir-tgl-kerja" class="px-2.5 py-1 rounded border border-navy-200 text-navy hover:bg-paper">Hari kerja (Sen–Jum)</button>
+                    <button type="button" id="hadir-tgl-transaksi" class="px-2.5 py-1 rounded border border-navy-200 text-navy hover:bg-paper">Tanggal transaksi</button>
+                    <button type="button" id="hadir-tgl-kosong" class="px-2.5 py-1 rounded border border-navy-200 text-rust hover:bg-paper">Kosongkan</button>
+                  </div>
+                </div>
+                <div id="hadir-kalender" class="grid gap-1.5" style="grid-template-columns:repeat(7,minmax(0,1fr));"></div>
+                <p class="text-[10px] text-navy-300 mt-1.5">Klik tanggal untuk memilih / membatalkan. Titik <span style="color:#C8963E;">&#9679;</span> = ada transaksi kegiatan pada tanggal itu. Tiap tanggal terpilih menjadi satu kolom paraf pada daftar hadir bulan tersebut.</p>
               </div>
             </div>
 
@@ -2084,11 +2107,15 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
                 </div>
               </div>
               <div class="grid grid-cols-12 gap-1.5 text-[10px] font-semibold text-navy-300 uppercase px-0.5">
-                <span class="col-span-5">Nama</span><span class="col-span-6">Jabatan / Instansi</span><span class="col-span-1"></span>
+                <span class="col-span-4">Nama</span><span class="col-span-3">NIP</span><span class="col-span-4">Jabatan / Instansi</span><span class="col-span-1"></span>
               </div>
               <div id="hadir-rows" class="space-y-1.5"></div>
             </div>
-            <button id="btn-cetak-hadir-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak Daftar Hadir</button>
+            <div class="flex flex-wrap gap-2 no-print">
+              <button id="btn-simpan-hadir" class="no-print bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan</button>
+              <button id="btn-cetak-hadir-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak Daftar Hadir</button>
+            </div>
+            <div id="sk-list-hadir" class="no-print"></div>
           </div>
 
           <!-- Panel KAFER (SAMPUL) LAPORAN PERTAHAP -->
@@ -2119,7 +2146,11 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
                   <input id="kafer-provinsi" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Nusa Tenggara Timur"></div>
               </div>
             </div>
-            <button id="btn-cetak-kafer-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak Kafer Laporan</button>
+            <div class="flex flex-wrap gap-2 no-print">
+              <button id="btn-simpan-kafer" class="no-print bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan</button>
+              <button id="btn-cetak-kafer-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak Kafer Laporan</button>
+            </div>
+            <div id="sk-list-kafer" class="no-print"></div>
           </div>
 
           <!-- Panel SPTJM: Surat Pernyataan Tanggung Jawab Mutlak — lampiran wajib
@@ -2151,7 +2182,11 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
               </div>
               <p class="text-xs text-navy-400">Total realisasi belanja pada periode/tahap terpilih dihitung otomatis dari Buku Kas Umum dan akan dicantumkan pada isi surat.</p>
             </div>
-            <button id="btn-cetak-sptjm-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak SPTJM</button>
+            <div class="flex flex-wrap gap-2 no-print">
+              <button id="btn-simpan-sptjm" class="no-print bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan</button>
+              <button id="btn-cetak-sptjm-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak SPTJM</button>
+            </div>
+            <div id="sk-list-sptjm" class="no-print"></div>
           </div>
 
           <!-- Panel SK Panitia Penyusunan RKAS, SK Tim Pengelola BOS & Surat Pengantar:
@@ -3295,7 +3330,7 @@ function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res));
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.1.16"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.1.17"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -3968,6 +4003,7 @@ function syncCetakDesign(){
   document.querySelectorAll('[data-cxtahap]').forEach(b=>b.classList.toggle('aktif', b.dataset.cxtahap===th));
   document.querySelectorAll('[data-cxdoc]').forEach(b=>b.classList.toggle('aktif', b.dataset.cxdoc===doc));
   const j = document.getElementById('cx-hero-judul'); if(j) j.textContent = labelDanaTahapAktif();
+  if(state.cetakDoc==='hadir' && typeof renderHadirPanel==='function') renderHadirPanel();
   const bw = document.getElementById('cx-bulan-wrap');
   if(bw){
     const p = TAHAP_PERIODE[th], bAktif = cetakBulanAktif();
@@ -8421,7 +8457,7 @@ document.querySelectorAll('.cetak-tab').forEach(btn=>{
       if(!document.getElementById('sk-tanggal').value) document.getElementById('sk-tanggal').value = todayStr();
     } else if(state.cetakDoc === 'hadir'){
       if(!document.getElementById('hadir-rows').children.length) addHadirRow();
-      if(!document.getElementById('hadir-tanggal').value) document.getElementById('hadir-tanggal').value = todayStr();
+      renderHadirPanel();
     } else if(state.cetakDoc === 'kafer'){
       initKaferFields();
     } else if(state.cetakDoc === 'sptjm'){
@@ -8709,36 +8745,122 @@ function addHadirRow(data){
   const row = document.createElement('div');
   row.className = 'hadir-row grid grid-cols-12 gap-1.5 items-center';
   row.innerHTML = `
-    <input class="hd-nama col-span-5 rounded border border-navy-100 px-2 py-1.5 text-xs" placeholder="Nama">
-    <input class="hd-jabatan col-span-6 rounded border border-navy-100 px-2 py-1.5 text-xs" placeholder="Jabatan / Instansi">
+    <input class="hd-nama col-span-4 rounded border border-navy-100 px-2 py-1.5 text-xs" placeholder="Nama">
+    <input class="hd-nip col-span-3 rounded border border-navy-100 px-2 py-1.5 text-xs" placeholder="NIP (opsional)">
+    <input class="hd-jabatan col-span-4 rounded border border-navy-100 px-2 py-1.5 text-xs" placeholder="Jabatan / Instansi">
     <button type="button" class="btn-hapus-hd col-span-1 text-rust hover:text-rust-600 text-base font-bold leading-none" title="Hapus baris ini">&times;</button>
   `;
   wrap.appendChild(row);
   row.querySelector('.hd-nama').value = data.nama||'';
+  row.querySelector('.hd-nip').value = (data.nip && data.nip!=='-') ? data.nip : '';
   row.querySelector('.hd-jabatan').value = data.jabatan||'';
   row.querySelector('.btn-hapus-hd').addEventListener('click', ()=>{ row.remove(); });
 }
 function collectHadirRows(){
   return Array.from(document.querySelectorAll('#hadir-rows .hadir-row')).map(row=>({
     nama: row.querySelector('.hd-nama').value.trim(),
+    nip: row.querySelector('.hd-nip').value.trim(),
     jabatan: row.querySelector('.hd-jabatan').value.trim()
   })).filter(r=>r.nama);
 }
 document.getElementById('btn-tambah-hadir').addEventListener('click', ()=>addHadirRow());
 
+/* ---- Daftar Hadir bulanan: pilih bulan -> pilih tanggal -> satu kolom paraf per tanggal ---- */
+const _hadirTgl = new Set();           // tanggal terpilih (YYYY-MM-DD)
+/* Transaksi kegiatan = pengeluaran yang uraiannya memuat kata kunci jasa / kegiatan / makan / minum.
+   Belanja lain (ATK, alat, dll.) tidak ditampilkan pada pilihan Daftar Hadir. */
+const HADIR_KATA_KUNCI = /jasa|kegiatan|makan|minum/i;
+function hadirTransaksiKegiatan(t){
+  return HADIR_KATA_KUNCI.test([t.uraian, t.kegiatan, t.kategori].filter(Boolean).join(' '));
+}
+function hadirTransaksiBulan(bulanMM){
+  const th = state.tahapAktif||getDefaultTahap(), jd = state.jenisDanaAktif||getDefaultJenisDana();
+  return state.transactions.filter(t=>t.jenis==='pengeluaran' && hadirTransaksiKegiatan(t) && bulanDalamTahap(t.tanggal, th) && jenisDanaTransaksi(t)===jd
+    && (!bulanMM || String(t.tanggal||'').slice(5,7)===bulanMM));
+}
+function hadirBulanAktif(){ return document.getElementById('hadir-bulan').value; }
+function renderHadirPanel(){
+  const selB = document.getElementById('hadir-bulan');
+  if(!selB) return;
+  const th = state.tahapAktif||getDefaultTahap(), per = TAHAP_PERIODE[th];
+  const sig = th+'|'+tahunAnggaranAktif();
+  if(selB.dataset.sig !== sig){
+    let h=''; for(let m=per.mulaiBulan;m<=per.selesaiBulan;m++){ const mm=String(m).padStart(2,'0'); h+=`<option value="${mm}">${NAMA_BULAN[m-1]} ${tahunAnggaranAktif()}</option>`; }
+    selB.innerHTML = h; selB.dataset.sig = sig;
+    // bulan awal: ikut Filter Bulan bila diisi, jika tidak bulan pertama yang punya transaksi
+    let awal = cetakBulanAktif();
+    if(!awal){ const ada = hadirTransaksiBulan('').map(t=>String(t.tanggal).slice(5,7)).sort(); awal = ada[0] || String(per.mulaiBulan).padStart(2,'0'); }
+    selB.value = awal; _hadirTgl.clear();
+  }
+  const mm = selB.value, thn = tahunAnggaranAktif();
+  const trx = hadirTransaksiBulan(mm);
+  // daftar kegiatan dari transaksi
+  const kegList = Array.from(new Set(trx.map(t=>(t.uraian||'').trim()).filter(Boolean)));
+  const selK = document.getElementById('hadir-kegiatan-pilih'), kSig = kegList.join('\u0001');
+  if(selK.dataset.sig !== kSig){
+    selK.innerHTML = '<option value="">'+(kegList.length?'— Pilih kegiatan —':'(tidak ada transaksi)')+'</option>' + kegList.map(k=>`<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+    selK.dataset.sig = kSig;
+  }
+  const info = document.getElementById('hadir-info');
+  if(!trx.length){
+    info.textContent = 'Belum ada transaksi kegiatan (uraian memuat kata jasa, kegiatan, makan, atau minum) pada '+NAMA_BULAN[Number(mm)-1]+' untuk jenis dana & tahap ini. Anda tetap dapat mengetik nama kegiatan secara manual.';
+    info.classList.remove('hidden');
+  } else info.classList.add('hidden');
+  // kalender
+  const tglTrx = new Set(trx.map(t=>t.tanggal));
+  const jmlHari = new Date(thn, Number(mm), 0).getDate();
+  const awalHari = new Date(thn, Number(mm)-1, 1).getDay();      // 0=Min
+  const kolomAwal = (awalHari+6)%7;                                // Senin = 0
+  Array.from(_hadirTgl).forEach(t=>{ if(t.slice(0,7)!==thn+'-'+mm) _hadirTgl.delete(t); });
+  let h = ['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(x=>`<div class="text-center text-[10px] font-semibold text-navy-300 uppercase">${x}</div>`).join('');
+  for(let i=0;i<kolomAwal;i++) h+='<div></div>';
+  for(let d=1; d<=jmlHari; d++){
+    const iso = `${thn}-${mm}-${String(d).padStart(2,'0')}`, on = _hadirTgl.has(iso), libur = new Date(thn,Number(mm)-1,d).getDay()===0;
+    h += `<button type="button" data-hdtgl="${iso}" class="relative rounded border text-xs font-semibold py-2 ${on?'bg-navy text-white border-navy':'bg-white text-navy border-navy-200 hover:bg-paper'} ${libur&&!on?'text-rust':''}">${d}${tglTrx.has(iso)?'<span class="absolute top-0.5 right-1" style="color:'+(on?'#F2D39A':'#C8963E')+';font-size:8px;">&#9679;</span>':''}</button>`;
+  }
+  document.getElementById('hadir-kalender').innerHTML = h;
+  document.getElementById('hadir-jml-tgl').textContent = _hadirTgl.size ? '— '+_hadirTgl.size+' tanggal dipilih' : '';
+}
+(function(){
+  try{ const o = localStorage.getItem('sikebos.hadir.orient'); if(o) document.getElementById('hadir-orientasi').value = o; }catch(e){}
+  const cal = document.getElementById('hadir-kalender');
+  cal.addEventListener('click', (e)=>{
+    const b = e.target.closest('[data-hdtgl]'); if(!b) return;
+    const t = b.dataset.hdtgl; if(_hadirTgl.has(t)) _hadirTgl.delete(t); else _hadirTgl.add(t);
+    renderHadirPanel();
+  });
+  const semuaHari = (filter)=>{
+    const mm = hadirBulanAktif(), thn = tahunAnggaranAktif(), n = new Date(thn, Number(mm), 0).getDate();
+    _hadirTgl.clear();
+    for(let d=1; d<=n; d++){ const dow = new Date(thn,Number(mm)-1,d).getDay(); if(filter(dow)) _hadirTgl.add(`${thn}-${mm}-${String(d).padStart(2,'0')}`); }
+    renderHadirPanel();
+  };
+  document.getElementById('hadir-tgl-semua').addEventListener('click', ()=>semuaHari(()=>true));
+  document.getElementById('hadir-tgl-kerja').addEventListener('click', ()=>semuaHari(d=>d>=1&&d<=5));
+  document.getElementById('hadir-tgl-kosong').addEventListener('click', ()=>{ _hadirTgl.clear(); renderHadirPanel(); });
+  document.getElementById('hadir-tgl-transaksi').addEventListener('click', ()=>{
+    _hadirTgl.clear(); hadirTransaksiBulan(hadirBulanAktif()).forEach(t=>_hadirTgl.add(t.tanggal)); renderHadirPanel();
+  });
+  document.getElementById('hadir-bulan').addEventListener('change', ()=>{ _hadirTgl.clear(); renderHadirPanel(); });
+  document.getElementById('hadir-kegiatan-pilih').addEventListener('change', (e)=>{ if(e.target.value) document.getElementById('hadir-kegiatan').value = e.target.value; });
+})();
+
 document.getElementById('btn-cetak-hadir-print').addEventListener('click', ()=>{
   const peserta = collectHadirRows();
   if(peserta.length===0){ alertFix('Tambahkan minimal satu peserta pada daftar sebelum mencetak.'); return; }
+  const tanggalList = Array.from(_hadirTgl).sort();
+  const orientasi = document.getElementById('hadir-orientasi').value;
+  try{ localStorage.setItem('sikebos.hadir.orient', orientasi); }catch(e){}
   const hadirHeader = {
+    orientasi,
     kegiatan: document.getElementById('hadir-kegiatan').value.trim(),
-    tanggal: document.getElementById('hadir-tanggal').value,
+    bulan: hadirBulanAktif(),
+    tanggalList,
     waktu: document.getElementById('hadir-waktu').value.trim(),
     tempat: document.getElementById('hadir-tempat').value.trim()
   };
-  if(!hadirHeader.kegiatan || !hadirHeader.tanggal){
-    alertFix('Mohon lengkapi minimal Nama Kegiatan dan Tanggal.');
-    return;
-  }
+  if(!hadirHeader.kegiatan){ alertFix('Mohon isi Nama Kegiatan (pilih dari transaksi atau ketik manual).'); return; }
+  if(!tanggalList.length){ alertFix('Pilih minimal satu tanggal pada kalender.'); return; }
   buildDaftarHadirDocument(hadirHeader, peserta);
   window.print();
 });
@@ -8937,6 +9059,7 @@ document.getElementById('btn-cetak-sptjm-print').addEventListener('click', async
     nomor: document.getElementById('sptjm-nomor').value.trim(),
     tanggal: document.getElementById('sptjm-tanggal').value,
     tahap: document.getElementById('sptjm-tahap').value,
+    jenisDana: document.getElementById('sptjm-jenisdana').value,
     tahun: document.getElementById('sptjm-tahun').value.trim()
   };
   if(!sptjmHeader.tanggal || !sptjmHeader.tahun){
@@ -9474,43 +9597,58 @@ function buildDaftarHadirDocument(hadirHeader, peserta){
   const root = document.getElementById('print-root');
   const kopHtml = buildKopSuratHtml(s);
   const box = 'border:1px solid #16324F; padding:20px; margin-bottom:16px; font-family:Inter,sans-serif; font-size:13px; color:#23262B;';
-
+  const HARI_PENDEK = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const tgl = (hadirHeader.tanggalList && hadirHeader.tanggalList.length) ? hadirHeader.tanggalList : (hadirHeader.tanggal ? [hadirHeader.tanggal] : []);
+  const n = tgl.length || 1;
+  const wNama = n>20 ? 130 : 160, wJab = n>20 ? 90 : 120;   // kolom tanggal membagi sisa lebar secara merata
+  const fsT = n>24 ? 8 : (n>16 ? 9 : 10);
+  const th = 'border:1px solid #16324F; padding:5px 4px; background:#EAF0F5; text-align:center;';
+  const td = 'border:1px solid #16324F; padding:4px 6px; height:'+((n>12||hadirHeader.orientasi==='landscape')?32:40)+'px; vertical-align:middle;';
+  const bulanTxt = tgl.length ? `${NAMA_BULAN[Number(tgl[0].slice(5,7))-1]} ${tgl[0].slice(0,4)}` : '';
+  const headTgl = tgl.map(t=>{ const [y,m,d]=t.split('-').map(Number); const dow=new Date(y,m-1,d).getDay();
+    return `<th style="${th} padding:4px 0; white-space:nowrap; font-size:${fsT}px; line-height:1.25; ${dow===0?'color:#B23A2E;':''}">${HARI_PENDEK[dow]}<br><b style="font-size:${fsT+2}px;">${d}</b></th>`; }).join('');
   const rows = peserta.map((p,idx)=>`
     <tr style="page-break-inside:avoid;">
-      <td style="border:1px solid #16324F; padding:8px 6px; height:44px; vertical-align:middle; text-align:center;">${idx+1}</td>
-      <td style="border:1px solid #16324F; padding:8px 6px; height:44px; vertical-align:middle;">${escapeHtml(p.nama||'-')}</td>
-      <td style="border:1px solid #16324F; padding:8px 6px; height:44px; vertical-align:middle;">${escapeHtml(p.jabatan||'-')}</td>
-      <td style="border:1px solid #16324F; padding:8px 6px; height:44px; vertical-align:middle;"></td>
+      <td style="${td} text-align:center;">${idx+1}</td>
+      <td style="${td}"><b>${escapeHtml(p.nama||'-')}</b>${(p.nip && p.nip!=='-') ? '<br><span style="font-size:11px;">NIP. '+escapeHtml(p.nip)+'</span>' : ''}</td>
+      <td style="${td}">${escapeHtml(p.jabatan||'-')}</td>
+      ${tgl.map(()=>`<td style="${td} padding:0;"></td>`).join('')}
     </tr>`).join('');
+  const tglAkhir = tgl.length ? tgl[tgl.length-1] : '';
 
   const bodyHtml = `
     <div style="${box}">
       <div style="text-align:center; font-family:Lora,serif; font-weight:700; font-size:15px; letter-spacing:1px;">DAFTAR HADIR</div>
       <table style="font-size:13px; width:100%; margin:12px 0;">
         <tr><td style="width:110px; padding:2px 0; vertical-align:top;">Kegiatan</td><td style="vertical-align:top;">: ${escapeHtml(hadirHeader.kegiatan||'')}</td></tr>
-        <tr><td style="padding:2px 0; vertical-align:top;">Hari/Tanggal</td><td style="vertical-align:top;">: ${formatTanggalPanjang(hadirHeader.tanggal)}</td></tr>
+        <tr><td style="padding:2px 0; vertical-align:top;">Bulan</td><td style="vertical-align:top;">: ${escapeHtml(bulanTxt)}</td></tr>
         <tr><td style="padding:2px 0; vertical-align:top;">Waktu</td><td style="vertical-align:top;">: ${escapeHtml(hadirHeader.waktu||'-')}</td></tr>
         <tr><td style="padding:2px 0; vertical-align:top;">Tempat</td><td style="vertical-align:top;">: ${escapeHtml(hadirHeader.tempat||'-')}</td></tr>
       </table>
-      <table style="width:100%; border-collapse:collapse; font-size:12px;">
-        <thead><tr>
-          <th style="border:1px solid #16324F; padding:6px; background:#EAF0F5; width:36px;">No</th>
-          <th style="border:1px solid #16324F; padding:6px; background:#EAF0F5;">Nama</th>
-          <th style="border:1px solid #16324F; padding:6px; background:#EAF0F5;">Jabatan / Instansi</th>
-          <th style="border:1px solid #16324F; padding:6px; background:#EAF0F5; width:200px;">Tanda Tangan</th>
-        </tr></thead>
+      <table style="width:100%; min-width:${34+wNama+wJab+n*26}px; border-collapse:collapse; font-size:12px; table-layout:fixed;">
+        <colgroup><col style="width:34px;"><col style="width:${wNama}px;"><col style="width:${wJab}px;">${tgl.map(()=>'<col>').join('')}</colgroup>
+        <thead>
+          <tr>
+            <th rowspan="2" style="${th} width:34px;">No</th>
+            <th rowspan="2" style="${th}">Nama / NIP</th>
+            <th rowspan="2" style="${th}">Jabatan</th>
+            <th colspan="${n}" style="${th}">Hari / Tanggal &amp; Paraf</th>
+          </tr>
+          <tr>${headTgl}</tr>
+        </thead>
         <tbody>${rows}</tbody>
       </table>
 
       <div style="text-align:center; margin-top:30px; font-size:13px; page-break-inside:avoid;">
-        ${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(hadirHeader.tanggal)}<br>
+        ${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(tglAkhir)}<br>
         Mengetahui,<br>Kepala ${escapeHtml(s.namaSekolah||'')},
         <div style="height:80px;"></div>
         <b>${escapeHtml(kepsek.nama||'( ..................... )')}</b><br>NIP. ${escapeHtml(kepsek.nip||'-')}
       </div>
     </div>`;
 
-  root.innerHTML = `<div style="padding:24px;">${kopHtml}${bodyHtml}</div>`;
+  const ori = (hadirHeader.orientasi==='landscape'||hadirHeader.orientasi==='portrait') ? hadirHeader.orientasi : '';
+  root.innerHTML = `<div ${ori?'data-orient="'+ori+'" ':''}style="padding:24px;">${kopHtml}${bodyHtml}</div>`;
 }
 
 /* ---- Cetak Kafer (Sampul) Laporan Pertahap: halaman sampul untuk bundel LPJ per tahap ---- */
@@ -10255,7 +10393,11 @@ function panelPengantarHtml(){
           <p class="text-[10px] text-navy-300 mt-1">Satu butir per baris. Baris biasa diberi nomor 1, 2, 3 ...; baris yang diawali tanda "- " menjadi butir a, b, c ... di bawah nomor sebelumnya.</p></div>
       </div>
     </div>
-    <button id="spg-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak Surat Pengantar</button>`;
+    <div class="flex flex-wrap gap-2 no-print">
+      <button id="spg-simpan" class="no-print bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2.5">Simpan</button>
+      <button id="spg-print" class="no-print bg-gold-500 hover:bg-gold-600 text-white text-sm font-semibold rounded px-5 py-2.5">Cetak Surat Pengantar</button>
+    </div>
+    <div id="sk-list-pengantar" class="no-print"></div>`;
 }
 function initPengantarFields(){
   const s = state.schoolData || {};
@@ -10458,7 +10600,7 @@ function nsIsiSppdBilaKosong(builderFn){
   return isiNomorOtomatisBilaKosong(builderFn===buildSuratTugasPrintDocument ? 'sppd-no-surat-tugas' : 'sppd-no-spd');
 }
 function nsPastikanSK(jenis){
-  const id = {skguru:'sk-nomor', skrkas:'skrk-nomor', sktimbos:'sktb-nomor'}[jenis];
+  const id = {skguru:'sk-nomor', skrkas:'skrk-nomor', sktimbos:'sktb-nomor', sptjm:'sptjm-nomor', pengantar:'spg-nomor'}[jenis];
   return id ? isiNomorOtomatisBilaKosong(id) : Promise.resolve();
 }
 // Nilai untuk disimpan: pratinjau yang belum diambil tidak ikut tersimpan (supaya tidak ada nomor "bocor")
@@ -10645,7 +10787,7 @@ function renderNomorSurat(){
    tersimpan, form masuk ke mode edit sehingga simpan/cetak berikutnya
    memperbarui SK yang sama (tidak membuat duplikat). Daftar SK tampil di bawah form tiap tab SK.
    ========================================================================= */
-const SK_LABEL = { skguru:'SK Guru', skrkas:'SK Panitia RKAS', sktimbos:'SK Tim BOS' };
+const SK_LABEL = { skguru:'SK Guru', skrkas:'SK Panitia RKAS', sktimbos:'SK Tim BOS', hadir:'Daftar Hadir', kafer:'Kafer Laporan', sptjm:'SPTJM', pengantar:'Surat Pengantar' };
 
 function getSkList(){
   const raw = (state.schoolData && state.schoolData.dokumenSK) || {};
@@ -10665,6 +10807,34 @@ function kumpulkanSK(jenis){
     };
     if(!header.nomor || !header.tanggal || !header.tentang) return { error:'Mohon lengkapi minimal Nomor SK, Tanggal Penetapan, dan Tentang.' };
     return { nomor: header.nomor, tanggal: header.tanggal, judul: header.tentang, data: { header, guru: collectSkGuruRows() } };
+  }
+  const el = (id)=>document.getElementById(id);
+  if(jenis === 'hadir'){
+    const h = {
+      kegiatan: el('hadir-kegiatan').value.trim(), bulan: el('hadir-bulan').value,
+      tahap: state.tahapAktif||getDefaultTahap(), jenisDana: state.jenisDanaAktif||getDefaultJenisDana(),
+      tanggalList: Array.from(_hadirTgl).sort(), waktu: el('hadir-waktu').value.trim(), tempat: el('hadir-tempat').value.trim(),
+      orientasi: el('hadir-orientasi').value
+    };
+    if(!h.kegiatan) return { error:'Mohon isi Nama Kegiatan sebelum menyimpan.' };
+    return { nomor:'', tanggal: h.tanggalList[0]||'', judul: `${h.kegiatan}${h.bulan?' — '+NAMA_BULAN[Number(h.bulan)-1]:''}`, data:{ header:h, peserta: collectHadirRows() } };
+  }
+  if(jenis === 'kafer'){
+    const h = { tahap: el('kafer-tahap').value, jenisDana: el('kafer-jenisdana').value, tahun: el('kafer-tahun').value.trim(), judul: el('kafer-judul').value.trim(),
+      kecamatan: el('kafer-kecamatan').value.trim(), kabupaten: el('kafer-kabupaten').value.trim(), provinsi: el('kafer-provinsi').value.trim() };
+    if(!h.judul || !h.tahun) return { error:'Mohon lengkapi minimal Judul Laporan dan Tahun Anggaran.' };
+    return { nomor:'', tanggal:'', judul:`Kafer ${JENIS_DANA[h.jenisDana]?JENIS_DANA[h.jenisDana].label:h.jenisDana} Tahap ${h.tahap} ${h.tahun}`, data:{ header:h } };
+  }
+  if(jenis === 'sptjm'){
+    const h = { nomor: el('sptjm-nomor').value.trim(), tanggal: el('sptjm-tanggal').value, tahap: el('sptjm-tahap').value, jenisDana: el('sptjm-jenisdana').value, tahun: el('sptjm-tahun').value.trim() };
+    if(!h.tanggal || !h.tahun) return { error:'Mohon lengkapi minimal Tanggal Surat dan Tahun Anggaran.' };
+    return { nomor:h.nomor, tanggal:h.tanggal, judul:`SPTJM ${JENIS_DANA[h.jenisDana]?JENIS_DANA[h.jenisDana].label:h.jenisDana} Tahap ${h.tahap} ${h.tahun}`, data:{ header:h } };
+  }
+  if(jenis === 'pengantar'){
+    const g = (id)=>el('spg-'+id).value;
+    const v = { nomor:g('nomor').trim(), tanggal:g('tanggal'), tempat:g('tempat').trim(), jilid:g('jilid').trim(), tahap:g('tahap'), periode:g('periode').trim(), uraian:g('uraian').trim(), tujuan:g('tujuan'), isi:g('isi') };
+    if(!v.nomor || !v.tanggal) return { error:'Mohon lengkapi minimal Nomor Surat dan Tanggal Surat.' };
+    return { nomor:v.nomor, tanggal:v.tanggal, judul:`Surat Pengantar Laporan BOS Tahap ${v.tahap}`, data:{ v } };
   }
   const c = KEPUTUSAN_CFG[jenis], p = c.prefix;
   const g = (id)=>document.getElementById(p+'-'+id).value;
@@ -10692,6 +10862,40 @@ function isiFormSK(jenis, data){
     if(guru.length) guru.forEach(r=>addSkGuruRow(r)); else addSkGuruRow();
     return;
   }
+  const $ = (id)=>document.getElementById(id);
+  if(jenis === 'hadir'){
+    const h = data.header || {};
+    $('hadir-kegiatan').value = h.kegiatan || ''; $('hadir-waktu').value = h.waktu || ''; $('hadir-tempat').value = h.tempat || '';
+    $('hadir-orientasi').value = h.orientasi || 'landscape';
+    $('hadir-rows').innerHTML = ''; const ps = data.peserta || []; if(ps.length) ps.forEach(r=>addHadirRow(r)); else addHadirRow();
+    // pastikan tahap & jenis dana sama dengan saat disimpan agar daftar bulan/transaksi sesuai
+    if(h.jenisDana && h.jenisDana !== state.jenisDanaAktif){ const t = document.querySelector(`.jenisdana-tab[data-jenisdana="${h.jenisDana}"]`); if(t) t.click(); }
+    if(h.tahap && h.tahap !== state.tahapAktif){ const t = document.querySelector(`.tahap-tab[data-tahap="${h.tahap}"]`); if(t) t.click(); }
+    renderHadirPanel();
+    $('hadir-bulan').value = h.bulan || $('hadir-bulan').value;
+    _hadirTgl.clear(); (h.tanggalList||[]).forEach(t=>_hadirTgl.add(t));
+    renderHadirPanel();
+    return;
+  }
+  if(jenis === 'kafer'){
+    const h = data.header || {};
+    $('kafer-tahap').value = h.tahap || '1'; $('kafer-jenisdana').value = h.jenisDana || 'reguler'; $('kafer-tahun').value = h.tahun || '';
+    $('kafer-judul').value = h.judul || ''; $('kafer-kecamatan').value = h.kecamatan || ''; $('kafer-kabupaten').value = h.kabupaten || ''; $('kafer-provinsi').value = h.provinsi || '';
+    return;
+  }
+  if(jenis === 'sptjm'){
+    const h = data.header || {};
+    $('sptjm-nomor').value = h.nomor || ''; $('sptjm-tanggal').value = h.tanggal || ''; $('sptjm-tahap').value = h.tahap || '1';
+    $('sptjm-jenisdana').value = h.jenisDana || 'reguler'; $('sptjm-tahun').value = h.tahun || '';
+    return;
+  }
+  if(jenis === 'pengantar'){
+    const v = data.v || {};
+    const set2 = (id,val)=>{ $('spg-'+id).value = val || ''; };
+    set2('nomor',v.nomor); set2('tanggal',v.tanggal); set2('tempat',v.tempat); set2('jilid',v.jilid); set2('tahap',v.tahap||'1');
+    set2('periode',v.periode); set2('uraian',v.uraian); set2('tujuan',v.tujuan); set2('isi',v.isi);
+    return;
+  }
   const p = KEPUTUSAN_CFG[jenis].prefix, v = data.v || {};
   const set = (id, val)=>{ document.getElementById(p+'-'+id).value = val || ''; };
   set('nomor', v.nomor); set('tanggal', v.tanggal); set('tempat', v.tempat); set('tahun', v.tahun);
@@ -10706,6 +10910,26 @@ function resetFormSK(jenis){
     isiFormSK('skguru', {});
     document.getElementById('sk-tanggal').value = todayStr();
     return;
+  }
+  if(jenis === 'hadir'){
+    ['kegiatan','waktu','tempat'].forEach(i=>document.getElementById('hadir-'+i).value='');
+    document.getElementById('hadir-kegiatan-pilih').value = '';
+    document.getElementById('hadir-rows').innerHTML = ''; addHadirRow(); _hadirTgl.clear(); renderHadirPanel();
+    return;
+  }
+  if(jenis === 'kafer'){
+    ['judul','tahun','kecamatan','kabupaten','provinsi'].forEach(i=>document.getElementById('kafer-'+i).value='');
+    initKaferFields(); return;
+  }
+  if(jenis === 'sptjm'){
+    ['nomor','tanggal','tahun'].forEach(i=>document.getElementById('sptjm-'+i).value='');
+    initSptjmFields(); return;
+  }
+  if(jenis === 'pengantar'){
+    ['nomor','tanggal','tempat','jilid','periode'].forEach(i=>document.getElementById('spg-'+i).value='');
+    document.getElementById('spg-uraian').value = 'laporan penggunaan Dana BOS';
+    document.getElementById('spg-isi').value = SURAT_PENGANTAR_ISI_DEFAULT;
+    initPengantarFields(); return;
   }
   const c = KEPUTUSAN_CFG[jenis];
   isiFormSK(jenis, { v:{
@@ -10731,16 +10955,16 @@ async function simpanSK(jenis, diam){
   try{
     if(sedangEdit){
       await base.child(state.editSK.id).update(rec);
-      logAudit('Cetak SK', 'ubah', `Ubah ${SK_LABEL[jenis]} No. ${rec.nomor}`);
+      logAudit('Cetak SK', 'ubah', `Ubah ${SK_LABEL[jenis]} ${rec.nomor?'No. '+rec.nomor:rec.judul}`);
     }else{
       const key = base.push().key;
       rec.createdAt = rec.updatedAt; rec.createdBy = email;
       await base.child(key).set(rec);
       state.editSK = { id:key, jenis };
-      logAudit('Cetak SK', 'tambah', `Simpan ${SK_LABEL[jenis]} No. ${rec.nomor}`);
+      logAudit('Cetak SK', 'tambah', `Simpan ${SK_LABEL[jenis]} ${rec.nomor?'No. '+rec.nomor:rec.judul}`);
     }
     updateSkEditBanner();
-    if(!diam) alertFix(`${SK_LABEL[jenis]} berhasil disimpan. SK dapat dilihat, diedit, atau dicetak ulang dari daftar di bawah form.`);
+    if(!diam) alertFix(`${SK_LABEL[jenis]} berhasil disimpan. Data dapat dilihat, diedit, atau dicetak ulang dari daftar di bawah form.`);
     return true;
   }catch(err){
     alertFix('Gagal menyimpan SK: ' + (err.message || 'Periksa koneksi internet Anda dan coba lagi.'));
@@ -10756,7 +10980,7 @@ function updateSkEditBanner(){
   if(!tampil) return;
   const rec = getSkList().find(x=>x.id === e.id);
   document.getElementById('sk-edit-banner-text').textContent =
-    `${SK_LABEL[e.jenis]}${rec && rec.nomor ? ' No. ' + rec.nomor : ''}`;
+    `${SK_LABEL[e.jenis]}${rec && rec.nomor ? ' No. ' + rec.nomor : (rec && rec.judul ? ' — ' + rec.judul : '')}`;
 }
 
 function renderDaftarSK(jenis){
@@ -10769,8 +10993,8 @@ function renderDaftarSK(jenis){
       ${list.length ? `<ul class="divide-y divide-navy-100">${list.map(r=>`
         <li class="py-2.5 flex flex-wrap items-center justify-between gap-2">
           <div class="min-w-0">
-            <p class="text-sm font-semibold text-navy truncate">${escapeHtml(r.nomor||'-')}</p>
-            <p class="text-xs text-navy-400">${escapeHtml(r.judul||'-')} &middot; ${r.tanggal ? formatTanggal(r.tanggal) : '-'}${r.updatedAt ? ' &middot; diubah ' + new Date(r.updatedAt).toLocaleString('id-ID') : ''}</p>
+            <p class="text-sm font-semibold text-navy truncate">${escapeHtml(r.nomor||r.judul||'-')}</p>
+            <p class="text-xs text-navy-400">${r.nomor ? escapeHtml(r.judul||'-') + ' &middot; ' : ''}${r.tanggal ? formatTanggal(r.tanggal) : ''}${r.updatedAt ? ' &middot; diubah ' + new Date(r.updatedAt).toLocaleString('id-ID') : ''}</p>
           </div>
           <div class="whitespace-nowrap">
             <button data-act="cetak" data-id="${r.id}" class="text-xs font-semibold text-white bg-gold-500 hover:bg-gold-600 rounded px-3 py-1.5">Cetak</button>
@@ -10778,13 +11002,22 @@ function renderDaftarSK(jenis){
             <button data-act="hapus" data-id="${r.id}" class="text-xs font-semibold text-rust border border-rust/30 hover:bg-rust-100 rounded px-3 py-1.5 ml-1">Hapus</button>
           </div>
         </li>`).join('')}</ul>`
-      : `<p class="text-sm text-navy-300 py-2">Belum ada SK tersimpan. Klik <b>Simpan SK</b> atau <b>Cetak</b> — SK otomatis masuk daftar ini.</p>`}
+      : `<p class="text-sm text-navy-300 py-2">Belum ada data tersimpan. Klik <b>Simpan</b> pada form di atas — hasilnya masuk daftar ini dan dapat diedit atau dicetak ulang kapan saja.</p>`}
     </div>`;
 }
 function renderSemuaDaftarSK(){ Object.keys(SK_LABEL).forEach(renderDaftarSK); }
 
 function cetakSKTersimpan(rec){
   const d = rec.data || {};
+  if(rec.jenis === 'hadir'){
+    const h = d.header || {};
+    if(!(d.peserta||[]).length){ alertFix('Daftar hadir ini belum memiliki peserta. Klik Edit untuk melengkapinya.'); return; }
+    if(!(h.tanggalList||[]).length){ alertFix('Daftar hadir ini belum memiliki tanggal. Klik Edit untuk memilih tanggal.'); return; }
+    buildDaftarHadirDocument(h, d.peserta); window.print(); return;
+  }
+  if(rec.jenis === 'kafer'){ buildKaferLaporanDocument(d.header || {}); window.print(); return; }
+  if(rec.jenis === 'sptjm'){ buildSptjmDocument(d.header || {}); window.print(); return; }
+  if(rec.jenis === 'pengantar'){ buildSuratPengantarDocument(d.v || {}); window.print(); return; }
   if(rec.jenis === 'skguru'){
     if(!(d.guru||[]).length){ alertFix('SK ini belum memiliki daftar guru. Klik Edit untuk melengkapinya.'); return; }
     buildSkGuruDocument(d.header || {}, d.guru);
@@ -10827,6 +11060,9 @@ function editSKTersimpan(rec){
 })();
 (function setupSkTersimpan(){
   document.getElementById('btn-simpan-skguru').addEventListener('click', ()=>simpanSK('skguru'));
+  [['hadir','btn-simpan-hadir'],['kafer','btn-simpan-kafer'],['sptjm','btn-simpan-sptjm'],['pengantar','spg-simpan']].forEach(([j,id])=>{
+    const b = document.getElementById(id); if(b) b.addEventListener('click', ()=>simpanSK(j));
+  });
   Object.keys(KEPUTUSAN_CFG).forEach(key=>{
     document.getElementById(KEPUTUSAN_CFG[key].prefix+'-simpan').addEventListener('click', ()=>simpanSK(key));
   });
@@ -10852,10 +11088,10 @@ function editSKTersimpan(rec){
       if(btn.dataset.act === 'cetak') return cetakSKTersimpan(rec);
       if(btn.dataset.act === 'edit') return editSKTersimpan(rec);
       if(btn.dataset.act === 'hapus'){
-        if(!await confirmFix(`Hapus ${SK_LABEL[rec.jenis]||'SK'} No. ${rec.nomor||'-'}?\n\nSK yang dihapus tidak dapat dikembalikan.`)) return;
+        if(!await confirmFix(`Hapus ${SK_LABEL[rec.jenis]||'data'} ${rec.nomor?'No. '+rec.nomor:(rec.judul||'')}?\n\nData yang dihapus tidak dapat dikembalikan.`)) return;
         try{
           await db.ref('sekolah/'+state.userData.npsn+'/dokumenSK/'+rec.id).remove();
-          logAudit('Cetak SK', 'hapus', `Hapus ${SK_LABEL[rec.jenis]||'SK'} No. ${rec.nomor||'-'}`);
+          logAudit('Cetak SK', 'hapus', `Hapus ${SK_LABEL[rec.jenis]||'SK'} ${rec.nomor?'No. '+rec.nomor:(rec.judul||'')}`);
           if(state.editSK && state.editSK.id === rec.id){ state.editSK = null; updateSkEditBanner(); }
         }catch(err){
           alertFix('Gagal menghapus SK: ' + (err.message || 'Periksa koneksi internet Anda dan coba lagi.'));
@@ -12135,7 +12371,11 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     pfLepas(r); fitLepas(r);
     r.style.setProperty('--pz','1');
     let orient = 'portrait', zoom = 1;
-    if(ukur(r, W_POTRET) > W_POTRET + 2){
+    /* Dokumen dapat memaksa orientasi lewat atribut data-orient pada pembungkus (mis. Daftar Hadir). */
+    const paksa = r.firstElementChild && r.firstElementChild.getAttribute('data-orient');
+    if(paksa==='portrait'){
+      const w = ukur(r, W_POTRET); if(w > W_POTRET + 2) zoom = W_POTRET / w;
+    } else if(paksa==='landscape' || ukur(r, W_POTRET) > W_POTRET + 2){
       orient = 'landscape';
       const w = ukur(r, W_LANSKAP);
       if(w > W_LANSKAP + 2) zoom = W_LANSKAP / w;
