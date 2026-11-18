@@ -207,6 +207,23 @@
   .cx-doc.aktif .cx-di{ background:rgba(255,255,255,.22); color:#fff; } .cx-doc.aktif .cx-go{ opacity:1; transform:none; background:rgba(255,255,255,.25); color:#fff; }
   @media (max-width:640px){ .cx-hero{ padding:22px 18px; } .cx-hero h2{ font-size:26px; } .cx-card{ padding:4px 16px; } }
   @media print{ .cx-hero,.cx-card{ display:none !important; } }
+  /* ---- Hero Cetak Dokumen versi ringkas (hemat ruang) ---- */
+  #page-cetak .cx-hero{ padding:14px 20px; border-radius:16px; box-shadow:0 10px 24px -14px rgba(11,26,41,.6); }
+  #page-cetak .cx-deco{ width:150px; height:150px; right:-20px; top:-50px; }
+  #page-cetak .cx-hero-in{ flex-wrap:wrap; gap:10px 16px; align-items:center; }
+  #page-cetak .cx-hero-l{ flex:1 1 300px; }
+  #page-cetak .cx-eyebrow{ font-size:10px; letter-spacing:.12em; padding:3px 10px; }
+  #page-cetak .cx-hero h2{ font-size:20px; line-height:1.2; margin-top:6px; }
+  #page-cetak .cx-hero-sub{ font-size:11.5px; line-height:1.35; margin:4px 0 0; max-width:none; }
+  #page-cetak .cx-tiles{ gap:8px; flex:0 1 auto; max-width:none; grid-template-columns:repeat(3,minmax(110px,auto)); }
+  #page-cetak .cx-tile{ padding:7px 10px; gap:8px; border-radius:12px; }
+  #page-cetak .cx-tico{ width:28px; height:28px; border-radius:9px; }
+  #page-cetak .cx-tico svg{ width:14px; height:14px; }
+  #page-cetak .cx-tv{ font-size:14px; }
+  #page-cetak .cx-tl{ font-size:10px; margin-top:1px; }
+  #page-cetak .cx-btn-print{ font-size:12.5px; padding:9px 14px; border-radius:11px; gap:8px; }
+  #page-cetak .cx-btn-print svg{ width:15px; height:15px; }
+  @media (max-width:640px){ #page-cetak .cx-hero h2{ font-size:17px; } #page-cetak .cx-hero{ padding:12px 14px; } #page-cetak .cx-tiles{ grid-template-columns:repeat(3,1fr); width:100%; } }
   /* Pemilih jenis dokumen cetak kini berupa dropdown; deretan tombol tab disembunyikan */
   #cetak-tabs .cetak-tab{ display:none; }
   #cetak-tabs:not(:has(#cetak-gabung-wrap:not(.hidden))){ display:none; }
@@ -358,6 +375,68 @@
   #tut-stage tr.gone{transition:all .6s;opacity:0;transform:translateX(50px)}
   @keyframes tutf{from{opacity:0}}
   @keyframes tutn{from{background:#F3DEB0}to{background:transparent}}
+
+/* ===== Kartu grid bulan BKU ===== */
+.bkb-card{background:#fff;border:1px solid #e3e6ec;border-radius:12px;overflow:hidden}
+.bkb-head{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-start;padding:18px 20px}
+.bkb-title-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.bkb-title{font-size:17px;font-weight:700;color:#1f2a44;margin:0}
+.bkb-aktif{font-size:12px;font-weight:600;color:#1f2a44;border:1px solid #c9ced8;border-radius:6px;padding:2px 10px;background:#fff}
+.bkb-hint{margin:6px 0 0;font-size:13px;color:#2f6fd6}
+.bkb-actions{display:flex;gap:8px;flex-wrap:wrap}
+.bkb-btn{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #c9ced8;color:#1f2a44;font-size:13px;font-weight:600;border-radius:8px;padding:8px 14px;cursor:pointer}
+.bkb-btn:hover{background:#f3f5f9}
+.bkb-body{background:#f1f2f4;padding:18px 20px 12px}
+.bkb-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media(max-width:900px){.bkb-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){.bkb-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bkb-month{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(20,30,60,.10);padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.bkb-mname{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600;color:#1f2a44}
+.bkb-mname svg{color:#2e9b57}
+.bkb-pill{font-size:12px;font-weight:600;border-radius:999px;padding:3px 12px}
+.bkb-ok{background:#d9f3e2;color:#1e7a43}
+.bkb-redo{background:#fde0e0;color:#c23a3a}
+.bkb-empty{background:#eceef2;color:#6b7387}
+.bkb-foot{display:flex;justify-content:flex-end;padding:12px 2px 2px}
+.bkb-link{display:inline-flex;align-items:center;gap:6px;background:none;border:0;color:#2f6fd6;font-size:13px;font-weight:600;cursor:pointer}
+.bkb-link:hover{text-decoration:underline}
+.bkb-prev{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid #e3e6ec}
+.bkb-prev:empty{display:none}
+.bkb-prev-left{display:flex;align-items:center;gap:10px;font-weight:700;color:#1f2a44;font-size:15px}
+html[data-theme="dark"] .bkb-card{background:var(--d-surface,#1b2130);border-color:var(--d-line,#2c3447)}
+html[data-theme="dark"] .bkb-title,html[data-theme="dark"] .bkb-mname,html[data-theme="dark"] .bkb-prev-left{color:var(--d-text,#e6e9f0)}
+html[data-theme="dark"] .bkb-aktif,html[data-theme="dark"] .bkb-btn{background:transparent;color:var(--d-text,#e6e9f0);border-color:var(--d-line,#2c3447)}
+html[data-theme="dark"] .bkb-body{background:rgba(255,255,255,.04)}
+html[data-theme="dark"] .bkb-month{background:var(--d-surface,#232b3d);box-shadow:none;border:1px solid var(--d-line,#2c3447)}
+html[data-theme="dark"] .bkb-prev{border-color:var(--d-line,#2c3447)}
+html[data-theme="dark"] .bkb-ok{background:rgba(46,155,87,.2);color:#6fd59a}
+html[data-theme="dark"] .bkb-redo{background:rgba(220,70,70,.22);color:#ff9a9a}
+html[data-theme="dark"] .bkb-empty{background:rgba(255,255,255,.08);color:var(--d-mute,#9aa3b8)}
+.cxb-month{cursor:pointer;border:2px solid transparent;font-family:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}
+.cxb-month:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(20,30,60,.16)}
+.cxb-month.aktif{border-color:#2f6fd6;box-shadow:0 0 0 3px rgba(47,111,214,.18)}
+.cxb-month.aktif .bkb-mname{color:#2f6fd6}
+.cxb-month:disabled{opacity:.55;cursor:not-allowed;transform:none}
+html[data-theme="dark"] .cxb-month.aktif{border-color:#6ea2f5}
+@media print{.cxb-card{display:none !important}}
+/* ---- Kartu bulan Cetak Dokumen: versi ringkas ---- */
+.cxb-card .bkb-head{padding:10px 14px;gap:8px}
+.cxb-card .bkb-title{font-size:14px}
+.cxb-card .bkb-hint{margin-top:2px;font-size:11.5px}
+.cxb-card .bkb-btn{padding:5px 10px;font-size:12px;border-radius:7px}
+.cxb-card .bkb-body{padding:10px 14px 6px}
+.cxb-card .bkb-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media(max-width:1000px){.cxb-card .bkb-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:640px){.cxb-card .bkb-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cxb-card .bkb-month{padding:7px 6px;gap:4px;border-radius:8px}
+.cxb-card .bkb-mname{font-size:13px;gap:4px}
+.cxb-card .bkb-mname svg{width:14px;height:14px}
+.cxb-card .bkb-pill{font-size:10.5px;padding:2px 8px;white-space:nowrap}
+.cxb-card .bkb-foot{padding:6px 2px 0}
+.cxb-card .bkb-link{font-size:12px}
+.cxb-card .bkb-prev{padding:8px 14px}
+.cxb-card .bkb-prev-left{font-size:13px}
+@media print{#bku-bulan-card{display:none!important}}
 </style>
 <link rel="icon" type="image/png" href="data:image/png;base64,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">
 
@@ -1620,6 +1699,30 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
             </div>
           </div>
 
+
+          <div id="bku-bulan-card" class="bkb-card">
+            <div class="bkb-head">
+              <div>
+                <div class="bkb-title-row">
+                  <h3 id="bkb-title" class="bkb-title">BKU BOSP Reguler</h3>
+                  <span class="bkb-aktif">Aktif</span>
+                </div>
+                <p id="bkb-hint" class="bkb-hint"></p>
+              </div>
+              <div class="bkb-actions no-print">
+                <button id="bkb-cetak" type="button" class="bkb-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Cetak</button>
+                <button id="bkb-tambah" type="button" class="bkb-btn">Tambah Penerimaan Dana</button>
+              </div>
+            </div>
+            <div class="bkb-body">
+              <div id="bkb-grid" class="bkb-grid"></div>
+              <div class="bkb-foot no-print">
+                <button id="bkb-refresh" type="button" class="bkb-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span id="bkb-refresh-label">Perbarui Data BKU</span></button>
+              </div>
+            </div>
+            <div id="bkb-prev" class="bkb-prev"></div>
+          </div>
+
           <div class="flex flex-wrap items-center gap-2 justify-between no-print">
             <div class="flex flex-wrap gap-2">
               <button id="btn-tambah-transaksi" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2">+ Transaksi</button>
@@ -1638,6 +1741,14 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
           <div id="import-feedback" class="hidden text-sm rounded px-3 py-2 no-print"></div>
           <p class="text-xs text-navy-300 no-print">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT), Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Kolom Kategori Belanja bersifat opsional (boleh dikosongkan) dan tidak memengaruhi import file lama tanpa kolom ini. Semua baris yang diimpor otomatis masuk ke bagian Jenis Dana BOSP yang sedang aktif di atas — pindah tab Jenis Dana terlebih dahulu bila file berisi data jenis dana lain. Klik "Unduh Template" untuk contoh filenya.</p>
           <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
+            <div id="bku-cari-bar" class="no-print flex flex-wrap items-center gap-3 px-4 py-3 border-b border-navy-100">
+              <div class="relative flex-1 min-w-[220px] max-w-xl">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-navy-300" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+                <input id="bku-cari" type="search" autocomplete="off" placeholder="Cari uraian, No. Bukti, kode, penerima, tanggal, atau nominal…" class="w-full text-sm rounded border border-navy-200 pl-9 pr-9 py-2 bg-white text-navy">
+                <button id="bku-cari-clear" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-navy-300 hover:text-navy text-lg leading-none px-1" title="Hapus pencarian" aria-label="Hapus pencarian">×</button>
+              </div>
+              <span id="bku-cari-info" class="text-xs text-navy-400"></span>
+            </div>
             <div class="overflow-x-auto ledger-bg">
               <table class="w-full text-sm min-w-[1100px] border-collapse">
                 <thead><tr class="text-left text-xs uppercase text-navy-400 bg-paper border-b border-black divide-x divide-black">
@@ -1879,13 +1990,13 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
                 <p class="cx-eyebrow"><span class="cx-dot"></span>Pusat Cetak Dokumen</p>
                 <h2 class="font-serif tracking-tight" id="cx-hero-judul">BOSP Reguler — Tahap 1</h2>
                 <p class="cx-hero-sub">Semua dokumen yang dicetak hanya memuat data dana &amp; tahap yang sedang dipilih — tidak tercampur.</p>
-                <button id="btn-cetak-spj-lengkap" class="cx-btn-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M7 14h10v7H7z"/></svg>Cetak SPJ Lengkap (Bundel)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
               </div>
               <div class="cx-tiles">
                 <div class="cx-tile"><span class="cx-tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg></span><div><div class="cx-tv" id="cx-chip-trx">0</div><div class="cx-tl">Total transaksi</div></div></div>
                 <div class="cx-tile"><span class="cx-tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></span><div><div class="cx-tv" id="cx-chip-keluar">0</div><div class="cx-tl">Pengeluaran</div></div></div>
                 <div class="cx-tile"><span class="cx-tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v12H3zM3 11h18M7 15h3"/></svg></span><div><div class="cx-tv" id="cx-chip-rp">0</div><div class="cx-tl">Total belanja</div></div></div>
               </div>
+              <button id="btn-cetak-spj-lengkap" class="cx-btn-print"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M7 14h10v7H7z"/></svg>Cetak SPJ Lengkap (Bundel)<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
             </div>
           </div>
 
@@ -1901,7 +2012,28 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
                 <button type="button" data-cxtahap="1"><b>Tahap 1</b><span>Januari – Juni</span></button>
                 <button type="button" data-cxtahap="2"><b>Tahap 2</b><span>Juli – Desember</span></button>
               </div>
-              <div class="cx-bln-grp"><span class="cx-bln-lbl">Bulan</span><div class="cx-bln" id="cx-bulan-wrap"></div></div>
+              </div>
+              <div id="cxb-card" class="bkb-card cxb-card" style="margin-top:16px">
+                <div class="bkb-head">
+                  <div>
+                    <div class="bkb-title-row">
+                      <h3 id="cxb-title" class="bkb-title">BKU BOSP Reguler</h3>
+                      <span class="bkb-aktif">Aktif</span>
+                    </div>
+                    <p id="cxb-hint" class="bkb-hint"></p>
+                  </div>
+                  <div class="bkb-actions no-print">
+                    <button id="cxb-cetak" type="button" class="bkb-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Cetak</button>
+                    <button id="cxb-semua" type="button" class="bkb-btn">Semua Bulan</button>
+                  </div>
+                </div>
+                <div class="bkb-body">
+                  <div id="cxb-grid" class="bkb-grid"></div>
+                  <div class="bkb-foot no-print">
+                    <button id="cxb-refresh" type="button" class="bkb-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span id="cxb-refresh-label">Perbarui Data BKU</span></button>
+                  </div>
+                </div>
+                <div id="cxb-prev" class="bkb-prev"></div>
               </div>
             </div>
             <div class="cx-sec">
@@ -3330,7 +3462,7 @@ function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res));
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.1.17"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.2.0"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -4014,6 +4146,7 @@ function syncCetakDesign(){
     }
     if(bw.dataset.sig !== th+'|'+bAktif){ bw.innerHTML = h; bw.dataset.sig = th+'|'+bAktif; }
   }
+  if(typeof renderCetakBulanCard==='function') renderCetakBulanCard();
   const tr = getTransaksiDanaAktif(), keluar = tr.filter(t=>t.jenis==='pengeluaran');
   const set=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v; };
   set('cx-chip-trx', tr.length); set('cx-chip-keluar', keluar.length);
@@ -4023,6 +4156,122 @@ function syncCetakDesign(){
     const e = document.querySelector(`[data-cxcount="${k}"]`); if(e) e.textContent = n+' transaksi · Tahap '+th+(cetakBulanAktif()?' · '+NAMA_BULAN[Number(cetakBulanAktif())-1]:'');
   });
 }
+/* ===== Kartu bulan bergaya BKU pada halaman Cetak Dokumen =====
+   Memakai status yang sama dengan menu BKU (statusBulanBku). Klik bulan = filter
+   cetak bulan tsb (otomatis pindah Tahap bila bulan di luar tahap aktif). */
+/* ===== Perbarui Data BKU: ambil ulang transaksi dari Firebase, hitung ulang saldo & status bulan ===== */
+let _bkuRefreshing = false;
+async function perbaruiDataBku(labelId){
+  if(_bkuRefreshing) return;
+  const lbl = document.getElementById(labelId);
+  const btn = lbl ? lbl.closest('button') : null;
+  const awal = lbl ? lbl.textContent : '';
+  _bkuRefreshing = true;
+  if(btn) btn.disabled = true;
+  if(lbl) lbl.textContent = 'Memperbarui…';
+  let ok = true;
+  try{
+    const npsn = state.userData && state.userData.npsn;
+    if(npsn){
+      const snap = await db.ref('transaksi_bku/'+npsn).once('value');
+      const val = snap.val() || {};
+      state.transactions = Object.entries(val)
+        .map(([id, t])=>({id, ...t}))
+        .sort((a,b)=> (a.tanggal||'').localeCompare(b.tanggal||'') || (a.createdAt||0)-(b.createdAt||0));
+      recomputeSaldo();
+    }
+    if(state.currentView==='bku') renderBKU();
+    if(state.currentView==='cetak'){
+      if(['kwitansi','nota','bast','lampiran'].includes(state.cetakDoc)) renderCetakList();
+      updateCetakSubActive();
+    }
+    if(state.currentView==='dashboard-sekolah') renderDashboardSekolah();
+  }catch(err){
+    ok = false;
+    alertFix('Gagal memperbarui data BKU: '+((err&&err.message)||err));
+  }finally{
+    _bkuRefreshing = false;
+    const l2 = document.getElementById(labelId), b2 = l2 ? l2.closest('button') : null;
+    if(b2) b2.disabled = false;
+    if(l2){
+      if(ok){
+        l2.textContent = 'Data diperbarui ✓';
+        setTimeout(()=>{ const x=document.getElementById(labelId); if(x && x.textContent==='Data diperbarui ✓') x.textContent = awal; }, 2000);
+      } else l2.textContent = awal;
+    }
+  }
+}
+function renderCetakBulanCard(){
+  const card = document.getElementById('cxb-card');
+  if(!card) return;
+  const tahun = tahunAnggaranAktif();
+  const jd = state.jenisDanaAktif || getDefaultJenisDana();
+  const label = JENIS_DANA[jd].label;
+  const bAktif = cetakBulanAktif();
+  document.getElementById('cxb-title').textContent = `BKU ${label} ${tahun}`;
+  document.getElementById('cxb-hint').textContent = `Tutup semua bulan BKU paling lambat 30 Januari ${tahun+1}`;
+  document.getElementById('cxb-refresh-label').textContent = `Perbarui Data BKU ${tahun}`;
+  const check = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  /* Hitung sama persis dengan daftar cetak: hanya transaksi PENGELUARAN (yang bisa dicetak
+     sebagai Kwitansi/Nota/BAST), tahun & bulan dibaca langsung dari teks tanggal (tanpa
+     konversi zona waktu), pada jenis dana aktif. Penerimaan dana tidak dihitung. */
+  const per = Array.from({length:12}, ()=>({n:0}));
+  (state.transactions||[]).forEach(t=>{
+    if(t.jenis!=='pengeluaran' || jenisDanaTransaksi(t)!==jd) return;
+    const tg = String(t.tanggal||'');
+    if(Number(tg.slice(0,4))!==tahun) return;
+    const m = Number(tg.slice(5,7));
+    if(m>=1 && m<=12) per[m-1].n++;
+  });
+  /* Hanya bulan DALAM tahap aktif yang punya transaksi yang ditampilkan. */
+  const th = state.tahapAktif || getDefaultTahap();
+  const rg = TAHAP_PERIODE[th];
+  const items = [];
+  per.forEach((p,i)=>{
+    const bln = i+1;
+    if(rg && (bln<rg.mulaiBulan || bln>rg.selesaiBulan)) return;
+    if(p.n<=0) return;
+    const mm = String(bln).padStart(2,'0');
+    const pill = '<span class="bkb-pill bkb-ok">Aktif · '+p.n+' pengeluaran</span>';
+    items.push(`<button type="button" class="bkb-month cxb-month${bAktif===mm?' aktif':''}" data-cxbm="${mm}" aria-pressed="${bAktif===mm}"><div class="bkb-mname">${check}<span>${NAMA_BULAN_PENUH[i]}</span></div>${pill}</button>`);
+  });
+  document.getElementById('cxb-grid').innerHTML = items.length ? items.join('')
+    : `<div style="grid-column:1/-1;text-align:center;font-size:12.5px;color:#6b7387;padding:10px 0">Belum ada transaksi pada ${escapeHtml(rg?rg.short:'tahap ini')} untuk ${escapeHtml(label)} ${tahun}.</div>`;
+  const semua = document.getElementById('cxb-semua');
+  if(semua) semua.style.background = bAktif==='' ? 'rgba(47,111,214,.10)' : '';
+  const prev = document.getElementById('cxb-prev');
+  const adaPrev = (state.transactions||[]).some(t=>t.jenis==='pengeluaran' && jenisDanaTransaksi(t)===jd && Number(String(t.tanggal||'').slice(0,4))===tahun-1);
+  if(adaPrev){
+    prev.innerHTML = `<div class="bkb-prev-left"><span>BKU ${escapeHtml(label)} ${tahun-1}</span><span class="bkb-pill bkb-ok">Aktif</span></div>
+      <button type="button" id="cxb-cetak-prev" class="bkb-btn no-print">Cetak</button>`;
+    document.getElementById('cxb-cetak-prev').onclick = ()=>alertFix(`Untuk mencetak BKU ${tahun-1}, ubah Tahun Anggaran pada pengaturan sekolah lalu cetak dari halaman ini.`);
+  } else prev.innerHTML = '';
+}
+(function setupCetakBulanCard(){
+  const $ = id=>document.getElementById(id);
+  const grid = $('cxb-grid'); if(!grid) return;
+  grid.addEventListener('click', (e)=>{
+    const b = e.target.closest('[data-cxbm]'); if(!b) return;
+    const mm = b.dataset.cxbm, n = Number(mm);
+    const tahapTujuan = n <= 6 ? '1' : '2';
+    const sudahDipilih = cetakBulanAktif() === mm;
+    if((state.tahapAktif||getDefaultTahap()) !== tahapTujuan){
+      const t = document.querySelector(`.tahap-tab[data-tahap="${tahapTujuan}"]`); if(t) t.click();
+    }
+    state.cetakBulan = sudahDipilih ? '' : mm;   // klik lagi = batalkan pilihan
+    state.cetakSelection.clear();
+    if(['kwitansi','nota','bast','lampiran'].includes(state.cetakDoc)) renderCetakList();
+    updateCetakSubActive();
+  });
+  $('cxb-semua').addEventListener('click', ()=>{
+    state.cetakBulan = '';
+    state.cetakSelection.clear();
+    if(['kwitansi','nota','bast','lampiran'].includes(state.cetakDoc)) renderCetakList();
+    updateCetakSubActive();
+  });
+  $('cxb-refresh').addEventListener('click', ()=>perbaruiDataBku('cxb-refresh-label'));
+  $('cxb-cetak').addEventListener('click', ()=>{ const b = $('btn-cetak-spj-lengkap'); if(b) b.click(); });
+})();
 function updateCetakSubActive(){
   syncCetakDesign();
   const sel = document.getElementById('cetak-doc-select');
@@ -4806,7 +5055,7 @@ function attachSchoolListeners(npsn){
     updateSppdNavVisibility();
     if(state.currentView==='bku') renderBKU();
     if(state.currentView==='dashboard-sekolah') renderDashboardSekolah();
-    if(state.currentView==='cetak') renderCetakList();
+    if(state.currentView==='cetak'){ renderCetakList(); updateCetakSubActive(); }
     if(state.currentView==='sppd') renderSppd();
     if(state.currentView==='nomor-surat') renderNomorSurat();
     if(typeof nsRefreshHints==='function') nsRefreshHints();
@@ -5663,9 +5912,103 @@ document.getElementById('form-akun-kepsek').addEventListener('submit', async (e)
 /* =========================================================================
    BUKU KAS UMUM — CRUD
    ========================================================================= */
+// ===== Kartu grid bulan BKU (status otomatis dari data) =====
+// "Sudah Selesai"        : bulan memiliki transaksi pada tahun anggaran & jenis dana aktif.
+// "Perlu Ditutup Ulang"  : ada transaksi di bulan itu yang diubah (updatedAt) pada bulan
+//                          kalender yang lebih akhir daripada bulan transaksinya.
+// "Belum Ada Data"       : bulan belum memiliki transaksi.
+function statusBulanBku(tahun, jenisDana){
+  const per = Array.from({length:12}, ()=>({n:0, redo:false}));
+  (state.transactions||[]).forEach(t=>{
+    if(jenisDanaTransaksi(t)!==jenisDana || !t.tanggal) return;
+    const d = new Date(t.tanggal);
+    if(isNaN(d) || d.getFullYear()!==tahun) return;
+    const m = d.getMonth();
+    per[m].n++;
+    const c = Number(t.createdAt), u = Number(t.updatedAt);
+    if(u && c && u - c > 60000){
+      const ud = new Date(u);
+      if(ud.getFullYear()*12+ud.getMonth() > tahun*12+m) per[m].redo = true;
+    }
+  });
+  return per;
+}
+function renderBkuBulanGrid(){
+  const card = document.getElementById('bku-bulan-card');
+  if(!card) return;
+  const tahun = tahunAnggaranAktif();
+  const jd = state.jenisDanaAktif || getDefaultJenisDana();
+  const label = JENIS_DANA[jd].label;
+  document.getElementById('bkb-title').textContent = `BKU ${label} ${tahun}`;
+  document.getElementById('bkb-hint').textContent = `Tutup semua bulan BKU paling lambat 30 Januari ${tahun+1}`;
+  document.getElementById('bkb-refresh-label').textContent = `Perbarui Data BKU ${tahun}`;
+  const check = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  const per = statusBulanBku(tahun, jd);
+  document.getElementById('bkb-grid').innerHTML = per.map((p,i)=>{
+    let pill, ico = '';
+    if(p.n===0) pill = '<span class="bkb-pill bkb-empty">Belum Ada Data</span>';
+    else if(p.redo) pill = '<span class="bkb-pill bkb-redo">Perlu Ditutup Ulang</span>';
+    else { pill = '<span class="bkb-pill bkb-ok">Sudah Selesai</span>'; ico = check; }
+    return `<div class="bkb-month"><div class="bkb-mname">${ico}<span>${NAMA_BULAN_PENUH[i]}</span></div>${pill}</div>`;
+  }).join('');
+  const prev = document.getElementById('bkb-prev');
+  const adaPrev = per && (state.transactions||[]).some(t=>jenisDanaTransaksi(t)===jd && t.tanggal && new Date(t.tanggal).getFullYear()===tahun-1);
+  if(adaPrev){
+    const pp = statusBulanBku(tahun-1, jd);
+    const semua = pp.every(x=>x.n===0 || !x.redo);
+    prev.innerHTML = `<div class="bkb-prev-left"><span>BKU ${escapeHtml(label)} ${tahun-1}</span><span class="bkb-pill ${semua?'bkb-ok':'bkb-redo'}">${semua?'Sudah Selesai':'Perlu Ditutup Ulang'}</span></div>
+      <button type="button" id="bkb-cetak-prev" class="bkb-btn no-print">Cetak</button>`;
+    document.getElementById('bkb-cetak-prev').onclick = ()=>alertFix(`Untuk mencetak BKU ${tahun-1}, ubah Tahun Anggaran pada pengaturan sekolah lalu cetak dari halaman ini.`);
+  } else prev.innerHTML = '';
+}
+(function(){
+  const $ = id=>document.getElementById(id);
+  $('bkb-cetak').addEventListener('click', ()=>$('btn-export-pdf').click());
+  $('bkb-tambah').addEventListener('click', ()=>$('btn-tambah-transaksi').click());
+  $('bkb-refresh').addEventListener('click', ()=>perbaruiDataBku('bkb-refresh-label'));
+})();
+
+/* ===== Pencarian data pada Buku Kas Umum ===== */
+state.bkuCari = state.bkuCari || '';
+function bkuNormal(v){ return String(v==null?'':v).toLowerCase(); }
+function bkuKataCari(){
+  return bkuNormal(state.bkuCari).split(/\s+/).filter(Boolean);
+}
+function bkuCocokCari(t, kata){
+  const jml = Number(t.jumlah)||0;
+  const hay = [
+    t.tanggal, formatTanggal(t.tanggal), t.kode, t.noBukti, t.kodeProgram, t.kodeRekening,
+    t.uraian, t.kualitas, t.satuan, t.penerima, t.nipPenerima, t.kategori, t.kategoriBelanja,
+    String(jml), fmtRupiah(jml), String(jml).replace(/\B(?=(\d{3})+(?!\d))/g,'.')
+  ].map(bkuNormal).join(' | ');
+  const hayAngka = hay.replace(/[.,]/g,'');
+  return kata.every(k=> hay.includes(k) || (/^[\d.,]+$/.test(k) && hayAngka.includes(k.replace(/[.,]/g,''))));
+}
+function bkuUpdateInfoCari(aktif, tampil, total){
+  const info = document.getElementById('bku-cari-info'), clr = document.getElementById('bku-cari-clear');
+  if(clr) clr.classList.toggle('hidden', !aktif);
+  if(info) info.textContent = aktif ? `Menampilkan ${tampil} dari ${total} transaksi` : (total ? `${total} transaksi pada tahap & jenis dana ini` : '');
+}
+(function setupBkuCari(){
+  const inp = document.getElementById('bku-cari'), clr = document.getElementById('bku-cari-clear');
+  if(!inp) return;
+  let tmr = null;
+  inp.addEventListener('input', ()=>{
+    clearTimeout(tmr);
+    tmr = setTimeout(()=>{ state.bkuCari = inp.value; renderBKU(); }, 150);
+  });
+  inp.addEventListener('keydown', e=>{ if(e.key==='Escape'){ inp.value=''; state.bkuCari=''; renderBKU(); } });
+  if(clr) clr.addEventListener('click', ()=>{ inp.value=''; state.bkuCari=''; renderBKU(); inp.focus(); });
+  /* Cetak BKU selalu memuat seluruh transaksi, bukan hasil pencarian saja */
+  let _cariSimpan = null;
+  window.addEventListener('beforeprint', ()=>{ if(state.bkuCari){ _cariSimpan = state.bkuCari; state.bkuCari=''; if(state.currentView==='bku') renderBKU(); } });
+  window.addEventListener('afterprint', ()=>{ if(_cariSimpan!==null){ state.bkuCari=_cariSimpan; _cariSimpan=null; if(state.currentView==='bku') renderBKU(); } });
+})();
+
 function renderBKU(){
   syncTahapUI();
   syncJenisDanaUI();
+  renderBkuBulanGrid();
 
   const readOnlyKepsek = state.userData.role === 'kepala_sekolah';
   const tahap = state.tahapAktif || getDefaultTahap();
@@ -5679,7 +6022,11 @@ function renderBKU(){
   // atau mereset SPJ salah satu jenis dana tidak menghapus data jenis dana lain.
   const txTahapIni = state.transactions.filter(t=>bulanDalamTahap(t.tanggal, tahap) && jenisDanaTransaksi(t)===jenisDana);
 
-  const rows = txTahapIni.map(t=>{
+  const kataCari = bkuKataCari();
+  const txTampil = kataCari.length ? txTahapIni.filter(t=>bkuCocokCari(t, kataCari)) : txTahapIni;
+  bkuUpdateInfoCari(kataCari.length, txTampil.length, txTahapIni.length);
+
+  const rows = txTampil.map(t=>{
     const isPenerimaan = t.jenis==='penerimaan';
     return `<tr class="align-top border-b border-black divide-x divide-black hover:bg-paper/60">
       <td class="py-2 px-3 whitespace-nowrap">${formatTanggal(t.tanggal)}</td>
@@ -5701,7 +6048,7 @@ function renderBKU(){
     </tr>`;
   }).join('');
 
-  document.getElementById('tbl-bku').innerHTML = rows || `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Belum ada transaksi ${escapeHtml(JENIS_DANA[jenisDana].label)} pada ${escapeHtml(TAHAP_PERIODE[tahap].label)}. ${bisaUbah ? 'Klik "+ Transaksi" untuk menambahkan.' : ''}</td></tr>`;
+  document.getElementById('tbl-bku').innerHTML = rows || (kataCari.length ? `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Tidak ada transaksi yang cocok dengan pencarian "${escapeHtml(state.bkuCari||'')}" pada ${escapeHtml(TAHAP_PERIODE[tahap].label)}.</td></tr>` : `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Belum ada transaksi ${escapeHtml(JENIS_DANA[jenisDana].label)} pada ${escapeHtml(TAHAP_PERIODE[tahap].label)}. ${bisaUbah ? 'Klik "+ Transaksi" untuk menambahkan.' : ''}</td></tr>`);
 
   document.querySelectorAll('.btn-edit-tx').forEach(b=>b.addEventListener('click', ()=>openTransaksiModal(b.dataset.id)));
   document.querySelectorAll('.btn-hapus-tx').forEach(b=>b.addEventListener('click', async ()=>{
