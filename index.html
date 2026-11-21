@@ -228,7 +228,8 @@
   #cetak-tabs .cetak-tab{ display:none; }
   #cetak-tabs:not(:has(#cetak-gabung-wrap:not(.hidden))){ display:none; }
   @media print{
-    html, body{ height:auto !important; min-height:0 !important; overflow:visible !important; background:#fff !important; }
+    html, html body, html[data-theme] , html[data-theme] body{ height:auto !important; min-height:0 !important; overflow:visible !important; background:#fff !important; background-color:#fff !important; background-image:none !important; color-scheme:light !important; }
+    #print-root, #print-root > div{ background:#fff !important; background-image:none !important; box-shadow:none !important; border-radius:0 !important; }
     body > *:not(#print-root){ display:none !important; }
     #print-root{ display:block !important; position:static !important; width:auto !important; height:auto !important; overflow:visible !important; margin:0; padding:0; }
     .no-print{ display:none !important; }
@@ -327,6 +328,7 @@
   @media screen{ #pv-bar.pv-on{ display:flex; position:fixed; top:0; left:0; right:0; height:56px; z-index:200; align-items:center; justify-content:space-between; gap:12px; padding:0 18px; background:linear-gradient(120deg,#0B1A29,#16324F); color:#fff; box-shadow:0 6px 18px -8px rgba(0,0,0,.6); } }
   #pv-bar b{ font-family:'Lora',Georgia,serif; font-size:16px; } #pv-bar small{ color:#B9C9D8; margin-left:10px; font-size:12px; }
   #pv-bar button{ border-radius:12px; padding:8px 18px; font-weight:700; font-size:13px; }
+  @media screen and (max-width:1250px){ #pv-bar small{ display:none; } #pv-bar.pv-on{ gap:6px; padding:0 10px; } #pv-bar button{ padding:8px 11px; } }
   #pv-cetak{ background:linear-gradient(180deg,#E3B35A,#C8963E); color:#fff; box-shadow:0 8px 18px -8px rgba(200,150,62,.8); }
   #pv-tutup{ background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25); }
   @media print{ #pv-bar{ display:none !important; } }
@@ -1729,6 +1731,9 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
               <label class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2 cursor-pointer">
                 Import Data<input type="file" id="input-import-csv" accept=".csv,.xlsx,.xls" class="hidden">
               </label>
+              <label id="lbl-import-bku-pdf" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2 cursor-pointer" title="Baca langsung PDF Buku Kas Umum dari aplikasi RKAS/ARKAS">
+                Import BKU (PDF)<input type="file" id="input-import-bku-pdf" accept="application/pdf,.pdf" multiple class="hidden">
+              </label>
               <button id="btn-unduh-template" class="bg-white border border-navy-200 text-navy-400 text-sm font-semibold rounded px-4 py-2">Unduh Template</button>
               <button id="btn-reset-bku" class="bg-white border border-rust text-rust text-sm font-semibold rounded px-4 py-2">Reset Data</button>
             </div>
@@ -1739,7 +1744,7 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
             </div>
           </div>
           <div id="import-feedback" class="hidden text-sm rounded px-3 py-2 no-print"></div>
-          <p class="text-xs text-navy-300 no-print">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT), Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Kolom Kategori Belanja bersifat opsional (boleh dikosongkan) dan tidak memengaruhi import file lama tanpa kolom ini. Semua baris yang diimpor otomatis masuk ke bagian Jenis Dana BOSP yang sedang aktif di atas — pindah tab Jenis Dana terlebih dahulu bila file berisi data jenis dana lain. Klik "Unduh Template" untuk contoh filenya.</p>
+          <p class="text-xs text-navy-300 no-print">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT), Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Kolom Kategori Belanja bersifat opsional (boleh dikosongkan) dan tidak memengaruhi import file lama tanpa kolom ini. Semua baris yang diimpor otomatis masuk ke bagian Jenis Dana BOSP yang sedang aktif di atas — pindah tab Jenis Dana terlebih dahulu bila file berisi data jenis dana lain. Klik "Unduh Template" untuk contoh filenya. Untuk PDF Buku Kas Umum dari aplikasi RKAS/ARKAS, klik "Import BKU (PDF)" — penerimaan &amp; pengeluaran dibaca otomatis (baris saldo awal dilewati, transaksi yang sudah ada tidak digandakan).</p>
           <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
             <div id="bku-cari-bar" class="no-print flex flex-wrap items-center gap-3 px-4 py-3 border-b border-navy-100">
               <div class="relative flex-1 min-w-[220px] max-w-xl">
@@ -2089,11 +2094,26 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
                hanya dipindah ke sini supaya toggle-nya sendiri bisa sejajar dengan tab). -->
           <p id="cetak-gabung-desc" class="hidden text-xs text-navy-400 no-print -mt-1">Berguna jika beberapa baris transaksi sebenarnya berasal dari satu bukti/nota belanja yang sama (mis. Buku, Balpoint, Kertas HVS, Spidol, Map). Kwitansi gabungan hanya memuat uraian umum (mis. "Belanja ATK") dan total uangnya — rincian tiap barang tidak dicetak. Cukup centang salah satu baris dari No. Bukti tersebut — SEMUA transaksi lain dengan No. Bukti yang sama otomatis ikut digabung ke kwitansi ini, tidak dibatasi jumlah centang. Saat mencetak, Anda akan diminta mengonfirmasi/mengisi uraian umum tersebut.</p>
 
+          <!-- Isi otomatis harga, satuan & kualitas dari data impor BKU & RAPBS (menu Impor BKU & RAPBS) -->
+          <div id="cetak-auto-box" class="no-print flex flex-wrap items-center gap-x-3 gap-y-1 rounded border border-navy-100 bg-paper/60 px-3 py-2 text-xs text-navy-500">
+            <label for="chk-cetak-auto" class="inline-flex items-center gap-1.5 font-semibold text-navy cursor-pointer">
+              <input type="checkbox" id="chk-cetak-auto" class="rounded border-navy-200" checked>
+              Isi otomatis <b>harga, satuan &amp; kualitas</b> dari data impor BKU &amp; RAPBS
+            </label>
+            <span id="cetak-auto-status" class="text-navy-400"></span>
+            <button type="button" id="btn-cetak-ke-impor" class="font-semibold text-gold-600 hover:underline">Kelola data impor</button>
+          </div>
+
           <!-- Panel Kwitansi / Nota / BAST / Lampiran: dokumen berbasis transaksi BKU (dipilih via checklist) -->
           <div id="cetak-panel-transaksi" class="space-y-4">
             <!-- Header dokumen: hanya relevan untuk Nota Pesan & BAST (satu dokumen memuat beberapa barang) -->
             <div id="cetak-header-fields" class="hidden bg-white rounded-lg border border-navy-100 p-4 no-print space-y-3">
               <p class="text-xs font-semibold text-navy-400 uppercase tracking-wide">Detail Dokumen</p>
+              <div class="flex flex-wrap items-center gap-2 rounded border border-gold-400 bg-gold-50 px-3 py-2">
+                <label for="cetak-pilih-penyedia" class="text-xs font-semibold text-navy">Penyedia</label>
+                <select id="cetak-pilih-penyedia" class="flex-1 min-w-[180px] rounded border border-navy-100 bg-white px-2 py-1.5 text-sm"></select>
+                <button type="button" id="btn-cetak-ke-penyedia" class="text-xs font-semibold text-gold-600 hover:underline">Kelola penyedia</button>
+              </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div><label class="block text-xs font-semibold text-navy-400 mb-1">Nomor Dokumen</label>
                   <input id="cetak-nomor" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="420/86/SDK-Jong/II/2025"></div>
@@ -2610,6 +2630,108 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
           </div>
         </section>
 
+        <!-- DATA PENYEDIA / PEMILIK TOKO: otomatis dimuat pada Kwitansi, Nota Pesan & BAST -->
+        <section id="page-penyedia" class="page hidden space-y-4">
+          <div class="bg-white rounded-lg border border-navy-100 p-4 flex flex-wrap items-start justify-between gap-3">
+            <p class="text-xs text-navy-400 max-w-2xl">Simpan data toko/penyedia langganan sekolah. Saat mencetak <b>Kwitansi</b>, <b>Nota Pesan</b>, dan <b>BAST</b>, nama pemilik, sebutan, dan alamat terisi otomatis dari penyedia yang ditautkan pada transaksi, atau dari <b>penyedia utama</b> bila transaksi belum ditautkan.</p>
+            <button type="button" id="btn-penyedia-tambah" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2">+ Tambah Penyedia</button>
+          </div>
+          <div class="bg-white rounded-lg border border-navy-100 p-4">
+            <h3 class="font-serif font-semibold text-navy text-sm mb-1">Isi otomatis penyedia per kategori belanja</h3>
+            <p class="text-xs text-navy-400 mb-3">ON = data penyedia dimuat otomatis di Kwitansi, Nota Pesan &amp; BAST untuk transaksi kategori itu. OFF = tidak diisi otomatis (kolom dibiarkan untuk diisi manual / memakai Nama Penerima transaksi).</p>
+            <div id="pv-kategori" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+          </div>
+          <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
+            <div class="overflow-x-auto"><table class="w-full text-sm">
+              <thead class="bg-paper text-left text-xs text-navy-400"><tr>
+                <th class="py-3 px-3">Toko / Penyedia</th><th class="py-3 px-3">Pemilik</th><th class="py-3 px-3">Alamat</th><th class="py-3 px-3">Telepon / NPWP</th><th class="py-3 px-3 text-right">Aksi</th></tr></thead>
+              <tbody id="tbl-penyedia"></tbody>
+            </table></div>
+          </div>
+        </section>
+
+        <!-- IMPOR BKU & RAPBS (PDF): sumber data harga, satuan & kualitas untuk Kwitansi / Nota Pesan / BAST -->
+        <section id="page-impor-sumber" class="page hidden space-y-4">
+          <div class="flex flex-wrap gap-2 no-print">
+            <button type="button" data-jd="reguler" class="isr-jd-tab px-4 py-2 text-sm font-semibold rounded border bg-navy text-white border-navy">BOSP Reguler</button>
+            <button type="button" data-jd="kinerja" class="isr-jd-tab px-4 py-2 text-sm font-semibold rounded border bg-white text-navy border-navy-200">BOSP Kinerja</button>
+          </div>
+          <div class="bg-white rounded-lg border border-navy-100 p-4">
+            <p class="text-xs text-navy-400">Impor berkas PDF <b>RAPBS</b> (<i>Kertas Kerja RKAS Per Tahap</i> atau <i>Per Triwulan</i>) dan <b>Buku Kas Umum</b> (satu PDF per bulan) dari aplikasi RKAS/ARKAS. Saat mencetak <b>Kwitansi, Nota Pesan, dan BAST</b>, kolom <b>harga satuan, satuan, dan kualitas (jumlah barang)</b> terisi otomatis: BKU dipakai untuk mencocokkan transaksi (No. Bukti, uraian, nominal), RAPBS untuk satuan &amp; harga satuan; jumlah barang = nominal transaksi ÷ harga satuan.</p>
+          </div>
+
+          <!-- 1. RAPBS -->
+          <div class="bg-white rounded-lg border border-navy-100 p-5 space-y-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 class="font-serif font-semibold text-navy">1. RAPBS (Kertas Kerja RKAS)</h3>
+                <p id="isr-rapbs-status" class="text-xs text-navy-400 mt-0.5">Belum ada data RAPBS.</p>
+              </div>
+              <div class="flex flex-wrap gap-2 no-print">
+                <input type="file" id="isr-rapbs-file" accept="application/pdf,.pdf" class="hidden">
+                <button type="button" id="isr-rapbs-impor" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2">Impor RAPBS (PDF)</button>
+                <button type="button" id="isr-rapbs-hapus" class="hidden text-rust border border-rust/40 hover:bg-rust-100 text-sm font-semibold rounded px-4 py-2">Hapus RAPBS</button>
+              </div>
+            </div>
+            <p id="isr-rapbs-pesan" class="hidden text-sm rounded px-3 py-2"></p>
+            <div id="isr-rapbs-wrap" class="hidden overflow-x-auto max-h-72 overflow-y-auto border border-navy-100 rounded">
+              <table class="min-w-full text-xs">
+                <thead class="sticky top-0 bg-paper"><tr class="text-left text-navy-400">
+                  <th class="py-2 px-3">Uraian</th><th class="py-2 px-3">Kode Rekening</th><th class="py-2 px-3 text-right">Volume</th><th class="py-2 px-3">Satuan</th><th class="py-2 px-3 text-right">Harga Satuan</th><th class="py-2 px-3 text-right">Jumlah</th>
+                </tr></thead>
+                <tbody id="isr-rapbs-tbl"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 2. BKU -->
+          <div class="bg-white rounded-lg border border-navy-100 p-5 space-y-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 class="font-serif font-semibold text-navy">2. Buku Kas Umum (per bulan)</h3>
+                <p id="isr-bku-status" class="text-xs text-navy-400 mt-0.5">Belum ada data BKU.</p>
+              </div>
+              <div class="flex flex-wrap gap-2 no-print">
+                <input type="file" id="isr-bku-file" accept="application/pdf,.pdf" multiple class="hidden">
+                <button type="button" id="isr-bku-impor" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2">Impor Buku Kas Umum (PDF)</button>
+              </div>
+            </div>
+            <p class="text-[11px] text-navy-300 no-print">Boleh memilih beberapa PDF sekaligus (satu per bulan). Mengimpor ulang bulan yang sama akan menggantikan data bulan tersebut.</p>
+            <p id="isr-bku-pesan" class="hidden text-sm rounded px-3 py-2 whitespace-pre-line"></p>
+            <div id="isr-bku-bulan" class="space-y-2"></div>
+            <div id="isr-bku-wrap" class="hidden overflow-x-auto max-h-72 overflow-y-auto border border-navy-100 rounded">
+              <table class="min-w-full text-xs">
+                <thead class="sticky top-0 bg-paper"><tr class="text-left text-navy-400">
+                  <th class="py-2 px-3">Tanggal</th><th class="py-2 px-3">No. Bukti</th><th class="py-2 px-3">Kode Rekening</th><th class="py-2 px-3">Uraian</th><th class="py-2 px-3 text-right">Pengeluaran</th>
+                </tr></thead>
+                <tbody id="isr-bku-tbl"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 3. Pratinjau pencocokan -->
+          <div class="bg-white rounded-lg border border-navy-100 p-5 space-y-3">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 class="font-serif font-semibold text-navy">3. Pratinjau Pengisian Otomatis</h3>
+                <p id="isr-cocok-status" class="text-xs text-navy-400 mt-0.5"></p>
+              </div>
+              <label class="inline-flex items-center gap-1.5 text-xs text-navy-600 no-print cursor-pointer">
+                <input type="checkbox" id="isr-hanya-belum" class="rounded border-navy-200"> Hanya yang belum cocok
+              </label>
+            </div>
+            <div class="overflow-x-auto max-h-96 overflow-y-auto border border-navy-100 rounded">
+              <table class="min-w-full text-xs">
+                <thead class="sticky top-0 bg-paper"><tr class="text-left text-navy-400">
+                  <th class="py-2 px-3">Tanggal</th><th class="py-2 px-3">No. Bukti</th><th class="py-2 px-3">Uraian</th><th class="py-2 px-3 text-right">Jumlah</th><th class="py-2 px-3 text-right">Kualitas</th><th class="py-2 px-3">Satuan</th><th class="py-2 px-3 text-right">Harga Satuan</th><th class="py-2 px-3">Sumber</th>
+                </tr></thead>
+                <tbody id="isr-cocok-tbl"></tbody>
+              </table>
+            </div>
+            <p class="text-[11px] text-navy-300">Transaksi yang belum cocok tetap memakai isian Kualitas &amp; Satuan dari form transaksi (bila ada). Pastikan uraian dan kode rekening pada BKU aplikasi sama dengan yang ada di RAPBS.</p>
+          </div>
+        </section>
+
         <section id="page-kk221" class="page hidden space-y-4">
           <p class="text-xs text-navy-400 -mt-1">Mengelompokkan transaksi pengeluaran pada Buku Kas Umum menurut "Kelompok Belanja" yang ditandai pada form Tambah/Ubah Transaksi. Tandai setiap transaksi pengeluaran sebagai Belanja ATK, Belanja Jasa, Belanja Modal, Belanja Honor, Belanja Kebersihan, atau Belanja Alat Rumah Tangga agar otomatis terkumpul pada sub bagian yang sesuai di bawah ini.</p>
 
@@ -2857,10 +2979,48 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
   <div id="tut-hint" class="hidden" style="text-align:center;font-size:12px;color:#EACB89;padding:0 12px 10px">Suara Bahasa Indonesia tidak ditemukan di perangkat ini. Animasi tetap berjalan dengan teks; pasang suara Indonesia di pengaturan perangkat agar narasi terdengar.</div>
 </div>
 
+<div id="modal-penyedia" class="hidden fixed inset-0 z-50 bg-navy-900/50 flex items-center justify-center p-4 no-print">
+  <div class="bg-white rounded-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+    <h3 class="font-serif text-lg font-semibold text-navy mb-4" id="modal-penyedia-title">Tambah Penyedia</h3>
+    <form id="form-penyedia" class="space-y-3">
+      <input type="hidden" id="pv-id">
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Nama Toko / Usaha</label>
+        <input required id="pv-toko" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Kios Nera"></div>
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Nama Pemilik</label>
+        <input required id="pv-pemilik" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Aventius Joman"></div>
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Sebutan / Jabatan <span class="font-normal">(muncul pada &ldquo;Kepada&rdquo; Nota &amp; Jabatan di BAST)</span></label>
+        <input id="pv-sebutan" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Kosongkan = Pemilik [nama toko]"></div>
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Alamat</label>
+        <input id="pv-alamat" class="w-full rounded border border-navy-100 px-3 py-2 text-sm" placeholder="Jong, Desa Benteng Raja, Kec. Borong, Kab. Manggarai Timur"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-navy-400 mb-1">No. Telepon</label>
+          <input id="pv-telp" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono"></div>
+        <div><label class="block text-xs font-semibold text-navy-400 mb-1">NPWP</label>
+          <input id="pv-npwp" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono"></div>
+      </div>
+      <label class="flex items-center gap-2 text-sm text-navy cursor-pointer"><input type="checkbox" id="pv-utama"> Jadikan penyedia utama (dipakai bila transaksi belum ditautkan)</label>
+      <div class="flex justify-end gap-2 pt-2">
+        <button type="button" id="btn-penyedia-batal" class="text-sm font-semibold rounded px-4 py-2 border border-navy-200 text-navy">Batal</button>
+        <button class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-5 py-2">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div id="modal-transaksi" class="hidden fixed inset-0 z-50 bg-navy-900/50 flex items-center justify-center p-4 no-print">
   <div class="bg-white rounded-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
     <h3 class="font-serif text-lg font-semibold text-navy mb-1" id="modal-transaksi-title">Tambah Transaksi</h3>
     <p class="text-xs text-navy-400 mb-4">Akan dicatat pada bagian <span id="modal-transaksi-jenisdana" class="font-semibold text-navy"></span>. Pindah tab Jenis Dana BOSP pada Buku Kas Umum bila ingin mencatat ke bagian lain.</p>
+    <!-- Pengisi otomatis dari RAPBS (mengikuti Jenis Dana & Tahap yang aktif) -->
+    <div id="rapbs-picker" class="mb-4 relative rounded border border-gold-400 bg-gold-50 p-3">
+      <div class="flex items-center justify-between gap-2 mb-1">
+        <label for="rapbs-cari" class="text-xs font-semibold text-navy">Isi otomatis dari RAPBS <span id="rapbs-tahap-label" class="font-normal text-navy-400"></span></label>
+        <label class="text-[11px] text-navy-400 flex items-center gap-1 cursor-pointer"><input type="checkbox" id="rapbs-semua-tahap"> semua tahap</label>
+      </div>
+      <input id="rapbs-cari" type="text" autocomplete="off" placeholder="Ketik uraian, kode rekening, atau kegiatan&hellip;" class="w-full rounded border border-navy-100 bg-white px-3 py-2 text-sm">
+      <p id="rapbs-info" class="text-[11px] text-navy-400 mt-1"></p>
+      <div id="rapbs-list" class="hidden absolute z-10 left-0 right-0 top-full mt-0.5 max-h-64 overflow-y-auto bg-white border border-navy-100 rounded shadow-lg"></div>
+    </div>
     <form id="form-transaksi" class="space-y-3">
       <input type="hidden" id="tx-id">
       <div class="grid grid-cols-2 gap-3">
@@ -2902,6 +3062,8 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
         </select></div>
       <div><label class="block text-xs font-semibold text-navy-400 mb-1">Jumlah (Rp)</label>
         <input required type="number" min="0" id="tx-jumlah" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono"></div>
+      <div><label class="block text-xs font-semibold text-navy-400 mb-1">Penyedia / Toko <span class="font-normal">(otomatis dimuat saat cetak Kwitansi, Nota &amp; BAST)</span></label>
+        <select id="tx-penyedia" class="w-full rounded border border-navy-100 px-3 py-2 text-sm bg-white"><option value="">Pakai penyedia utama</option></select></div>
       <div class="grid grid-cols-2 gap-3">
         <div><label class="block text-xs font-semibold text-navy-400 mb-1">Nama Penerima</label>
           <input id="tx-penerima" class="w-full rounded border border-navy-100 px-3 py-2 text-sm"></div>
@@ -3462,7 +3624,7 @@ function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res));
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.2.0"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "2.2.4"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -3670,9 +3832,11 @@ const NAV = {
     { id:'dashboard-sekolah', label:'Dashboard', title:'Dashboard Sekolah' },
     { id:'profil', label:'Profil Sekolah', title:'Profil Sekolah' },
     { id:'pejabat', label:'Kepsek & Bendahara', title:'Data Kepala Sekolah & Bendahara' },
+    { id:'penyedia', label:'Penyedia / Toko', title:'Data Penyedia / Pemilik Toko' },
     { id:'pegawai', label:'Data Pegawai', title:'Data Pegawai (Guru & Tenaga Kependidikan)' },
     { id:'bku', label:'Buku Kas Umum', title:'Buku Kas Umum (BKU)' },
     { id:'buku-pembantu', label:'Buku Pembantu', title:'Buku Pembantu (Opsional Penunjang SPJ)' },
+    { id:'impor-sumber', label:'Impor BKU & RAPBS', title:'Impor Buku Kas Umum & RAPBS (PDF)' },
     { id:'cetak', label:'Cetak Dokumen', title:'Cetak Kwitansi / Nota / BAST / SPJ Lengkap' },
     { id:'rekon', label:'Rekon', title:'Rekon — Rekonsiliasi Dana BOS (Format Rekon BPK T.A 2026)' },
     { id:'kk221', label:'Kertas Kerja 2.2.1', title:'Kertas Kerja Unit 2.2.1 — Belanja ATK / Jasa / Modal / Honor' },
@@ -4058,10 +4222,12 @@ const NAV_ICONS = {
   'akun': '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
   'profil': '<path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/>',
   'pejabat': '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><path d="M16 4.5a3.5 3.5 0 010 7M18 14.5c2 .8 3.5 2.8 3.5 5.5"/>',
+  'penyedia': '<path d="M3 9l1.5-5h15L21 9M3 9v11h18V9M3 9c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3"/><path d="M9 20v-5h6v5"/>',
   'pegawai': '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2.2"/><path d="M5.5 16c.5-2 2-3 3.5-3s3 1 3.5 3M15 9h3M15 13h3"/>',
   'bku': '<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5z"/><path d="M4 21h15M9 8h6M9 12h6"/>',
   'buku-pembantu': '<path d="M5 3h11l3 3v15H5z"/><path d="M9 9h6M9 13h6M9 17h4"/>',
   'cetak': '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+  'impor-sumber': '<path d="M12 15V4M8 8l4-4 4 4"/><path d="M4 15v4a2 2 0 002 2h12a2 2 0 002-2v-4"/>',
   'rekon': '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
   'kk221': '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
   'sppd': '<path d="M2 16l20-8-8 14-2.5-5.5L2 16z"/>',
@@ -4082,9 +4248,9 @@ const NAV_GROUP_OF = {
   'dashboard-utama':'dash','dashboard-sekolah':'dash',
   'manajemen-sekolah':'kelola','verifikasi':'kelola','monitoring':'kelola','rekapitulasi':'kelola',
   'maintenance':'sistem','video-admin':'sistem','audit-trail':'sistem','backup':'sistem','video-panduan':'sistem',
-  'profil':'induk','pejabat':'induk','pegawai':'induk',
+  'profil':'induk','pejabat':'induk','penyedia':'induk','pegawai':'induk',
   'bku':'kas','buku-pembantu':'kas','persetujuan':'valid','realisasi':'valid',
-  'cetak':'lapor','rekon':'lapor','kk221':'lapor','sppd':'lapor','nomor-surat':'lapor',
+  'impor-sumber':'lapor','cetak':'lapor','rekon':'lapor','kk221':'lapor','sppd':'lapor','nomor-surat':'lapor',
   'pengaturan':'app','akun':'app'
 };
 const NAV_GROUP_INFO = {
@@ -4282,6 +4448,7 @@ function updateCetakSubActive(){
   const gw = document.getElementById('cetak-gabung-wrap'), gd = document.getElementById('cetak-gabung-desc');
   if(gw) gw.classList.toggle('hidden', doc !== 'kwitansi');
   if(gd) gd.classList.toggle('hidden', doc !== 'kwitansi');
+  if(typeof refreshCetakAuto === 'function') refreshCetakAuto();
   if(state.currentView === 'cetak'){
     document.getElementById('page-title').textContent = 'Cetak Dokumen — ' + (CETAK_DOC_LABEL[state.cetakDoc||'kwitansi'] || '') + ' · ' + labelDanaTahapAktif();
   }
@@ -4327,6 +4494,7 @@ function navigateTo(pageId){
   updateCetakSubActive();
   if(pageId === 'kk221') renderKk221Table();
   if(pageId === 'rekon' && typeof renderRekon === 'function') renderRekon();
+  if(pageId === 'impor-sumber' && typeof renderImporSumber === 'function') renderImporSumber();
   if(pageId === 'profil') fillProfilForm();
   if(pageId === 'pejabat') fillPejabatForm();
   if(pageId === 'pegawai') renderPegawai();
@@ -5035,6 +5203,9 @@ function attachSchoolListeners(npsn){
 
     if(state.currentView==='dashboard-sekolah') renderDashboardSekolah();
     if(state.currentView==='rekon' && typeof renderRekon === 'function') renderRekon();
+    if(state.currentView==='impor-sumber' && typeof renderImporSumber === 'function') renderImporSumber();
+    if(state.currentView==='penyedia' && window.PenyediaApp) PenyediaApp.render();
+    if(state.currentView==='cetak' && typeof refreshCetakAuto === 'function') refreshCetakAuto();
     if(state.currentView==='profil') fillProfilForm();
     if(state.currentView==='pejabat') fillPejabatForm();
     if(state.currentView==='pegawai') renderPegawai();
@@ -6080,6 +6251,12 @@ function renderBKU(){
     btnImportLabel.classList.toggle('cursor-not-allowed', !bisaUbah);
     document.getElementById('input-import-csv').disabled = !bisaUbah;
   }
+  const lblBkuPdf = document.getElementById('lbl-import-bku-pdf');
+  if(lblBkuPdf){
+    lblBkuPdf.classList.toggle('opacity-40', !bisaUbah);
+    lblBkuPdf.classList.toggle('cursor-not-allowed', !bisaUbah);
+    document.getElementById('input-import-bku-pdf').disabled = !bisaUbah;
+  }
 
   // Tombol "Reset Data" nonaktif bila tahap terkunci, mode read-only, atau
   // memang belum ada transaksi pada tahap aktif untuk direset.
@@ -6622,6 +6799,7 @@ document.getElementById('form-transaksi').addEventListener('submit', async (e)=>
     lampiranPenerima: collectLampiranRows(),
     perjalananDinas: document.getElementById('tx-perjalanan-dinas').checked,
     jenisDana: state.jenisDanaAktif || getDefaultJenisDana(),
+    penyediaId: (document.getElementById('tx-penyedia')||{}).value || '',
     updatedAt: Date.now()
   };
   try{
@@ -8815,8 +8993,36 @@ document.querySelectorAll('.cetak-tab').forEach(btn=>{
       initPengantarFields();
     }
     if(typeof nsRefreshHints==='function') nsRefreshHints(true);
+    if(typeof refreshCetakAuto==='function') refreshCetakAuto();
   });
 });
+
+/* ---- Pengisian otomatis harga/satuan/kualitas (data impor BKU & RAPBS) ---- */
+function cetakAutoAktif(){ return ['kwitansi','nota','bast'].includes(state.cetakDoc||'kwitansi') && window.SumberImpor && SumberImpor.aktif(); }
+function badgeAutoCetak(t){
+  if(!cetakAutoAktif()) return '';
+  const c = window.RapbsTahap ? RapbsTahap.cek(t) : null;
+  if(c && c.ok) return `<div class="text-[11px] text-forest font-semibold">✓ ${escapeHtml(c.label)}</div>`;
+  const lbl = SumberImpor.labelRingkas(t);
+  if(lbl) return `<div class="text-[11px] text-forest font-semibold">✓ ${escapeHtml(lbl)}</div>`;
+  return `<div class="text-[11px] text-rust">Belum terisi otomatis${c&&c.alasan?': '+escapeHtml(c.alasan):''}</div>`;
+}
+function refreshCetakAuto(){
+  const box = document.getElementById('cetak-auto-box'); if(!box) return;
+  const doc = state.cetakDoc || 'kwitansi';
+  box.classList.toggle('hidden', !['kwitansi','nota','bast'].includes(doc));
+  const chk = document.getElementById('chk-cetak-auto'); if(chk) chk.checked = SumberImpor.aktif();
+  const st = document.getElementById('cetak-auto-status');
+  if(st){
+    const r = SumberImpor.ringkas(state.jenisDanaAktif==='kinerja' ? 'kinerja' : 'reguler');
+    st.textContent = r.ada ? `Data impor: RAPBS ${r.rapbs} rincian · BKU ${r.bku} baris` : 'Belum ada data impor — impor PDF BKU & RAPBS lebih dulu.';
+  }
+}
+document.getElementById('chk-cetak-auto').addEventListener('change', e=>{
+  try{ localStorage.setItem('sikebos.cetakAutoIsi', e.target.checked ? '1' : '0'); }catch(err){}
+  renderCetakList();
+});
+document.getElementById('btn-cetak-ke-impor').addEventListener('click', ()=>navigateTo('impor-sumber'));
 
 function renderCetakList(){
   // Tab "Daftar Lampiran" hanya memuat transaksi BKU yang dicentang "Sertakan
@@ -8850,11 +9056,12 @@ function renderCetakList(){
       <td class="py-2 px-3"><input type="checkbox" class="chk-cetak" data-id="${t.id}" ${checkedAttr}></td>
       <td class="py-2 px-3 whitespace-nowrap">${formatTanggal(t.tanggal)}</td>
       <td class="py-2 px-3 font-sans whitespace-nowrap">${escapeHtml(t.noBukti||'-')}</td>
-      <td class="py-2 px-3 font-sans">${escapeHtml(t.uraian||'')}</td>
+      <td class="py-2 px-3 font-sans">${escapeHtml(t.uraian||'')}${badgeAutoCetak(t)}</td>
       <td class="py-2 px-3 font-sans">${escapeHtml(labelPenerima)}</td>
       <td class="py-2 px-3 text-right">${fmtRupiah(t.jumlah)}</td>
     </tr>`;
   }).join('');
+  refreshCetakAuto();
   const emptyMsg = isLampiran
     ? 'Belum ada transaksi yang ditandai untuk Lampiran. Centang "Sertakan pada menu Cetak Lampiran" pada form Tambah/Ubah Transaksi.'
     : 'Tidak ada transaksi pengeluaran.';
@@ -9431,6 +9638,7 @@ document.getElementById('btn-cetak-print').addEventListener('click', async ()=>{
     alamatPenyedia: document.getElementById('cetak-alamat-penyedia').value.trim(),
     perihal: document.getElementById('cetak-perihal').value.trim()
   };
+  if(window.PenyediaApp) PenyediaApp.lengkapiHeader(docHeader, items);
 
   if(state.cetakDoc === 'nota' || state.cetakDoc === 'bast'){
     if(!docHeader.nomor || !docHeader.tanggal || !docHeader.namaPenyedia){
@@ -9475,6 +9683,20 @@ document.getElementById('btn-cetak-print').addEventListener('click', async ()=>{
     });
   }
 
+  // Peringatan bila Kualitas/Satuan tidak bisa diisi otomatis dari RAPBS (menampilkan alasan per barang)
+  if(['nota','bast'].includes(state.cetakDoc) && window.SumberImpor && SumberImpor.aktif() && window.RapbsTahap){
+    const alasan = {}; let kosong = 0;
+    itemsCetak.forEach(t=>{
+      if(String(t.kualitas||'').trim() && String(t.satuan||'').trim()) return;
+      const c = RapbsTahap.cek(t); if(c.ok || SumberImpor.labelRingkas(t)) return;
+      kosong++; const a = c.alasan || 'tidak cocok'; (alasan[a] = alasan[a] || []).push(t.uraian || '-');
+    });
+    if(kosong){
+      const dana = state.jenisDanaAktif==='kinerja' ? 'kinerja' : 'reguler';
+      const baris = Object.keys(alasan).map(a=>'• '+a+': '+alasan[a].slice(0,3).join(', ')+(alasan[a].length>3?' (+'+(alasan[a].length-3)+' lainnya)':'')).join('\n');
+      if(!await confirmFix(kosong+' dari '+itemsCetak.length+' barang belum terisi Kualitas/Satuan otomatis.\nData RAPBS terbaca: '+SumberImpor.ringkas(dana).rapbs+' rincian.\n\n'+baris+'\n\nTetap cetak?')) return;
+    }
+  }
   buildPrintDocument(state.cetakDoc, itemsCetak, docHeader);
   window.print();
 });
@@ -9798,7 +10020,7 @@ function buildSpjLengkapDocument(){
           <div style="text-align:center; width:45%;">
             <div>${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(t.tanggal)}</div>
             <div>Yang Menerima,</div>${meteraiBox(t.jumlah)}
-            <div style="padding-top:6px;"><b>${escapeHtml(t.penerima||'( ..................... )')}</b><br>NIP. ${escapeHtml(t.nipPenerima||'-')}</div>
+            ${(window.PenyediaApp ? PenyediaApp.penerimaKwitansiHtml(t) : `<div style="padding-top:6px;"><b>${escapeHtml(t.penerima||'( ..................... )')}</b><br>NIP. ${escapeHtml(t.nipPenerima||'-')}</div>`)}
           </div>
         </div>
         <div style="text-align:center; margin-top:22px; font-size:13px;">
@@ -10076,6 +10298,12 @@ function tanggalDalamKata(iso){
 
 function buildPrintDocument(docType, items, docHeader){
   docHeader = docHeader || {};
+  // Isi otomatis harga satuan, satuan & kualitas dari data impor BKU (PDF) + RAPBS (PDF).
+  // Transaksi yang tidak cocok tetap memakai isian dari form transaksi.
+  if(['kwitansi','nota','bast'].includes(docType) && (!window.SumberImpor || SumberImpor.aktif())){
+    // Utama: RAPBS sesuai tahap tanggal transaksi (Kualitas bulat); cadangan: pencocokan BKU PDF + RAPBS lama
+    items = items.map(t=>{ const m = window.RapbsTahap ? RapbsTahap.lengkapi(t) : t; return (m._auto || !window.SumberImpor) ? m : SumberImpor.lengkapi(m); });
+  }
   const s = state.schoolData || {};
   const kepsek = s.kepsek || {}; const bendahara = s.bendahara || {};
   const root = document.getElementById('print-root');
@@ -10125,7 +10353,7 @@ function buildPrintDocument(docType, items, docHeader){
             <div style="text-align:center; width:45%;">
               <div>${escapeHtml(s.namaSekolah||'')}, ${formatTanggalPanjang(t.tanggal)}</div>
               <div>Yang Menerima,</div>${meteraiBox(t.jumlah)}
-              <div style="padding-top:6px;"><b>${escapeHtml(t.penerima||'( ..................... )')}</b><br>NIP. ${escapeHtml(t.nipPenerima||'-')}</div>
+              ${(window.PenyediaApp ? PenyediaApp.penerimaKwitansiHtml(t) : `<div style="padding-top:6px;"><b>${escapeHtml(t.penerima||'( ..................... )')}</b><br>NIP. ${escapeHtml(t.nipPenerima||'-')}</div>`)}
             </div>
           </div>
           <div style="text-align:center; margin-top:22px; font-size:13px;">
@@ -10141,7 +10369,7 @@ function buildPrintDocument(docType, items, docHeader){
     const rows = items.map((t,idx)=>{
       const kualitasNum = Number(t.kualitas);
       const hasQty = kualitasNum > 0;
-      const harga = hasQty ? Math.round((Number(t.jumlah)||0) / kualitasNum) : (Number(t.jumlah)||0);
+      const harga = (t._auto && t._harga) ? t._harga : (hasQty ? Math.round((Number(t.jumlah)||0) / kualitasNum) : (Number(t.jumlah)||0));
       return `
         <tr>
           <td style="border:1px solid #16324F; padding:5px 6px; text-align:center;">${idx+1}</td>
@@ -11571,13 +11799,16 @@ function parseRapbs(pages){
     } else {
       const isProg=i=>/^\d{2}(\.\d{2})*\.$/.test(i.s) && i.x<r.xVol-40;
       prog=g.filter(isProg).sort((a,b)=>(Math.abs(b.y-a.y)>2)? b.y-a.y : a.x-b.x).map(i=>i.s).join('');
-      const rekPre=g.find(i=>/^5\.\d\.\d{2}\.\d{2}\.\d{2}\.$/.test(i.s) && i.x<130);
+      /* Kode rekening bisa ditulis bersama kode program (mis. "5.1.02.01.01.06.05.08." + baris bawah "0024") */
+      const rekPre=g.find(i=>/^5\.\d\.\d{2}\.\d{2}\.\d{2}\.(\d{2}\.){0,3}$/.test(i.s) && i.x<130);
       const rekSuf=g.find(i=>/^\d{4}$/.test(i.s) && i.x<130 && i.x>=40);
-      rek=rekPre? rekPre.s+(rekSuf?rekSuf.s:'') : null;
+      const rekM = rekPre ? rekPre.s.match(/^(5\.\d\.\d{2}\.\d{2}\.\d{2}\.)((?:\d{2}\.)*)$/) : null;
+      rek=rekPre? rekM[1]+(rekSuf?rekSuf.s:'') : null;
+      if(rekM && rekM[2]) prog = rekM[2]+prog;
       ur=g.filter(i=>i.x<r.xVol-10 && !isProg(i) && i!==rekPre && i!==rekSuf && !(i.x<130 && /^\d{4}$/.test(i.s)))
               .sort((a,b)=>(b.y-a.y>2||a.y-b.y>2)? b.y-a.y : a.x-b.x);
     }
-    const uraian=ur.map(i=>i.s).join(' ').replace(/\s+/g,' ').trim();
+    const uraian=ur.map(i=>i.s).join(' ').replace(/Kertas Kerja per(Tahap|Triwulan).*$/i,'').replace(/\s+/g,' ').trim();
     const rt=g.filter(i=>i.x>=r.xVol-10).sort((a,b)=>(b.y-a.y>2||a.y-b.y>2)? b.y-a.y : a.x-b.x);
     // baris utama = y mendekati y anchor
     const main=rt.filter(i=>Math.abs(i.y-r.y)<4).sort((a,b)=>a.x-b.x);
@@ -12546,6 +12777,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     'pegawai':'Daftar guru dan tenaga kependidikan.',
     'bku':'Catat dan telusuri seluruh transaksi kas.',
     'buku-pembantu':'Buku pembantu penunjang SPJ.',
+    'impor-sumber':'Impor PDF Buku Kas Umum & RAPBS untuk mengisi harga, satuan, dan kualitas otomatis.',
     'rekon':'Rekonsiliasi dana BOS sesuai format BPK.',
     'kk221':'Kertas kerja belanja ATK, jasa, modal, dan honor.',
     'sppd':'Surat tugas, SPD, dan laporan perjalanan dinas.',
@@ -12582,7 +12814,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
   const asli = window.print.bind(window);
   const bar = document.createElement('div');
   bar.id='pv-bar'; bar.className='no-print';
-  bar.innerHTML='<div><b>Pratinjau Cetak</b><small>Periksa dokumen, lalu klik Cetak</small></div><div style="display:flex;gap:8px;align-items:center"><label style="font-size:12px;color:#B9C9D8">Tgl. laporan <input type="date" id="pv-tgl" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"></label><label style="font-size:12px;color:#B9C9D8">Kertas <select id="pv-kertas" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"><option value="auto">Otomatis</option><option value="a4">A4</option><option value="f4">F4</option></select></label><button id="pv-tutup" type="button">Tutup (Esc)</button><button id="pv-simpan" type="button" style="display:none;background:#fff;color:#16324F">Simpan PDF</button><button id="pv-cetak" type="button">Cetak / Simpan PDF</button></div>';
+  bar.innerHTML='<div><b>Pratinjau Cetak</b><small>Periksa dokumen, lalu klik Cetak</small></div><div style="display:flex;gap:8px;align-items:center"><label style="font-size:12px;color:#B9C9D8">Tgl. laporan <input type="date" id="pv-tgl" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"></label><label style="font-size:12px;color:#B9C9D8">Kertas <select id="pv-kertas" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px"><option value="auto">Otomatis</option><option value="a4">A4</option><option value="f4">F4</option></select></label><label id="pv-prn-wrap" style="display:none;align-items:center;gap:6px;font-size:12px;color:#B9C9D8">Printer <select id="pv-prn" style="color:#000;border-radius:6px;padding:3px 6px;font-size:12px;max-width:190px"></select><span id="pv-prn-st" style="white-space:nowrap;min-width:60px"></span><button id="pv-prn-ref" type="button" title="Segarkan daftar printer" style="padding:4px 8px !important;background:rgba(255,255,255,.12)">&#8635;</button></label><button id="pv-tutup" type="button">Tutup (Esc)</button><button id="pv-simpan" type="button" style="display:none;background:#fff;color:#16324F">Simpan PDF</button><button id="pv-cetak" type="button">Cetak / Simpan PDF</button><button id="pv-cetak-prn" type="button" style="display:none;background:linear-gradient(180deg,#E3B35A,#C8963E);color:#fff">Cetak</button></div>';
   document.body.appendChild(bar);
   const root=()=>document.getElementById('print-root');
   function tutup(){ bar.classList.remove('pv-on'); const r=root(); if(r) r.classList.remove('pv-on'); document.removeEventListener('keydown',onKey,true); }
@@ -12590,7 +12822,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
   window.print=function(){
     const r=root();
     if(!r || !r.innerHTML.trim()){ return asli(); }
-    r.classList.add('pv-on'); bar.classList.add('pv-on'); r.scrollTop=0; const tg0=document.getElementById('pv-tgl'); if(tg0&&typeof tglLaporan==='function') tg0.value=tglLaporan();
+    r.classList.add('pv-on'); bar.classList.add('pv-on'); r.scrollTop=0; if(window.__muatPrinter) window.__muatPrinter(); const tg0=document.getElementById('pv-tgl'); if(tg0&&typeof tglLaporan==='function') tg0.value=tglLaporan();
     document.addEventListener('keydown',onKey,true);
   };
   document.getElementById('pv-tutup').addEventListener('click',tutup);
@@ -12601,9 +12833,9 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     bSimpan.style.display='';
     /* Satu tombol saja: di aplikasi desktop tombol cetak lama disembunyikan; tombol ini menggantikannya. */
     const bc=document.getElementById('pv-cetak'); if(bc) bc.style.display='none';
-    bSimpan.style.background='linear-gradient(180deg,#E3B35A,#C8963E)'; bSimpan.style.color='#fff'; bSimpan.textContent='Cetak / Simpan PDF';
+    if(window.sikebosDesktop.cetak && window.sikebosDesktop.daftarPrinter){ bSimpan.style.background='#fff'; bSimpan.style.color='#16324F'; bSimpan.textContent='Simpan PDF'; } else { bSimpan.style.background='linear-gradient(180deg,#E3B35A,#C8963E)'; bSimpan.style.color='#fff'; bSimpan.textContent='Cetak / Simpan PDF'; }
     bSimpan.addEventListener('click', async ()=>{
-      const lbl='Cetak / Simpan PDF'; bSimpan.disabled=true; bSimpan.textContent='Menyimpan...';
+      const lbl=bSimpan.textContent; bSimpan.disabled=true; bSimpan.textContent='Menyimpan...';
       try{
         if(window.__aturKertasOtomatis) window.__aturKertasOtomatis();
         /* latar halaman PDF harus putih (jendela aplikasi berlatar krem) */
@@ -12615,6 +12847,58 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
       finally{ [document.documentElement,document.body].forEach(e=>e.style.removeProperty('background')); if(window.__pfLepas) window.__pfLepas(); bSimpan.disabled=false; bSimpan.textContent=lbl; }
     });
   }
+  /* ===== Pilih printer aktif + tampilkan statusnya (aplikasi desktop) ===== */
+  (function(){
+    const D=window.sikebosDesktop; if(!D || !D.daftarPrinter || !D.cetak) return;
+    const wrap=document.getElementById('pv-prn-wrap'), sel=document.getElementById('pv-prn'), st=document.getElementById('pv-prn-st'),
+          ref=document.getElementById('pv-prn-ref'), bCetak=document.getElementById('pv-cetak-prn');
+    wrap.style.display='flex'; bCetak.style.display='';
+    const KEY='sikebos.printer', DIALOG='__dialog', WARNA={siap:'#4ADE80',sibuk:'#FBBF24',bermasalah:'#F87171'};
+    let daftar=[];
+    const baca=()=>{ try{ return localStorage.getItem(KEY)||''; }catch(e){ return ''; } };
+    function tampilStatus(){
+      st.textContent='';
+      const p=daftar.find(x=>x.name===sel.value); if(!p) return;
+      const dot=document.createElement('i');
+      dot.style.cssText='display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;background:'+(WARNA[p.kode]||'#9CA3AF');
+      st.appendChild(dot); st.appendChild(document.createTextNode(p.label));
+    }
+    async function muat(){
+      ref.disabled=true;
+      try{
+        daftar=(await D.daftarPrinter())||[];
+        const simpan=baca();
+        sel.innerHTML='';
+        daftar.forEach(p=>{
+          const o=document.createElement('option'); o.value=p.name;
+          o.textContent=(p.displayName||p.name)+(p.isDefault?' (utama)':''); sel.appendChild(o);
+        });
+        const od=document.createElement('option'); od.value=DIALOG; od.textContent='Pilih lewat dialog Windows...'; sel.appendChild(od);
+        const ada=n=>Array.from(sel.options).some(o=>o.value===n);
+        const utama=daftar.find(p=>p.isDefault);
+        sel.value = (simpan && ada(simpan)) ? simpan : (utama ? utama.name : (daftar[0] ? daftar[0].name : DIALOG));
+      }catch(e){}
+      ref.disabled=false; tampilStatus();
+    }
+    window.__muatPrinter=muat;
+    sel.addEventListener('change',()=>{ try{ localStorage.setItem(KEY,sel.value); }catch(e){} tampilStatus(); });
+    ref.addEventListener('click',muat);
+    muat();
+    bCetak.addEventListener('click', async ()=>{
+      await muat(); /* ambil status terbaru sebelum mencetak */
+      const nm=sel.value, p=daftar.find(x=>x.name===nm);
+      if(p && p.kode==='bermasalah' && !window.confirm('Status printer "'+(p.displayName||p.name)+'": '+p.label+'.\n\nTetap kirim dokumen ke printer ini?')) return;
+      const lbl=bCetak.textContent; bCetak.disabled=true; bCetak.textContent='Mencetak...';
+      try{
+        if(window.__aturKertasOtomatis) window.__aturKertasOtomatis();
+        [document.documentElement,document.body].forEach(e=>e.style.setProperty('background','#fff','important'));
+        const k=window.__kertasAktif||{w:210,h:297,landscape:false};
+        const res=await D.cetak({deviceName: nm===DIALOG ? '' : nm, w:k.w, h:k.h, landscape:k.landscape});
+        if(res && res.error) (window.alertFix||window.alert)('Gagal mencetak: '+res.error);
+      }catch(e){ (window.alertFix||window.alert)('Gagal mencetak: '+(e&&e.message||e)); }
+      finally{ [document.documentElement,document.body].forEach(e=>e.style.removeProperty('background')); if(window.__pfLepas) window.__pfLepas(); bCetak.disabled=false; bCetak.textContent=lbl; }
+    });
+  })();
   const tg=document.getElementById('pv-tgl'), kt=document.getElementById('pv-kertas');
   try{ kt.value=localStorage.getItem('sikebos.kertas')||'a4'; }catch(e){}
   tg.addEventListener('change',()=>{ try{ if(tg.value) localStorage.setItem('sikebos.tglLaporan',tg.value); else localStorage.removeItem('sikebos.tglLaporan'); }catch(e){} const t=tg.value||todayStr(); const r=root(); if(r) r.querySelectorAll('.tgl-lap').forEach(x=>x.textContent=formatTanggalPanjang(t)); });
@@ -12628,7 +12912,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
 /* Kertas otomatis: ukuran kertas mengikuti pilihan printer/dialog cetak (size tidak dipaksa),
    orientasi dipilih otomatis (potret/lanskap) dan isi diperkecil seperlunya agar tidak terpotong. */
 (function(){
-  const PX_PER_MM = 96/25.4, MT=15, MR=12, MB=15, ML=25; /* margin kiri lebih lebar untuk jilid */
+  const PX_PER_MM = 96/25.4, MT=15, MR=15, MB=15, ML=15; /* margin kiri & kanan sama agar seimbang */
   // Acuan terkecil (A4): lebar area cetak potret ~190mm, lanskap ~277mm
   const W_POTRET = (210-ML-MR)*PX_PER_MM, W_LANSKAP = (297-ML-MR)*PX_PER_MM;
   const st = document.createElement('style'); st.id='auto-page-style'; document.head.appendChild(st);
@@ -12732,9 +13016,10 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     let kt='a4'; try{ kt=localStorage.getItem('sikebos.kertas')||'a4'; }catch(e){}
     const dim={a4:[210,297],f4:[215,330]}[kt];
     const sz = dim ? (orient==='landscape' ? dim[1]+'mm '+dim[0]+'mm' : dim[0]+'mm '+dim[1]+'mm') : orient;
+    window.__kertasAktif = { w: dim ? dim[0] : 210, h: dim ? dim[1] : 297, landscape: orient==='landscape' };
     if(orient==='portrait') fitPasang(r, dim ? dim[1] : 279.4);
     pfPasang(r);
-    st.textContent = '@page{ size:' + sz + '; margin:' + MT + 'mm ' + MR + 'mm ' + MB + 'mm ' + ML + 'mm; @bottom-center{ content:"Halaman " counter(page) " dari " counter(pages); font:10px Inter,Arial,sans-serif; color:#444; } }';
+    st.textContent = '@page{ size:' + sz + '; margin:' + MT + 'mm ' + MR + 'mm ' + MB + 'mm ' + ML + 'mm; background:#fff; @bottom-center{ content:"Halaman " counter(page) " dari " counter(pages); font:10px Inter,Arial,sans-serif; color:#444; } }';
   }
   window.addEventListener('beforeprint', atur);
   window.addEventListener('afterprint', ()=>{
@@ -13081,6 +13366,859 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#tut').classList
   new MutationObserver(sync).observe(app,{attributes:true,attributeFilter:['class']});
   if(window.ResizeObserver){ var ro=new ResizeObserver(sync); ['.jw-topbar','.jw-crumb','aside.app-chrome'].forEach(function(q){ var e=app.querySelector(q); if(e) ro.observe(e); }); }
   sync();
+})();
+</script>
+<script>
+/* ===== Parser PDF "Buku Kas Umum" (BKU) dari aplikasi RKAS/ARKAS -> baris transaksi referensi.
+   pages = [[{str,x,y,w}...]...]  (x,y,w dari pdf.js: transform[4], transform[5], width) ===== */
+(function(root){
+const toNum = s => parseInt(String(s).replace(/\./g,''),10);
+const isMoney = s => /^(\d{1,3}(\.\d{3})+|\d+)$/.test(s);
+const isDate = s => /^\d{2}-\d{2}-\d{4}$/.test(s);
+function parseBku(pages){
+  const meta={}; const rows=[]; let total=null;
+  pages.forEach((items,pi)=>{
+    const its = items.filter(i=>i.str && String(i.str).trim()).map(i=>({s:String(i.str).trim(), x:i.x, y:i.y, w:i.w||0}));
+    if(pi===0){
+      const baris = {}; its.filter(i=>i.x<700).forEach(i=>{ const k=Math.round(i.y); (baris[k]=baris[k]||[]).push(i); });
+      const teks = Object.keys(baris).map(k=>baris[k].sort((a,b)=>a.x-b.x).map(i=>i.s).join(' '));
+      const val = lab => { const l = teks.find(t=>t.startsWith(lab)); return l ? l.slice(lab.length).replace(/^\s*:\s*/,'').trim() : ''; };
+      meta.npsn = val('NPSN'); meta.nama = val('Nama Sekolah'); meta.sumberDana = val('Sumber Dana');
+      const bt = teks.find(t=>/BULAN\s*:/.test(t)); if(bt){ const m = bt.match(/BULAN\s*:\s*(.+?)\s+TAHUN\s*:\s*(\d{4})/); if(m){ meta.bulan=m[1]; meta.tahun=m[2]; } }
+    }
+    // baris nomor kolom "1 2 3 ... 8" (ada di tiap halaman tabel; judul kolom hanya di halaman 1)
+    const n1 = its.find(i=>i.s==='1' && i.x<80);
+    const nr = n1 ? its.filter(i=>Math.abs(i.y-n1.y)<2) : [];
+    const n8 = nr.find(i=>i.s==='8');
+    if(!n1 || !n8) return;                                                // halaman tanpa tabel (mis. halaman penutup)
+    const ctr = i => i.x+i.w/2;
+    const n4 = nr.find(i=>i.s==='4'), n6 = nr.find(i=>i.s==='6');
+    const xBukti = n4 ? ctr(n4)-28 : 192;
+    const xUraian = n4 ? ctr(n4)+23 : 241;
+    const xMoney = n6 ? ctr(n6)-52 : 590;
+    const yTop = n1.y-4;
+    const hal = its.find(i=>/^Halaman\s+\d+/.test(i.s));
+    const yFoot = hal ? hal.y+6 : -1e9;
+    const jml = its.find(i=>/^Jumlah$/.test(i.s) && i.x>250 && i.x<700 && i.y<yTop);
+    const yBot = Math.max(yFoot, jml ? jml.y+8 : -1e9);
+    if(jml){
+      const nums = its.filter(i=>Math.abs(i.y-jml.y)<3 && i.x>=xMoney && isMoney(i.s)).sort((a,b)=>a.x-b.x).map(i=>toNum(i.s));
+      if(nums.length>=3){ const t3=nums.slice(-3); total={terima:t3[0],keluar:t3[1],saldo:t3[2]}; }
+    }
+    const body = its.filter(i=>i.y<yTop && i.y>yBot);
+    const anchors = body.filter(i=>isDate(i.s) && i.x<90).sort((a,b)=>b.y-a.y);
+    if(!anchors.length) return;
+    const groups = anchors.map(a=>({a, g:[]}));
+    body.forEach(i=>{
+      if(anchors.includes(i)) return;
+      let best=0, bd=1e9; anchors.forEach((a,k)=>{ const d=Math.abs(a.y-i.y); if(d<bd){bd=d;best=k;} });
+      if(bd<=22) groups[best].g.push(i);
+    });
+    const ord = (a,b)=> (Math.abs(b.y-a.y)>2) ? b.y-a.y : a.x-b.x;
+    groups.forEach(({a,g})=>{
+      const money = g.filter(i=>i.x>=xMoney && isMoney(i.s)).sort((a,b)=>a.x-b.x);
+      if(money.length<3) return;
+      const m3 = money.slice(-3).map(i=>toNum(i.s));
+      const left = g.filter(i=>!money.includes(i));
+      const keg = left.filter(i=>i.x<xBukti && /^\d{2}(\.\d{2})+\.?$/.test(i.s)).sort(ord).map(i=>i.s).join('');
+      const rek = left.filter(i=>i.x>=100 && i.x<xBukti && /^[\d.]+$/.test(i.s) && !/^\d{2}(\.\d{2})+\.?$/.test(i.s)).sort(ord).map(i=>i.s).join('');
+      const bukti = left.filter(i=>i.x>=xBukti && i.x<xUraian).sort(ord).map(i=>i.s).join(' ');
+      const uraian = left.filter(i=>i.x>=xUraian && i.x<xMoney).sort(ord).map(i=>i.s).join(' ').replace(/\s+/g,' ').trim();
+      const [d,m,y] = a.s.split('-');
+      rows.push({tgl:`${y}-${m}-${d}`, kegiatan:keg, rek, bukti, uraian, terima:m3[0], keluar:m3[1], saldo:m3[2]});
+    });
+  });
+  return {meta, rows, total};
+}
+const api={parseBku}; if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.BkuParse=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+/* ===== Pencocokan transaksi BKU aplikasi -> data impor (BKU PDF + RAPBS PDF).
+   Hasil: kualitas (volume), satuan, harga satuan (tarif). ===== */
+(function(root){
+const norm = s => String(s==null?'':s).toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+const normBukti = s => String(s==null?'':s).toLowerCase().replace(/\s+/g,'');
+const normKode = s => String(s==null?'':s).replace(/\s+/g,'').replace(/\.+$/,'');
+const round2 = n => Math.round(n*100)/100;
+function tokenOverlap(a,b){
+  const A=new Set(a.split(' ').filter(x=>x.length>1)), B=new Set(b.split(' ').filter(x=>x.length>1));
+  if(!A.size||!B.size) return 0; let c=0; A.forEach(x=>{ if(B.has(x)) c++; });
+  return c/Math.min(A.size,B.size);
+}
+/* baris BKU yang merupakan belanja (bukan terima/setor pajak, tarik tunai, dst.) */
+function bkuBelanja(rows){
+  return (rows||[]).filter(r=>r && r.bukti && Number(r.keluar)>0 && !/^(terima|setor)\s/i.test(r.uraian||''));
+}
+function cariBkuRow(t, rows){
+  const jml = Number(t.jumlah)||0, bukti = normBukti(t.noBukti), ur = norm(t.uraian);
+  let best=null, bs=0;
+  rows.forEach(r=>{
+    const sameBukti = bukti && normBukti(r.bukti)===bukti;
+    const sameUr = ur && norm(r.uraian)===ur;
+    const sameJml = Number(r.keluar)===jml;
+    if(!( (sameBukti && (sameUr||sameJml)) || (!bukti && sameUr && sameJml) )) return;
+    let s = (sameUr?4:0) + (sameJml?2:0) + (sameBukti?1:0) + (t.tanggal && r.tgl===t.tanggal ? 1:0);
+    if(s>bs){ bs=s; best=r; }
+  });
+  return best;
+}
+function cariRapbs(t, bkuRow, items){
+  const jml = Number(t.jumlah)||0;
+  const ur = norm(bkuRow ? bkuRow.uraian : t.uraian);
+  if(!ur) return null;
+  const rek = normKode(bkuRow && bkuRow.rek ? bkuRow.rek : t.kodeRekening);
+  const prog = normKode(bkuRow && bkuRow.kegiatan ? bkuRow.kegiatan : t.kodeProgram);
+  let best=null, bs=0;
+  items.forEach(it=>{
+    const nu = norm(it.uraian); if(!nu) return;
+    let s=0;
+    if(nu===ur) s=10;
+    else if(ur.length>=6 && nu.length>=6 && (nu.includes(ur)||ur.includes(nu))) s=6;
+    else if(tokenOverlap(nu,ur)>=0.75) s=4;
+    else return;
+    if(rek){ if(normKode(it.rek)===rek) s+=4; else s-=2; }
+    const tr = Number(it.tarif)||0;
+    if(tr>0 && jml>0 && jml%tr===0) s+=2;
+    if(Number(it.t1)===jml || Number(it.t2)===jml) s+=3;
+    if(Number(it.jumlah)===jml) s+=2;
+    if(prog && normKode(it.prog)===prog) s+=1;
+    if(s>bs){ bs=s; best=it; }
+  });
+  return bs>=5 ? best : null;
+}
+function hitung(t, bkuRow, it){
+  const jml = Number(t.jumlah)||0, tarif = Number(it.tarif)||0, volTot = Number(it.vol)||0;
+  let vol=null, approx=false;
+  if(tarif>0 && jml>0){
+    const q = jml/tarif;
+    if(Math.abs(q-Math.round(q))<1e-9) vol = Math.round(q);
+    else if(Number(it.jumlah)===jml && volTot>0) vol = volTot;
+    else { vol = round2(q); approx = true; }
+  } else if(volTot>0 && Number(it.jumlah)===jml) vol = volTot;
+  if(vol==null) return null;
+  const harga = tarif>0 ? tarif : (vol>0 ? Math.round(jml/vol) : jml);
+  return { kualitas: vol, satuan: String(it.sat||'').replace(/Halaman\s*\d+\s*dari\s*\d+/gi,'').replace(/\s+/g,' ').trim(), harga, approx, sumber: bkuRow?'BKU + RAPBS':'RAPBS', uraianRapbs: it.uraian };
+}
+/* t: transaksi aplikasi; bkuRows: baris BKU PDF; items: rincian RAPBS */
+function cari(t, bkuRows, items){
+  if(!t || !items || !items.length) return null;
+  const bkuRow = cariBkuRow(t, bkuBelanja(bkuRows));
+  const it = cariRapbs(t, bkuRow, items);
+  if(!it) return null;
+  return hitung(t, bkuRow, it);
+}
+const fmtVol = v => (Number(v)||0).toLocaleString('id-ID',{maximumFractionDigits:2});
+const api={cari, cariBkuRow, cariRapbs, bkuBelanja, norm, fmtVol};
+if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.SumberData=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
+/* ===== MENU IMPOR BKU & RAPBS (PDF) — sumber pengisian otomatis harga/satuan/kualitas pada
+   Kwitansi, Nota Pesan & BAST. Penyimpanan: sekolah/{npsn}/rapbs (sama dengan menu Rekon),
+   sekolah/{npsn}/bkuPdf/bulan/{yyyy-mm} (BKU per bulan; Kinerja: rapbsKinerja / bkuPdfKinerja). ===== */
+(function(){
+  const $ = id => document.getElementById(id);
+  const esc = s => escapeHtml(String(s==null?'':s));
+  const fmt = n => (Number(n)||0).toLocaleString('id-ID');
+  const BULAN = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember'];
+  const BULAN_LABEL = k => { const [y,m]=k.split('-'); return (BULAN[Number(m)-1]||m).replace(/^./,c=>c.toUpperCase())+' '+y; };
+
+  let jd = 'reguler';
+  const kRapbs = d => d==='kinerja' ? 'rapbsKinerja' : 'rapbs';
+  const kBku   = d => d==='kinerja' ? 'bkuPdfKinerja' : 'bkuPdf';
+  const jdTrx  = t => jenisDanaTransaksi(t)==='kinerja' ? 'kinerja' : 'reguler';
+  const labelJd = d => d==='kinerja' ? 'BOSP Kinerja' : 'BOSP Reguler';
+  const sd = () => state.schoolData || {};
+  const toArr = o => !o ? [] : Array.isArray(o) ? o : Object.keys(o).sort((a,b)=>a-b).map(k=>o[k]);
+
+  function rapbsOf(d){ const r = sd()[kRapbs(d)]; return r && r.items ? toArr(r.items).filter(x=>x && x.rek) : []; }
+  function bulanBkuOf(d){ const b = sd()[kBku(d)]; return (b && b.bulan) ? b.bulan : {}; }
+  function bkuRowsOf(d){ const bl = bulanBkuOf(d); return Object.keys(bl).sort().flatMap(k=>toArr(bl[k].rows)); }
+
+  /* ---------- API untuk menu Cetak ---------- */
+  const rapbsCache = {}, bkuCache = {};
+  function cached(cache, d, ref, build){ const c = cache[d]; if(c && c.ref===ref) return c.val; const val = build(); cache[d] = {ref, val}; return val; }
+  function itemsCached(d){ const r = sd()[kRapbs(d)]; return cached(rapbsCache, d, r&&r.items, ()=>rapbsOf(d)); }
+  function rowsCached(d){ const b = sd()[kBku(d)]; return cached(bkuCache, d, b&&b.bulan, ()=>bkuRowsOf(d)); }
+
+  function cariData(t){
+    if(!t) return null;
+    const d = jdTrx(t);
+    return SumberData.cari(t, rowsCached(d), itemsCached(d));
+  }
+  const strVol = v => String(v).replace('.',',');
+  function lengkapi(t){
+    if(!t || Number(t._jumlahTransaksiGabungan)>1) return t;        // kwitansi gabungan: tidak dirinci
+    const h = cariData(t); if(!h) return t;
+    return Object.assign({}, t, { kualitas: strVol(h.kualitas), satuan: h.satuan || t.satuan, _harga: h.harga, _auto: h });
+  }
+  function aktif(){
+    try{ const v = localStorage.getItem('sikebos.cetakAutoIsi'); return v === null ? true : v === '1'; }catch(e){ return true; }
+  }
+  function ringkas(d){
+    const nb = rowsCached(d).length, nr = itemsCached(d).length;
+    return { bku:nb, rapbs:nr, ada: nb>0 || nr>0 };
+  }
+  function labelRingkas(t){
+    const h = cariData(t); if(!h) return '';
+    return `${SumberData.fmtVol(h.kualitas)} ${h.satuan||''} × ${fmtRupiah(h.harga)}`.replace(/\s+/g,' ');
+  }
+  window.SumberImpor = { lengkapi, aktif, ringkas, cariData, labelRingkas, bacaPdf };
+
+  /* ---------- Pembaca PDF (pdf.js 3.11, sama dengan menu Rekon) ---------- */
+  async function bacaPdf(file){
+    if(!window.pdfjsLib) throw new Error('Pustaka pembaca PDF belum termuat. Periksa koneksi internet lalu muat ulang halaman.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const doc = await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+    const pages = [];
+    for(let p=1;p<=doc.numPages;p++){
+      const tc = await (await doc.getPage(p)).getTextContent();
+      pages.push(tc.items.map(i=>({str:i.str,x:i.transform[4],y:i.transform[5],w:i.width})));
+    }
+    return pages;
+  }
+
+  function setPesan(id, teks, jenis){
+    const el = $(id); if(!el) return;
+    if(!teks){ el.classList.add('hidden'); el.textContent=''; return; }
+    el.className = 'text-sm rounded px-3 py-2 whitespace-pre-line ' + (jenis==='err' ? 'bg-rust-100 text-rust' : jenis==='ok' ? 'bg-forest-100 text-forest' : 'bg-gold-50 text-gold-600');
+    el.textContent = teks;
+  }
+  const tglImpor = ms => ms ? new Date(ms).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+
+  /* ---------- Render halaman ---------- */
+  window.renderImporSumber = function(){
+    if(!$('page-impor-sumber')) return;
+    document.querySelectorAll('.isr-jd-tab').forEach(b=>{
+      const on = b.dataset.jd===jd;
+      b.classList.toggle('bg-navy',on); b.classList.toggle('text-white',on); b.classList.toggle('border-navy',on);
+      b.classList.toggle('bg-white',!on); b.classList.toggle('text-navy',!on); b.classList.toggle('border-navy-200',!on);
+    });
+    // RAPBS
+    const items = rapbsOf(jd), r = sd()[kRapbs(jd)] || {}, meta = r.meta || {};
+    $('isr-rapbs-impor').textContent = items.length ? 'Impor Ulang RAPBS (PDF)' : 'Impor RAPBS (PDF)';
+    $('isr-rapbs-hapus').classList.toggle('hidden', !items.length);
+    $('isr-rapbs-wrap').classList.toggle('hidden', !items.length);
+    $('isr-rapbs-status').textContent = items.length
+      ? `${items.length} rincian belanja · total Rp ${fmt(items.reduce((a,x)=>a+(Number(x.jumlah)||0),0))} · RAPBS ${meta.tahun||''} ${meta.tahap?('· '+(/triwulan/i.test(meta.tahap)?'':'Tahap ')+meta.tahap):''}${r.namaBerkas?(' · '+r.namaBerkas):''}${r.diimporPada?(' · diimpor '+tglImpor(r.diimporPada)):''}`
+      : 'Belum ada data RAPBS '+labelJd(jd)+'.';
+    $('isr-rapbs-tbl').innerHTML = items.map(x=>`<tr class="border-b border-navy-50">
+      <td class="py-1.5 px-3 font-sans">${esc(x.uraian)}</td><td class="py-1.5 px-3 font-mono whitespace-nowrap">${esc(x.rek)}</td>
+      <td class="py-1.5 px-3 text-right">${fmt(x.vol)}</td><td class="py-1.5 px-3 font-sans">${esc(x.sat)}</td>
+      <td class="py-1.5 px-3 text-right">${fmt(x.tarif)}</td><td class="py-1.5 px-3 text-right">${fmt(x.jumlah)}</td></tr>`).join('');
+
+    // BKU
+    const bl = bulanBkuOf(jd), keys = Object.keys(bl).sort();
+    const rows = rowsCached(jd);
+    $('isr-bku-status').textContent = keys.length
+      ? `${keys.length} bulan · ${rows.length} baris transaksi · belanja Rp ${fmt(SumberData.bkuBelanja(rows).reduce((a,x)=>a+(Number(x.keluar)||0),0))}`
+      : 'Belum ada data BKU '+labelJd(jd)+'.';
+    $('isr-bku-bulan').innerHTML = keys.map(k=>{
+      const b = bl[k], rr = toArr(b.rows);
+      return `<div class="flex flex-wrap items-center justify-between gap-2 border border-navy-100 rounded px-3 py-2 text-xs">
+        <div><b class="text-navy">${esc(BULAN_LABEL(k))}</b> <span class="text-navy-400">· ${rr.length} baris · pengeluaran Rp ${fmt(b.total ? b.total.keluar : rr.reduce((a,x)=>a+(Number(x.keluar)||0),0))}${b.namaBerkas?(' · '+esc(b.namaBerkas)):''}${b.diimporPada?(' · diimpor '+tglImpor(b.diimporPada)):''}</span></div>
+        <button type="button" data-isr-hapus-bku="${esc(k)}" class="no-print text-rust font-semibold hover:underline">Hapus</button></div>`;
+    }).join('');
+    const bel = SumberData.bkuBelanja(rows);
+    $('isr-bku-wrap').classList.toggle('hidden', !bel.length);
+    $('isr-bku-tbl').innerHTML = bel.slice(0,500).map(x=>`<tr class="border-b border-navy-50">
+      <td class="py-1.5 px-3 whitespace-nowrap">${esc(formatTanggal(x.tgl))}</td><td class="py-1.5 px-3 font-sans whitespace-nowrap">${esc(x.bukti)}</td>
+      <td class="py-1.5 px-3 font-mono whitespace-nowrap">${esc(x.rek)}</td><td class="py-1.5 px-3 font-sans">${esc(x.uraian)}</td>
+      <td class="py-1.5 px-3 text-right">${fmt(x.keluar)}</td></tr>`).join('');
+
+    renderCocok();
+  };
+
+  function renderCocok(){
+    const hanyaBelum = $('isr-hanya-belum').checked;
+    /* Daftar ini = transaksi BKU di aplikasi (bukan data impor). Baru ditampilkan setelah ada data impor (RAPBS/BKU). */
+    const adaImpor = ringkas(jd).ada;
+    const list = !adaImpor ? [] : (state.transactions||[]).filter(t=>t.jenis==='pengeluaran' && jdTrx(t)===jd
+        && !/^\s*(tarik tunai|pergeseran uang|terima |setor )/i.test(t.uraian||''))
+      .sort((a,b)=>String(a.tanggal).localeCompare(String(b.tanggal)));
+    const dataCocok = t=>{
+      const h = cariData(t); if(h) return h;
+      if(window.RapbsTahap){ const o = RapbsTahap.lengkapi(Object.assign({}, t, {kualitas:'', satuan:''})); if(o._auto) return o._auto; }
+      return null;
+    };
+    let ok = 0;
+    const html = list.map(t=>{
+      const h = dataCocok(t); if(h) ok++;
+      if(hanyaBelum && h) return '';
+      return `<tr class="border-b border-navy-50 ${h?'':'bg-gold-50/60'}">
+        <td class="py-1.5 px-3 whitespace-nowrap">${esc(formatTanggal(t.tanggal))}</td><td class="py-1.5 px-3 font-sans whitespace-nowrap">${esc(t.noBukti||'-')}</td>
+        <td class="py-1.5 px-3 font-sans">${esc(t.uraian)}</td><td class="py-1.5 px-3 text-right">${fmt(t.jumlah)}</td>
+        ${h ? `<td class="py-1.5 px-3 text-right font-semibold">${esc(SumberData.fmtVol(h.kualitas))}${h.approx?' ~':''}</td><td class="py-1.5 px-3 font-sans">${esc(h.satuan)}</td><td class="py-1.5 px-3 text-right">${fmt(h.harga)}</td><td class="py-1.5 px-3 font-sans text-forest">${esc(h.sumber)}</td>`
+              : `<td class="py-1.5 px-3 text-navy-300" colspan="4">Belum cocok — memakai isian transaksi${(t.kualitas||t.satuan)?` (${esc(t.kualitas||'-')} ${esc(t.satuan||'')})`:''}</td>`}
+      </tr>`;
+    }).join('');
+    $('isr-cocok-tbl').innerHTML = html || `<tr><td colspan="8" class="py-6 text-center text-navy-300 font-sans">${!adaImpor?'Belum ada data impor. Impor RAPBS (dan BKU) di atas, lalu daftar transaksi yang cocok akan tampil di sini.':list.length?'Semua transaksi sudah cocok.':'Belum ada transaksi pengeluaran pada BKU aplikasi untuk '+esc(labelJd(jd))+'.'}</td></tr>`;
+    const s = ringkas(jd);
+    $('isr-cocok-status').textContent = !s.ada ? 'Impor RAPBS (dan BKU) terlebih dahulu agar transaksi dapat dicocokkan.'
+      : `${ok} dari ${list.length} transaksi pengeluaran ${labelJd(jd)} cocok dan akan terisi otomatis saat dicetak.`;
+  }
+
+  /* ---------- Event ---------- */
+  document.querySelectorAll('.isr-jd-tab').forEach(b=>b.addEventListener('click', ()=>{ jd = b.dataset.jd; setPesan('isr-rapbs-pesan',''); setPesan('isr-bku-pesan',''); renderImporSumber(); }));
+  $('isr-hanya-belum').addEventListener('change', renderCocok);
+
+  $('isr-rapbs-impor').addEventListener('click', ()=>$('isr-rapbs-file').click());
+  $('isr-rapbs-file').addEventListener('change', async e=>{
+    const f = e.target.files && e.target.files[0]; e.target.value = '';
+    if(!f) return;
+    setPesan('isr-rapbs-pesan','Membaca berkas PDF…','info');
+    try{
+      const hasil = RapbsParse.parseRapbs(await bacaPdf(f));
+      if(!hasil.items.length) throw new Error('Tidak ditemukan rincian belanja. Pastikan berkas adalah “Kertas Kerja RKAS” (Per Tahap atau Per Triwulan) dari aplikasi RKAS.');
+      const npsn = state.userData.npsn;
+      if(hasil.meta.npsn && String(hasil.meta.npsn)!==String(npsn) && !await confirmFix(`NPSN pada PDF (${hasil.meta.npsn}) berbeda dari NPSN sekolah ini (${npsn}). Tetap impor?`)){ setPesan('isr-rapbs-pesan',''); return; }
+      if(rapbsOf(jd).length && !await confirmFix('Data RAPBS '+labelJd(jd)+' yang sudah ada akan diganti dengan isi berkas ini. Lanjutkan?')){ setPesan('isr-rapbs-pesan',''); return; }
+      const total = hasil.items.reduce((a,x)=>a+x.jumlah,0);
+      const items = hasil.items.map(x=>{ const o = Object.assign({},x); if(window.RekonFill && RekonFill.classify) o.kategori = RekonFill.classify(o); return o; });
+      const payload = JSON.parse(JSON.stringify({ meta:hasil.meta, items, namaBerkas:f.name, diimporPada:Date.now() }));
+      await db.ref('sekolah/'+npsn+'/'+kRapbs(jd)).set(payload);
+      logAudit('Impor BKU & RAPBS','impor',`[${labelJd(jd)}] Impor RAPBS ${f.name} — ${items.length} rincian, total Rp ${fmt(total)}`);
+      const cocok = !hasil.meta.total || hasil.meta.total[0]===total;
+      setPesan('isr-rapbs-pesan',`Berhasil mengimpor ${items.length} rincian belanja, total Rp ${fmt(total)}.`+(cocok?'':` Perhatian: total pada PDF Rp ${fmt(hasil.meta.total[0])} — periksa hasil impor.`), cocok?'ok':'info');
+    }catch(err){ console.error(err); setPesan('isr-rapbs-pesan','Gagal mengimpor RAPBS: '+(err.message||err),'err'); }
+  });
+  $('isr-rapbs-hapus').addEventListener('click', async ()=>{
+    if(!await confirmFix('Hapus data RAPBS '+labelJd(jd)+'? (Data ini juga dipakai menu Rekon.)')) return;
+    try{ await db.ref('sekolah/'+state.userData.npsn+'/'+kRapbs(jd)).remove(); logAudit('Impor BKU & RAPBS','hapus','['+labelJd(jd)+'] Hapus data RAPBS'); setPesan('isr-rapbs-pesan','Data RAPBS dihapus.','info'); }
+    catch(err){ alertFix('Gagal menghapus: '+(err.message||err)); }
+  });
+
+  function kunciBulan(meta, rows){
+    const m = BULAN.indexOf(String(meta.bulan||'').toLowerCase());
+    if(m>=0 && /^\d{4}$/.test(meta.tahun||'')) return meta.tahun+'-'+String(m+1).padStart(2,'0');
+    const t = rows.find(r=>/^\d{4}-\d{2}/.test(r.tgl||'')); return t ? t.tgl.slice(0,7) : null;
+  }
+  $('isr-bku-impor').addEventListener('click', ()=>$('isr-bku-file').click());
+  $('isr-bku-file').addEventListener('change', async e=>{
+    const files = Array.from(e.target.files||[]); e.target.value = '';
+    if(!files.length) return;
+    const npsn = state.userData.npsn, hasilPesan = []; let berhasil = 0, gagal = 0;
+    setPesan('isr-bku-pesan','Membaca '+files.length+' berkas PDF…','info');
+    for(const f of files){
+      try{
+        const h = BkuParse.parseBku(await bacaPdf(f));
+        if(!h.rows.length) throw new Error('Tidak ditemukan baris transaksi. Pastikan berkas adalah “Buku Kas Umum” dari aplikasi RKAS.');
+        if(h.meta.npsn && String(h.meta.npsn)!==String(npsn) && !await confirmFix(`${f.name}: NPSN pada PDF (${h.meta.npsn}) berbeda dari NPSN sekolah ini (${npsn}). Tetap impor?`)){ hasilPesan.push(`• ${f.name}: dilewati.`); continue; }
+        const sumber = String(h.meta.sumberDana||''), kin = /kinerja/i.test(sumber);
+        if(((jd==='kinerja') !== kin) && sumber && !await confirmFix(`${f.name}: sumber dana pada PDF “${sumber}” tampaknya bukan ${labelJd(jd)}. Tetap impor ke ${labelJd(jd)}?`)){ hasilPesan.push(`• ${f.name}: dilewati.`); continue; }
+        const key = kunciBulan(h.meta, h.rows);
+        if(!key) throw new Error('Bulan BKU tidak terbaca dari berkas.');
+        if(bulanBkuOf(jd)[key] && !await confirmFix(`Data BKU ${BULAN_LABEL(key)} (${labelJd(jd)}) sudah ada dan akan diganti. Lanjutkan?`)){ hasilPesan.push(`• ${f.name}: dilewati.`); continue; }
+        const sk = h.rows.reduce((a,x)=>a+x.keluar,0), st = h.rows.reduce((a,x)=>a+x.terima,0);
+        const cocok = !h.total || (h.total.keluar===sk && h.total.terima===st);
+        const payload = JSON.parse(JSON.stringify({ meta:h.meta, rows:h.rows, total:h.total||null, namaBerkas:f.name, diimporPada:Date.now() }));
+        await db.ref('sekolah/'+npsn+'/'+kBku(jd)+'/bulan/'+key).set(payload);
+        logAudit('Impor BKU & RAPBS','impor',`[${labelJd(jd)}] Impor BKU ${BULAN_LABEL(key)} ${f.name} — ${h.rows.length} baris, pengeluaran Rp ${fmt(sk)}`);
+        hasilPesan.push(`• ${BULAN_LABEL(key)}: ${h.rows.length} baris, pengeluaran Rp ${fmt(sk)}.`+(cocok?'':` Perhatian: total pada PDF (pengeluaran Rp ${fmt(h.total.keluar)}) berbeda dari hasil baca — periksa.`));
+        berhasil++;
+      }catch(err){ console.error(err); gagal++; hasilPesan.push(`• ${f.name}: gagal — ${err.message||err}`); }
+    }
+    setPesan('isr-bku-pesan', (berhasil?`Berhasil mengimpor ${berhasil} berkas.\n`:'')+hasilPesan.join('\n'), gagal && !berhasil ? 'err' : 'ok');
+  });
+  $('isr-bku-bulan').addEventListener('click', async e=>{
+    const b = e.target.closest('[data-isr-hapus-bku]'); if(!b) return;
+    const k = b.dataset.isrHapusBku;
+    if(!await confirmFix('Hapus data BKU '+BULAN_LABEL(k)+' ('+labelJd(jd)+')?')) return;
+    try{ await db.ref('sekolah/'+state.userData.npsn+'/'+kBku(jd)+'/bulan/'+k).remove(); logAudit('Impor BKU & RAPBS','hapus','['+labelJd(jd)+'] Hapus data BKU '+BULAN_LABEL(k)); }
+    catch(err){ alertFix('Gagal menghapus: '+(err.message||err)); }
+  });
+})();
+
+</script>
+<script>
+/* =========================================================================
+   IMPORT BKU (PDF) — baca PDF Buku Kas Umum (RKAS/ARKAS) langsung menjadi transaksi BKU.
+   Aturan sama dengan Import Data: hanya tanggal pada periode tahap aktif, masuk ke jenis dana aktif.
+   Baris "Saldo ..." (saldo awal) dilewati; transaksi identik yang sudah ada tidak digandakan.
+   ========================================================================= */
+(function(){
+  const inp = document.getElementById('input-import-bku-pdf'); if(!inp) return;
+  const fmt = n => (Number(n)||0).toLocaleString('id-ID');
+  const keyTrx = (tgl,bukti,ur,jenis,jml)=>[tgl,String(bukti||'').toLowerCase().replace(/\s+/g,''),String(ur||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(),jenis,Number(jml)||0].join('|');
+  inp.addEventListener('change', async e=>{
+    const files = Array.from(e.target.files||[]); e.target.value = '';
+    if(!files.length) return;
+    const tahap = state.tahapAktif || getDefaultTahap();
+    const jd = state.jenisDanaAktif || getDefaultJenisDana();
+    if(isTahapTerkunci(tahap)){ showImportFeedback(false, `${TAHAP_PERIODE[tahap].label} sedang terkunci. Buka kunci tahap terlebih dahulu untuk mengimpor data.`); return; }
+    showImportFeedback(true, 'Membaca PDF Buku Kas Umum…');
+    const npsn = state.userData.npsn, updates = {}, cat = [];
+    const ada = new Set((state.transactions||[]).filter(t=>jenisDanaTransaksi(t)===jd).map(t=>keyTrx(t.tanggal,t.noBukti,t.uraian,t.jenis,t.jumlah)));
+    let nT=0,nK=0,sT=0,sK=0,dup=0,luar=0,saldo=0,nol=0,pajak=0;
+    /* Baris pajak (Terima/Setor PPN, PPh, Pajak Bunga, dst.) tidak ikut diimpor */
+    const barisPajak = u => /^\s*(terima|setor)\s+(ppn|pph|pajak|ppnbm|pb\s?1)\b/i.test(u||'') || /^\s*(ppn|pph|pajak)\b/i.test(u||'');
+    try{
+      for(const f of files){
+        const h = BkuParse.parseBku(await SumberImpor.bacaPdf(f));
+        if(!h.rows.length){ cat.push(`${f.name}: tidak ditemukan baris transaksi (bukan PDF Buku Kas Umum?)`); continue; }
+        if(h.meta.npsn && String(h.meta.npsn)!==String(npsn) && !await confirmFix(`${f.name}: NPSN pada PDF (${h.meta.npsn}) berbeda dari NPSN sekolah ini (${npsn}). Tetap impor?`)){ continue; }
+        const sb = String(h.meta.sumberDana||''); const det = /kinerja/i.test(sb)?'kinerja':/afirmasi/i.test(sb)?'afirmasi':/reguler/i.test(sb)?'reguler':null;
+        if(det && det!==jd && !await confirmFix(`${f.name}: sumber dana pada PDF “${sb}” tampaknya bukan ${JENIS_DANA[jd].label} (tab yang sedang aktif). Tetap impor ke ${JENIS_DANA[jd].label}?`)){ continue; }
+        h.rows.forEach(r=>{
+          if(/^saldo\b/i.test(r.uraian||'')){ saldo++; return; }
+          if(barisPajak(r.uraian)){ if(r.terima>0 || r.keluar>0) pajak++; return; }
+          if(!(r.terima>0) && !(r.keluar>0)){ nol++; return; }
+          if(!bulanDalamTahap(r.tgl, tahap)){ luar++; return; }
+          [['penerimaan',r.terima],['pengeluaran',r.keluar]].forEach(([jenis,jml])=>{
+            if(!(jml>0)) return;
+            const k = keyTrx(r.tgl,r.bukti,r.uraian,jenis,jml);
+            if(ada.has(k)){ dup++; return; }
+            ada.add(k);
+            const id = db.ref('transaksi_bku/'+npsn).push().key;
+            updates[id] = { tanggal:r.tgl, kode:r.kegiatan||'', noBukti:r.bukti||'', kodeProgram:r.kegiatan||'', kodeRekening:r.rek||'', uraian:r.uraian, kualitas:'', satuan:'', jenis, kelompokBelanja:'', jumlah:jml, penerima:'', nipPenerima:'', jabatan:'', lampiran:false, jenisDana:jd, createdAt:Date.now() };
+            if(jenis==='penerimaan'){ nT++; sT+=jml; } else { nK++; sK+=jml; }
+          });
+        });
+      }
+    }catch(err){ console.error(err); showImportFeedback(false, 'Gagal membaca PDF: '+(err.message||err)); return; }
+    const n = nT+nK;
+    const sisa = [];
+    if(luar) sisa.push(luar+' baris di luar periode '+TAHAP_PERIODE[tahap].label+' (pindah tab tahap lalu impor lagi bila perlu)');
+    if(dup) sisa.push(dup+' baris sudah ada');
+    if(saldo) sisa.push(saldo+' baris saldo awal');
+    if(pajak) sisa.push(pajak+' baris pajak (PPN/PPh/pajak bunga) tidak diimpor');
+    if(nol) sisa.push(nol+' baris bernilai 0');
+    cat.forEach(c=>sisa.push(c));
+    if(!n){ showImportFeedback(false, 'Tidak ada transaksi baru untuk diimpor.'+(sisa.length?' ('+sisa.join('; ')+')':'')); return; }
+    if(!await confirmFix(`Impor ${n} transaksi dari PDF ke ${JENIS_DANA[jd].label} — ${TAHAP_PERIODE[tahap].label}?\n\nPenerimaan: ${nT} baris, Rp ${fmt(sT)}\nPengeluaran: ${nK} baris, Rp ${fmt(sK)}`+(sisa.length?'\n\nDilewati: '+sisa.join('; '):''))){ showImportFeedback(true,'Impor dibatalkan.'); return; }
+    try{
+      await db.ref('transaksi_bku/'+npsn).update(updates);
+      logAudit('Buku Kas Umum','import',`Import BKU PDF ${files.map(f=>f.name).join(', ')} — ${n} transaksi ke ${JENIS_DANA[jd].label} — ${TAHAP_PERIODE[tahap].label}`);
+      showImportFeedback(true, `${n} transaksi (penerimaan ${nT}, pengeluaran ${nK}) berhasil diimpor dari PDF ke bagian ${JENIS_DANA[jd].label} — ${TAHAP_PERIODE[tahap].label}${sisa.length?' ('+sisa.join('; ')+')':''}.`);
+    }catch(err){ showImportFeedback(false, 'Gagal mengimpor transaksi: '+(err.message||'periksa koneksi internet lalu coba lagi.')); }
+  });
+})();
+</script>
+<script>
+/* ===== ISI OTOMATIS FORM TRANSAKSI DARI RAPBS =====
+   Sumber: sekolah/{npsn}/rapbs (Reguler) atau rapbsKinerja (Kinerja) — sama dengan menu Impor BKU & RAPBS.
+   Mengikuti Jenis Dana & Tahap Laporan yang aktif: hanya rincian yang punya anggaran pada tahap itu
+   (t1 untuk Tahap 1, t2 untuk Tahap 2) yang ditawarkan, kecuali kotak "semua tahap" dicentang.
+   Mengisi: Kode Kegiatan, Kode Program, Kode Rekening, Uraian, Satuan, Kualitas (+ Jenis & Kelompok Belanja bila kosong). */
+(function(){
+  const $ = id => document.getElementById(id);
+  const modal = $('modal-transaksi'); if(!modal || !$('rapbs-cari')) return;
+  const toArr = o => !o ? [] : Array.isArray(o) ? o : Object.keys(o).sort((a,b)=>a-b).map(k=>o[k]);
+  const norm = s => String(s==null?'':s).toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const normKd = s => String(s==null?'':s).replace(/[^0-9]/g,'');
+  const rp = n => 'Rp ' + (Number(n)||0).toLocaleString('id-ID');
+  const esc = s => escapeHtml(String(s==null?'':s));
+  const jd = () => state.jenisDanaAktif || 'reguler';
+  const punyaRapbs = () => jd()==='reguler' || jd()==='kinerja';
+  const tahap = () => state.tahapAktif || getDefaultTahap();
+  const nilaiTahap = (it,t) => Number(t==='2' ? it.t2 : it.t1) || 0;
+  function items(){
+    if(!punyaRapbs()) return [];
+    const r = (state.schoolData||{})[jd()==='kinerja' ? 'rapbsKinerja' : 'rapbs'];
+    return r && r.items ? toArr(r.items).filter(x=>x && x.rek) : [];
+  }
+
+  let terpilih = null, kualManual = false;
+
+  /* realisasi item pada tahap aktif (rekening + uraian sama), tidak menghitung transaksi yang sedang diubah */
+  function realisasi(it){
+    const t = tahap(), idEdit = $('tx-id').value, ur = norm(it.uraian), rk = normKd(it.rek);
+    return (state.transactions||[]).filter(x=>x.jenis==='pengeluaran' && x.id!==idEdit
+        && (x.jenisDana||'reguler')===jd() && bulanDalamTahap(x.tanggal,t)
+        && normKd(x.kodeRekening)===rk && norm(x.uraian)===ur)
+      .reduce((a,x)=>a+(Number(x.jumlah)||0),0);
+  }
+  const fmtQ = v => String(Math.round(Number(v)||0));   // RAPBS tidak memakai desimal
+  const tarifOf = it => Number(it.tarif)||0;
+  /* jatah volume tahap aktif = anggaran tahap ÷ tarif (mis. 100 eks setahun -> Tahap 1: 40, Tahap 2: 60) */
+  const volTahap = it => tarifOf(it)>0 ? nilaiTahap(it,tahap())/tarifOf(it) : 0;
+  const sisaRp = it => nilaiTahap(it,tahap()) - realisasi(it);
+  /* Kualitas bulat: Jumlah kelipatan tarif -> Jumlah ÷ tarif; bila tidak (harga belanja beda dari tarif RAPBS)
+     -> sisa jatah volume tahap (anggaran tahap ÷ tarif), lalu jatah penuh tahap. */
+  function hitungKualitas(it){
+    const tr = tarifOf(it), jml = Number($('tx-jumlah').value)||0, nt = nilaiTahap(it,tahap());
+    if(!(tr>0)) return 0;
+    if(jml>0 && jml%tr===0) return jml/tr;
+    if(jml>0) return Math.round(Math.max(0,sisaRp(it))/tr) || Math.round(nt/tr) || Math.round(jml/tr);
+    return Math.round(Math.max(0,sisaRp(it))/tr);
+  }
+  function kelompok(it){
+    const k = window.RekonFill && RekonFill.classify ? RekonFill.classify(it) : '';
+    if(String(it.rek).startsWith('5.2.')) return 'modal';
+    if(k==='honor' || k==='kebersihan') return k;
+    if(['pulsa','jasaKeu','dapodik','transport'].includes(k)) return 'jasa';
+    if(String(it.rek).endsWith('.0024')) return 'atk';
+    return '';
+  }
+  const autoVals = {};   // nilai yang diisi otomatis; boleh diperbarui selama belum diubah manual
+  function setVal(id, v, hanyaKosong){
+    const el = $(id); if(!el || v==null || v==='') return;
+    if(hanyaKosong && String(el.value).trim()!=='' && el.value!==autoVals[id]) return;
+    el.value = v; autoVals[id] = v;
+  }
+  function tampilInfo(it, prefix){
+    const t = tahap(), nt = nilaiTahap(it,t), rl = realisasi(it), tr = tarifOf(it), sisa = nt-rl, sat = esc(it.sat||'');
+    const q = v => fmtQ(v).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+    const jml = Number($('tx-jumlah').value)||0;
+    let h = `${prefix||''}<b>${esc(it.uraian)}</b> &mdash; Tahap ${t}: `;
+    if(tr>0) h += `jatah ${q(nt/tr)} ${sat}, terealisasi ${q(rl/tr)}, <b class="${sisa<0?'text-rust':'text-forest'}">sisa ${q(sisa/tr)} ${sat}</b> (${rp(sisa)} &middot; tarif ${rp(tr)}/${sat||'satuan'})`;
+    else h += `anggaran ${rp(nt)}, terealisasi ${rp(rl)}, <b class="${sisa<0?'text-rust':'text-forest'}">sisa ${rp(sisa)}</b>`;
+    if(nt===0) h += ' <span class="text-rust">(tidak dianggarkan pada tahap ini)</span>';
+    else if(jml>sisa) h += ` <b class="text-rust">&middot; &#9888; Jumlah melebihi sisa tahap ini sebesar ${rp(jml-sisa)}</b>`;
+    $('rapbs-info').innerHTML = h;
+  }
+  function isi(it, hanyaKosong){
+    terpilih = it;
+    setVal('tx-kode', it.prog, hanyaKosong);
+    setVal('tx-kodeprogram', it.prog, hanyaKosong);
+    setVal('tx-koderekening', it.rek, hanyaKosong);
+    setVal('tx-uraian', it.uraian, hanyaKosong);
+    setVal('tx-satuan', it.sat, hanyaKosong);
+    if(!hanyaKosong || !kualManual) setVal('tx-kualitas', fmtQ(hitungKualitas(it)), hanyaKosong);
+    if(tarifOf(it)>0 && (!hanyaKosong || !$('tx-id').value)){      // Jumlah (Rp) = Kualitas × tarif, hanya bila kosong / sebelumnya otomatis
+      const q = Number(String($('tx-kualitas').value).replace(',','.'))||0;
+      if(q>0) setVal('tx-jumlah', Math.round(q*tarifOf(it)), true);
+    }
+    if(!hanyaKosong) $('tx-jenis').value = 'pengeluaran';
+    const kb = kelompok(it); if(kb && !$('tx-kelompok-belanja').value) $('tx-kelompok-belanja').value = kb;
+    tampilInfo(it, hanyaKosong ? 'Cocok dengan RAPBS: ' : 'Terisi dari RAPBS: ');
+  }
+
+  /* ---------- daftar pilihan ---------- */
+  const daftar = $('rapbs-list');
+  function tutup(){ daftar.classList.add('hidden'); }
+  function buka(){
+    const sem = $('rapbs-semua-tahap').checked, t = tahap();
+    const q = norm($('rapbs-cari').value).split(' ').filter(Boolean);
+    let arr = items().map(it=>({it, nt:nilaiTahap(it,t)})).filter(x=>sem || x.nt>0);
+    if(q.length) arr = arr.filter(x=>{ const h = norm([x.it.uraian,x.it.rek,x.it.prog,x.it.kegiatan].join(' ')); return q.every(w=>h.includes(w)) || (normKd(q.join(''))&&normKd(x.it.rek+x.it.prog).includes(normKd(q.join('')))); });
+    arr.sort((a,b)=>(b.nt>0)-(a.nt>0));
+    if(!arr.length){ daftar.innerHTML = '<p class="px-3 py-3 text-xs text-navy-400">Tidak ada rincian RAPBS yang cocok'+(sem?'':' pada Tahap '+t+' (centang &ldquo;semua tahap&rdquo; untuk melihat semuanya)')+'.</p>'; daftar.classList.remove('hidden'); return; }
+    daftar.innerHTML = arr.slice(0,60).map((x,i)=>{
+      const rl = realisasi(x.it), sisa = x.nt-rl;
+      return `<button type="button" data-i="${i}" class="block w-full text-left px-3 py-2 border-b border-navy-50 hover:bg-gold-50 ${x.nt>0?'':'opacity-60'}">
+        <span class="block text-sm font-semibold text-navy">${esc(x.it.uraian)}</span>
+        <span class="block text-[11px] text-navy-400 font-mono">${esc(x.it.prog)} &middot; ${esc(x.it.rek)}${x.it.kegiatan?' &middot; <span class="font-sans">'+esc(x.it.kegiatan)+'</span>':''}</span>
+        <span class="block text-[11px] ${x.nt>0?'text-navy-400':'text-rust'}">Tahap ${t}: ${x.nt>0?rp(x.nt)+' &middot; sisa '+rp(sisa):'tidak dianggarkan'}${x.it.tarif?' &middot; '+rp(x.it.tarif)+'/'+esc(x.it.sat||''):''}</span></button>`;
+    }).join('') + (arr.length>60 ? '<p class="px-3 py-2 text-[11px] text-navy-300">Menampilkan 60 teratas &mdash; persempit pencarian.</p>' : '');
+    daftar._arr = arr.slice(0,60).map(x=>x.it);
+    daftar.classList.remove('hidden');
+  }
+  daftar.addEventListener('mousedown', e=>{
+    const b = e.target.closest('button[data-i]'); if(!b) return;
+    e.preventDefault(); kualManual = false;
+    isi(daftar._arr[Number(b.dataset.i)], false);
+    $('rapbs-cari').value = ''; tutup();
+  });
+  $('rapbs-cari').addEventListener('focus', buka);
+  $('rapbs-cari').addEventListener('input', buka);
+  $('rapbs-semua-tahap').addEventListener('change', ()=>{ if(!daftar.classList.contains('hidden')) buka(); });
+  document.addEventListener('mousedown', e=>{ if(!e.target.closest('#rapbs-picker')) tutup(); });
+
+  /* ---------- Jumlah <-> Kualitas saling mengikuti (tarif dari RAPBS) ---------- */
+  $('tx-kualitas').addEventListener('input', e=>{
+    if(!e.isTrusted) return;
+    kualManual = true;
+    const q = Number(String($('tx-kualitas').value).replace(',','.'))||0;
+    if(terpilih && tarifOf(terpilih)>0 && q>0){ $('tx-jumlah').value = Math.round(q*tarifOf(terpilih)); autoVals['tx-jumlah'] = $('tx-jumlah').value; }
+    if(terpilih) tampilInfo(terpilih,'RAPBS: ');
+  });
+  $('tx-jumlah').addEventListener('input', e=>{
+    if(!terpilih) return;
+    if(e.isTrusted && tarifOf(terpilih)>0 && Number($('tx-jumlah').value)>0){
+      kualManual = false; $('tx-kualitas').value = fmtQ(hitungKualitas(terpilih)); autoVals['tx-kualitas'] = $('tx-kualitas').value;
+    }
+    tampilInfo(terpilih,'RAPBS: ');
+  });
+
+  /* ---------- cocokkan otomatis saat Uraian / Kode Rekening / Kode Program diketik ----------
+     Hanya rincian RAPBS yang dianggarkan pada tahap aktif; hanya melengkapi kolom yang masih kosong
+     (atau yang sebelumnya terisi otomatis). Kualitas = Jumlah ÷ tarif, atau volume tahap bila Jumlah kosong. */
+  function skor(it, ur, rk, kp, longgar){
+    let sc = 0;
+    const rkIt = normKd(it.rek), kpIt = normKd(it.prog);
+    if(rk && rk.length>=6){ if(rkIt===rk) sc += 5; else if(longgar) sc -= 1; else return 0; }      // rekening sudah lengkap tapi beda -> bukan kandidat
+    if(kp && kp.length>=4 && kpIt===kp) sc += 1;
+    if(ur.length){
+      const a = new Set(norm(it.uraian).split(' ').filter(Boolean)), b = ur;
+      const inter = b.filter(w=>a.has(w)).length;
+      const cover = inter / Math.max(1, Math.min(a.size, b.length));
+      if(norm(it.uraian)===b.join(' ')) sc += 6; else if(cover>=(longgar?0.6:0.75) && inter>=1) sc += 3 + cover; else if(!rk || longgar) return 0;
+    }
+    return sc;
+  }
+  /* nominal transaksi = anggaran tahap, atau kelipatan tarif yang masih dalam jatah -> kandidat lebih tepat */
+  function bonusNominal(it, th, jml){
+    if(!(jml>0)) return 0; const nt = nilaiTahap(it,th), tr = tarifOf(it);
+    if(nt===jml) return 3; if(tr>0 && jml%tr===0 && jml<=nt) return 2; return 0;
+  }
+  function cocokOtomatis(){
+    if($('tx-jenis').value!=='pengeluaran') return;
+    const ur = norm($('tx-uraian').value).split(' ').filter(Boolean);
+    const rk = normKd($('tx-koderekening').value), kp = normKd($('tx-kodeprogram').value);
+    if(!ur.length && rk.length<6) return;
+    const t = tahap();
+    const jml0 = Number($('tx-jumlah').value)||0;
+    const kand = items().filter(x=>nilaiTahap(x,t)>0).map(x=>({x, sc:skor(x,ur,rk,kp)+bonusNominal(x,t,jml0)})).filter(c=>c.sc>=3).sort((a,b)=>b.sc-a.sc);
+    if(!kand.length) return;
+    if(kand.length>1 && kand[0].sc===kand[1].sc && !ur.length) return;       // ambigu -> biarkan
+    isi(kand[0].x, true);
+  }
+  let _tm; const tunda = ()=>{ clearTimeout(_tm); _tm = setTimeout(cocokOtomatis, 350); };
+  ['tx-uraian','tx-koderekening','tx-kodeprogram'].forEach(id=>$(id).addEventListener('input', e=>{ if(e.isTrusted) tunda(); }));
+  $('tx-jumlah').addEventListener('change', cocokOtomatis);
+
+  /* ---------- Cetak (Kwitansi / Nota / BAST): lengkapi Kualitas, Satuan & harga dari RAPBS sesuai tahap tanggal transaksi ---------- */
+  const tahapDariTanggal = tgl => ['1','2'].find(k=>bulanDalamTahap(tgl,k)) || tahap();
+  const itemsDana = dana => { const r=(sd0()||{})[dana==='kinerja'?'rapbsKinerja':'rapbs']; return r&&r.items?toArr(r.items).filter(x=>x&&x.rek):[]; };
+  const sd0 = () => state.schoolData;
+  const bersihSat = v => String(v||'').replace(/Halaman\s*\d+\s*dari\s*\d+/gi,'').replace(/\s+/g,' ').trim();
+  /* cari rincian RAPBS untuk satu transaksi (tahap dari tanggal transaksi) */
+  function cariItemCetak(t){
+    const dana = (typeof jenisDanaTransaksi==='function' && jenisDanaTransaksi(t)==='kinerja') ? 'kinerja' : 'reguler';
+    const all = itemsDana(dana);
+    if(!all.length) return {alasan:'Data RAPBS belum diimpor (menu Impor BKU & RAPBS)'};
+    const th = tahapDariTanggal(t.tanggal);
+    const ur = norm(t.uraian).split(' ').filter(Boolean), rk = normKd(t.kodeRekening), kp = normKd(t.kodeProgram);
+    const jml = Number(t.jumlah)||0;
+    const pilih = arr => arr.map(x=>({x, sc:skor(x,ur,rk,kp,true)+bonusNominal(x,th,jml)})).filter(c=>c.sc>=3).sort((a,b)=>b.sc-a.sc)[0];
+    const c = pilih(all.filter(x=>nilaiTahap(x,th)>0)) || pilih(all);
+    if(c) return {it:c.x, th};
+    /* Cadangan: uraian transaksi beda penulisan dengan RAPBS -> cocokkan lewat Kode Rekening (+ Kode Program / nominal) */
+    if(rk.length>=6){
+      let kand = all.filter(x=>normKd(x.rek)===rk);
+      const kTahap = kand.filter(x=>nilaiTahap(x,th)>0); if(kTahap.length) kand = kTahap;
+      if(kand.length>1 && kp.length>=4){ const k2 = kand.filter(x=>normKd(x.prog)===kp); if(k2.length) kand = k2; }
+      if(kand.length>1 && jml>0){
+        const mx = Math.max(...kand.map(x=>bonusNominal(x,th,jml)));
+        if(mx>0) kand = kand.filter(x=>bonusNominal(x,th,jml)===mx);
+      }
+      if(kand.length===1) return {it:kand[0], th};
+      if(kand.length>1) return {alasan:'Ada '+kand.length+' rincian RAPBS dengan kode rekening sama — samakan uraian transaksi dengan uraian RAPBS'};
+    }
+    return {alasan:'Uraian tidak ditemukan di RAPBS (isi Kode Rekening atau samakan uraian dengan RAPBS)'};
+  }
+  function lengkapiCetak(t){
+    if(!t || t._auto || Number(t._jumlahTransaksiGabungan)>1) return t;
+    if(String(t.kualitas||'').trim() && String(t.satuan||'').trim()) return t;
+    const r = cariItemCetak(t); if(!r.it) return t;
+    const it = r.it, th = r.th, tr = Number(it.tarif)||0, jml = Number(t.jumlah)||0, nt = nilaiTahap(it,th);
+    /* Kualitas = jatah volume tahap di RAPBS (anggaran tahap ÷ tarif); bila tahap itu tidak dianggarkan, pakai volume setahun.
+       Harga satuan = Jumlah transaksi ÷ Kualitas, sehingga Kualitas × Harga = Jumlah. */
+    let q = 0;
+    if(tr>0){ q = (jml>0 && jml%tr===0) ? jml/tr : (nt>0 ? Math.round(nt/tr) : (Number(it.vol)||Math.round(jml/tr))); }
+    else q = Number(it.vol)||0;
+    q = Math.round(q);
+    const sat = String(t.satuan||'').trim() || bersihSat(it.sat);
+    const out = Object.assign({}, t, { satuan: sat });
+    if(q>0 && !String(t.kualitas||'').trim()) out.kualitas = String(q);
+    const qPakai = Number(String(out.kualitas||'').replace(',','.'))||0;
+    if(qPakai>0 && jml>0){ const harga = Math.round(jml/qPakai); out._harga = harga;
+      out._auto = { kualitas:qPakai, satuan:sat, harga, approx:false, sumber:'RAPBS Tahap '+th, uraianRapbs:it.uraian }; }
+    return out;
+  }
+  /* label untuk daftar cetak: tampil ✓ bila cocok, atau alasan bila belum */
+  function cek(t){
+    const r = cariItemCetak(t); if(!r.it) return {ok:false, alasan:r.alasan};
+    const o = lengkapiCetak(Object.assign({}, t, {kualitas:'', satuan:''}));
+    return o._auto ? {ok:true, label:`${String(o.kualitas)} ${o.satuan||''} × ${fmtRupiah(o._harga)} (RAPBS Tahap ${r.th})`.replace(/\s+/g,' ')} : {ok:false, alasan:'Cocok, tetapi tarif/volume RAPBS kosong'};
+  }
+  window.RapbsTahap = { lengkapi: lengkapiCetak, cek };
+
+  /* ---------- reset tiap modal dibuka ---------- */
+  function siapkan(){
+    terpilih = null; kualManual = false; tutup(); Object.keys(autoVals).forEach(k=>delete autoVals[k]);
+    $('rapbs-cari').value = ''; $('rapbs-semua-tahap').checked = false;
+    const t = tahap(), n = items().length, nT = items().filter(x=>nilaiTahap(x,t)>0).length;
+    $('rapbs-tahap-label').textContent = '— Tahap ' + t;
+    $('rapbs-cari').disabled = !n;
+    $('rapbs-info').textContent = !punyaRapbs() ? 'RAPBS hanya tersedia untuk BOSP Reguler & BOS Kinerja; isi kolom secara manual.'
+      : !n ? 'Belum ada data RAPBS — impor dulu di menu Impor BKU & RAPBS.'
+      : `${nT} rincian belanja dianggarkan pada Tahap ${t}. Pilih satu untuk mengisi kode, uraian, satuan & kualitas.`;
+    if($('tx-id').value){   // mode ubah: tampilkan sisa anggaran bila uraian+rekening cocok
+      const ur = norm($('tx-uraian').value), rk = normKd($('tx-koderekening').value);
+      const it = items().find(x=>normKd(x.rek)===rk && norm(x.uraian)===ur);
+      if(it){ terpilih = it; kualManual = false; isi(it, true); tampilInfo(it, 'RAPBS: '); }   // lengkapi Kualitas/Satuan yang kosong
+      else cocokOtomatis();
+    } else if($('tx-uraian').value.trim() || $('tx-koderekening').value.trim()) cocokOtomatis();
+  }
+  new MutationObserver(()=>{ if(!modal.classList.contains('hidden')) siapkan(); })
+    .observe(modal, {attributes:true, attributeFilter:['class']});
+})();
+</script>
+<script>
+/* ===== DATA PENYEDIA / PEMILIK TOKO =====
+   Penyimpanan: sekolah/{npsn}/penyedia/{id} dan sekolah/{npsn}/penyediaUtama.
+   Dipakai otomatis oleh Kwitansi (Yang Menerima), Nota Pesan (Kepada/Penyedia) dan BAST (Pihak Pertama). */
+(function(){
+  const $ = id => document.getElementById(id);
+  const esc = s => escapeHtml(String(s==null?'':s));
+  const sd = () => state.schoolData || {};
+  const toArr = o => !o ? [] : Object.keys(o).map(k=>Object.assign({id:k}, o[k]));
+  const daftar = () => toArr(sd().penyedia).sort((a,b)=>String(a.namaToko).localeCompare(String(b.namaToko)));
+  const utamaId = () => sd().penyediaUtama || '';
+  const byId = id => daftar().find(p=>p.id===id) || null;
+  const utama = () => byId(utamaId()) || null;
+  const sebutanDari = p => p ? (p.sebutan || ('Pemilik ' + (p.namaToko||'')).trim()) : '';
+
+  /* penyedia untuk satu transaksi: tautan transaksi -> penyedia utama */
+  const KATEGORI = Object.assign({}, KELOMPOK_BELANJA_LABELS, { _none:'Tanpa kategori' });
+  const kunciKat = t => (t && t.kelompokBelanja && KELOMPOK_BELANJA_LABELS[t.kelompokBelanja]) ? t.kelompokBelanja : '_none';
+  const katAktif = k => !(sd().penyediaKategori && sd().penyediaKategori[k] === false);
+  const untukTransaksi = t => !katAktif(kunciKat(t)) ? null : ((t && t.penyediaId && byId(t.penyediaId)) || utama());
+  /* satu penyedia bersama untuk sekumpulan transaksi; null bila semua kategorinya OFF */
+  function untukBanyak(items){
+    const aktif = (items||[]).filter(t=>katAktif(kunciKat(t)));
+    if(!aktif.length) return null;
+    const set = new Set(aktif.map(t=>{ const p = untukTransaksi(t); return p ? p.id : ''; }));
+    if(set.size===1){ const id = [...set][0]; return id ? byId(id) : null; }
+    return utama();
+  }
+
+  /* ---------- Kwitansi: kolom "Yang Menerima" ---------- */
+  function penerimaKwitansiHtml(t){
+    const p = (t && t.penerima) ? null : untukTransaksi(t);
+    if(p) return `<div style="padding-top:6px;"><b>${esc(p.namaPemilik||'( ..................... )')}</b></div>`;
+    return `<div style="padding-top:6px;"><b>${esc((t&&t.penerima)||'( ..................... )')}</b><br>NIP. ${esc((t&&t.nipPenerima)||'-')}</div>`;
+  }
+
+  /* ---------- Nota Pesan & BAST: Detail Dokumen ---------- */
+  const selCetak = () => $('cetak-pilih-penyedia');
+  const fCetak = { nama:'cetak-nama-penyedia', sebutan:'cetak-sebutan-penyedia', alamat:'cetak-alamat-penyedia' };
+  function isiFieldCetak(p){
+    $(fCetak.nama).value = p ? (p.namaPemilik||'') : '';
+    $(fCetak.sebutan).value = p ? sebutanDari(p) : '';
+    $(fCetak.alamat).value = p ? (p.alamat||'') : '';
+  }
+  function itemsTerpilih(){
+    const ids = Array.from(state.cetakSelection||[]);
+    return (state.transactions||[]).filter(t=>ids.includes(t.id));
+  }
+  function isiOpsiCetak(){
+    const sel = selCetak(); if(!sel) return;
+    const keep = sel.value || 'auto';
+    sel.innerHTML = '<option value="auto">Otomatis — sesuai penyedia transaksi / penyedia utama</option>'
+      + daftar().map(p=>`<option value="${esc(p.id)}">${esc(p.namaToko)} — ${esc(p.namaPemilik)}${p.id===utamaId()?' (utama)':''}</option>`).join('')
+      + '<option value="manual">Isi manual</option>';
+    sel.value = [...sel.options].some(o=>o.value===keep) ? keep : 'auto';
+  }
+  function terapkanPilihanCetak(){
+    const sel = selCetak(); if(!sel) return;
+    if(sel.value==='manual') return;
+    const p = sel.value==='auto' ? untukBanyak(itemsTerpilih()) : byId(sel.value);
+    if(p || sel.value==='auto') isiFieldCetak(p);
+  }
+  function lengkapiHeader(h, items){
+    const sel = selCetak(); if(!sel || sel.value==='manual') return;
+    const p = sel.value==='auto' ? untukBanyak(items) : byId(sel.value);
+    if(!p) return;
+    isiFieldCetak(p);
+    h.namaPenyedia = p.namaPemilik||''; h.sebutanPenyedia = sebutanDari(p); h.alamatPenyedia = p.alamat||'';
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{});
+  if(selCetak()){
+    selCetak().addEventListener('change', terapkanPilihanCetak);
+    Object.values(fCetak).forEach(id=>$(id).addEventListener('input', e=>{ if(e.isTrusted){ isiOpsiCetak(); selCetak().value='manual'; } }));
+    new MutationObserver(()=>{ if(!$('cetak-header-fields').classList.contains('hidden')){ isiOpsiCetak(); terapkanPilihanCetak(); } })
+      .observe($('cetak-header-fields'), {attributes:true, attributeFilter:['class']});
+    $('btn-cetak-ke-penyedia').addEventListener('click', ()=>navigateTo('penyedia'));
+  }
+
+  /* ---------- Form transaksi: pilihan penyedia ---------- */
+  function isiOpsiTransaksi(){
+    const sel = $('tx-penyedia'); if(!sel) return;
+    const u = utama();
+    sel.innerHTML = `<option value="">Pakai penyedia utama${u?' ('+esc(u.namaToko)+')':' (belum diatur)'}</option>`
+      + daftar().map(p=>`<option value="${esc(p.id)}">${esc(p.namaToko)} — ${esc(p.namaPemilik)}</option>`).join('');
+    const id = $('tx-id').value, t = id ? (state.transactions||[]).find(x=>x.id===id) : null;
+    sel.value = (t && t.penyediaId && byId(t.penyediaId)) ? t.penyediaId : '';
+  }
+  const mtx = $('modal-transaksi');
+  if(mtx) new MutationObserver(()=>{ if(!mtx.classList.contains('hidden')) isiOpsiTransaksi(); }).observe(mtx,{attributes:true, attributeFilter:['class']});
+
+  /* ---------- Halaman Data Penyedia ---------- */
+  function renderKategori(){
+    const box = $('pv-kategori'); if(!box) return;
+    box.innerHTML = Object.keys(KATEGORI).map(k=>{
+      const on = katAktif(k);
+      return `<button type="button" role="switch" aria-checked="${on}" data-kat="${k}" class="flex items-center justify-between gap-3 rounded border border-navy-100 px-3 py-2 text-left hover:bg-paper">
+        <span class="text-sm text-navy">${esc(KATEGORI[k])}</span>
+        <span class="flex items-center gap-2"><span class="text-[11px] font-bold ${on?'text-forest':'text-navy-300'}">${on?'ON':'OFF'}</span>
+        <span style="display:inline-block;width:36px;height:20px;border-radius:10px;position:relative;background:${on?'#2F6B4F':'#C5CCD6'};transition:background .15s">
+          <span style="position:absolute;top:2px;left:${on?'18px':'2px'};width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s"></span></span></span></button>`;
+    }).join('');
+  }
+  function render(){
+    renderKategori();
+    const tb = $('tbl-penyedia'); if(!tb) return;
+    const arr = daftar();
+    tb.innerHTML = arr.length ? arr.map(p=>`<tr class="border-b border-navy-50">
+      <td class="py-2 px-3 font-sans"><b>${esc(p.namaToko)}</b>${p.id===utamaId()?' <span class="ml-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-gold-50 text-gold-600 border border-gold-400">Utama</span>':''}</td>
+      <td class="py-2 px-3 font-sans">${esc(p.namaPemilik)}<div class="text-[11px] text-navy-400">${esc(sebutanDari(p))}</div></td>
+      <td class="py-2 px-3 font-sans">${esc(p.alamat||'-')}</td>
+      <td class="py-2 px-3 font-mono text-xs">${esc(p.telepon||'-')}<br>${esc(p.npwp||'')}</td>
+      <td class="py-2 px-3 text-right whitespace-nowrap">
+        ${p.id===utamaId()?'':`<button data-pv="utama" data-id="${esc(p.id)}" class="text-xs font-semibold text-gold-600 hover:underline mr-2">Jadikan utama</button>`}
+        <button data-pv="ubah" data-id="${esc(p.id)}" class="text-xs font-semibold text-navy hover:underline mr-2">Ubah</button>
+        <button data-pv="hapus" data-id="${esc(p.id)}" class="text-xs font-semibold text-rust hover:underline">Hapus</button></td></tr>`).join('')
+      : '<tr><td colspan="5" class="py-8 text-center text-navy-300 font-sans">Belum ada data penyedia. Klik &ldquo;+ Tambah Penyedia&rdquo; untuk mengisi.</td></tr>';
+  }
+  const ref = sub => db.ref('sekolah/'+state.userData.npsn+'/'+sub);
+  function bukaForm(id){
+    const p = id ? byId(id) : null;
+    $('form-penyedia').reset();
+    $('pv-id').value = id||'';
+    $('modal-penyedia-title').textContent = p ? 'Ubah Penyedia' : 'Tambah Penyedia';
+    if(p){ $('pv-toko').value=p.namaToko||''; $('pv-pemilik').value=p.namaPemilik||''; $('pv-sebutan').value=p.sebutan||''; $('pv-alamat').value=p.alamat||''; $('pv-telp').value=p.telepon||''; $('pv-npwp').value=p.npwp||''; }
+    $('pv-utama').checked = p ? p.id===utamaId() : daftar().length===0;
+    $('modal-penyedia').classList.remove('hidden');
+  }
+  const tutupForm = () => $('modal-penyedia').classList.add('hidden');
+  $('btn-penyedia-tambah').addEventListener('click', ()=>bukaForm(''));
+  $('btn-penyedia-batal').addEventListener('click', tutupForm);
+  $('form-penyedia').addEventListener('submit', async e=>{
+    e.preventDefault();
+    const data = { namaToko:$('pv-toko').value.trim(), namaPemilik:$('pv-pemilik').value.trim(), sebutan:$('pv-sebutan').value.trim(),
+      alamat:$('pv-alamat').value.trim(), telepon:$('pv-telp').value.trim(), npwp:$('pv-npwp').value.trim(), updatedAt:Date.now() };
+    try{
+      let id = $('pv-id').value;
+      if(id) await ref('penyedia/'+id).update(data);
+      else { data.createdAt = Date.now(); id = (await ref('penyedia').push(data)).key; }
+      if($('pv-utama').checked) await ref('penyediaUtama').set(id);
+      else if(utamaId()===id) await ref('penyediaUtama').remove();
+      logAudit('Data Penyedia', $('pv-id').value?'ubah':'tambah', `${$('pv-id').value?'Ubah':'Tambah'} penyedia ${data.namaToko}`);
+      tutupForm();
+    }catch(err){ alertFix('Gagal menyimpan penyedia: '+(err.message||'periksa koneksi internet lalu coba lagi.')); }
+  });
+  $('pv-kategori').addEventListener('click', async e=>{
+    const b = e.target.closest('button[data-kat]'); if(!b) return;
+    const k = b.dataset.kat, baru = !katAktif(k);
+    try{
+      await ref('penyediaKategori/'+k).set(baru);
+      logAudit('Data Penyedia','ubah',`Isi otomatis penyedia ${KATEGORI[k]}: ${baru?'ON':'OFF'}`);
+    }catch(err){ alertFix('Gagal menyimpan pengaturan: '+(err.message||'periksa koneksi internet.')); }
+  });
+  $('tbl-penyedia').addEventListener('click', async e=>{
+    const b = e.target.closest('button[data-pv]'); if(!b) return;
+    const id = b.dataset.id, p = byId(id); if(!p) return;
+    try{
+      if(b.dataset.pv==='ubah') bukaForm(id);
+      else if(b.dataset.pv==='utama') await ref('penyediaUtama').set(id);
+      else if(b.dataset.pv==='hapus'){
+        if(!await confirmFix(`Hapus penyedia "${p.namaToko}"? Transaksi yang tertaut akan memakai penyedia utama.`)) return;
+        await ref('penyedia/'+id).remove();
+        if(utamaId()===id) await ref('penyediaUtama').remove();
+        logAudit('Data Penyedia','hapus','Hapus penyedia '+p.namaToko);
+      }
+    }catch(err){ alertFix('Gagal: '+(err.message||'periksa koneksi internet.')); }
+  });
+
+  /* tampilkan halaman saat dibuka */
+  const asal = navigateTo;
+  navigateTo = function(id){ asal.apply(this, arguments); if(id==='penyedia') render(); };
+
+  window.PenyediaApp = { render, lengkapiHeader, penerimaKwitansiHtml, untukTransaksi, daftar };
 })();
 </script>
 </body>
