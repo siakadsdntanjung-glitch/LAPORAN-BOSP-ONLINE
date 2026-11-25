@@ -123,6 +123,21 @@
   @keyframes spin{ to{ transform:rotate(360deg); } }
   [data-nav].active-nav{ background:rgba(255,255,255,0.08); border-left-color:#C8963E; }
 
+  /* ===== Penanda menu aktif (tambahan) =====
+     Menambah bilah aksen di kiri, teks tebal, dan penanda grup pada sidebar & menu HP.
+     Tidak mengubah aturan .active-nav yang sudah ada. ===== */
+  #view-app .nav-btn{ position:relative; transition:background .15s, color .15s; }
+  #view-app .nav-btn.active-nav{
+    font-weight:700;
+    box-shadow:0 2px 8px -2px rgba(0,0,0,.35), inset 4px 0 0 #C8963E;
+  }
+  #view-app .nav-btn.active-nav svg{ opacity:1; }
+  #view-app .nav-btn.active-nav::after{
+    content:''; position:absolute; right:.7rem; top:50%; width:.45rem; height:.45rem;
+    margin-top:-.225rem; border-radius:9999px; background:#C8963E;
+  }
+  #view-app .jw-nav-group.jw-group-aktif .jw-nav-gt{ color:#C8963E; font-weight:600; }
+
   input:focus, select:focus, textarea:focus, button:focus-visible{
     outline: 2px solid #C8963E; outline-offset: 1px;
   }
@@ -1793,7 +1808,7 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
             </div>
           </div>
           <div id="import-feedback" class="hidden text-sm rounded px-3 py-2 no-print"></div>
-          <p class="text-xs text-navy-300 no-print">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT), Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Kolom Kategori Belanja bersifat opsional (boleh dikosongkan) dan tidak memengaruhi import file lama tanpa kolom ini. Semua baris yang diimpor otomatis masuk ke bagian Jenis Dana BOSP yang sedang aktif di atas — pindah tab Jenis Dana terlebih dahulu bila file berisi data jenis dana lain. Klik "Unduh Template" untuk contoh filenya. Untuk PDF Buku Kas Umum dari aplikasi RKAS/ARKAS, klik "Import BKU (PDF)" — penerimaan &amp; pengeluaran dibaca otomatis (baris saldo awal dilewati, transaksi yang sudah ada tidak digandakan).</p>
+          <p class="text-xs text-navy-300 no-print">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT/Perangko), Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Kolom Kategori Belanja bersifat opsional (boleh dikosongkan) dan tidak memengaruhi import file lama tanpa kolom ini. Semua baris yang diimpor otomatis masuk ke bagian Jenis Dana BOSP yang sedang aktif di atas — pindah tab Jenis Dana terlebih dahulu bila file berisi data jenis dana lain. Klik "Unduh Template" untuk contoh filenya. Untuk PDF Buku Kas Umum dari aplikasi RKAS/ARKAS, klik "Import BKU (PDF)" — penerimaan &amp; pengeluaran dibaca otomatis (baris saldo awal dilewati, transaksi yang sudah ada tidak digandakan).</p>
           <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
             <div id="bku-cari-bar" class="no-print flex flex-wrap items-center gap-3 px-4 py-3 border-b border-navy-100">
               <div class="relative flex-1 min-w-[220px] max-w-xl">
@@ -2845,6 +2860,7 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
             <button data-kel="honor" class="kk221-tab px-4 py-2 text-sm font-semibold rounded bg-white border border-navy-200 text-navy">Belanja Honor</button>
             <button data-kel="kebersihan" class="kk221-tab px-4 py-2 text-sm font-semibold rounded bg-white border border-navy-200 text-navy">Belanja Kebersihan</button>
             <button data-kel="rumahtangga" class="kk221-tab px-4 py-2 text-sm font-semibold rounded bg-white border border-navy-200 text-navy">Belanja Alat Rumah Tangga</button>
+            <button data-kel="perangko" class="kk221-tab px-4 py-2 text-sm font-semibold rounded bg-white border border-navy-200 text-navy">Belanja Perangko</button>
           </div>
 
           <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
@@ -2893,6 +2909,11 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
         <section id="page-nomor-surat" class="page hidden space-y-4 max-w-3xl">
           <div id="nomor-surat-root" class="space-y-4"></div>
         </section>
+
+        <!-- MENU BARU: Penerimaan Dana, Manajemen Pajak, Mutasi Kas -->
+        <section id="page-penerimaan-dana" class="page hidden space-y-4"><div id="penerimaan-dana-root" class="space-y-4"></div></section>
+        <section id="page-manajemen-pajak" class="page hidden space-y-4"><div id="manajemen-pajak-root" class="space-y-4"></div></section>
+        <section id="page-mutasi-kas" class="page hidden space-y-4"><div id="mutasi-kas-root" class="space-y-4"></div></section>
 
         <section id="page-backup" class="page hidden space-y-4">
           <div class="bg-white rounded-lg border border-navy-100 p-6 max-w-2xl space-y-5">
@@ -3185,6 +3206,7 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
           <option value="honor">Belanja Honor</option>
           <option value="kebersihan">Belanja Kebersihan</option>
           <option value="rumahtangga">Belanja Alat Rumah Tangga</option>
+          <option value="perangko">Belanja Perangko</option>
         </select></div>
       <div><label class="block text-xs font-semibold text-navy-400 mb-1">Jumlah (Rp)</label>
         <input required type="number" min="0" id="tx-jumlah" class="w-full rounded border border-navy-100 px-3 py-2 text-sm font-mono"></div>
@@ -3787,7 +3809,7 @@ function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res));
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "2.2.9"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "3.0.0"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -3911,7 +3933,7 @@ const state = {
   cetakDoc: 'kwitansi',
   cetakSelection: new Set(),
   cetakBulan: '',
-  kk221Tab: 'atk',   // sub bagian aktif pada Kertas Kerja Unit 2.2.1: 'atk' | 'jasa' | 'modal' | 'honor' | 'kebersihan' | 'rumahtangga'
+  kk221Tab: 'atk',   // sub bagian aktif pada Kertas Kerja Unit 2.2.1: 'atk' | 'jasa' | 'modal' | 'honor' | 'kebersihan' | 'rumahtangga' | 'perangko'
   tahapAktif: null,   // '1' (Jan–Jun) atau '2' (Jul–Des) — tahap laporan BOSP yang sedang dikerjakan admin sekolah
   jenisDanaAktif: null, // 'reguler' | 'kinerja' | 'afirmasi' — bagian dana BOSP yang sedang dikerjakan admin sekolah
   listeners: []       // refs to detach on logout
@@ -5976,6 +5998,7 @@ const KELOMPOK_BELANJA_COLORS = {
   honor: '#B23A2E',
   kebersihan: '#9DB9CE',
   rumahtangga: '#EACB89',
+  perangko: '#7A5C9E',
   lainnya: '#B7BDC6'
 };
 function renderChartKelompokBelanja(){
@@ -6002,7 +6025,7 @@ function renderChartKelompokBelanja(){
   const totalBelanja = Object.values(totals).reduce((s,v)=>s+v,0);
   if(totalEl) totalEl.textContent = fmtRupiah(totalBelanja);
 
-  const urutan = ['atk','jasa','modal','honor','kebersihan','rumahtangga','lainnya'];
+  const urutan = ['atk','jasa','modal','honor','kebersihan','rumahtangga','perangko','lainnya'];
   const entries = urutan
     .filter(k=>totals[k]>0)
     .map(k=>({
@@ -9125,7 +9148,7 @@ const FIELD_LABELS = {
   kualitas: 'Kualitas',
   satuan: 'Satuan',
   jenis: 'Jenis Transaksi',
-  kelompokBelanja: 'Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT)',
+  kelompokBelanja: 'Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT/Perangko)',
   jumlah: 'Jumlah (Rp)',
   penerima: 'Nama Penerima',
   nipPenerima: 'NIP Penerima',
@@ -9162,7 +9185,7 @@ function normalizeHeader(h){
 }
 // Label kategori belanja (kode -> teks) dipakai bersama oleh export/template/
 // import serta Kertas Kerja 2.2.1, agar teks di file impor & tampilan selalu sama.
-const KELOMPOK_BELANJA_LABELS = { atk:'Belanja ATK', jasa:'Belanja Jasa', modal:'Belanja Modal', honor:'Belanja Honor', kebersihan:'Belanja Kebersihan', rumahtangga:'Belanja Alat Rumah Tangga' };
+const KELOMPOK_BELANJA_LABELS = { atk:'Belanja ATK', jasa:'Belanja Jasa', modal:'Belanja Modal', honor:'Belanja Honor', kebersihan:'Belanja Kebersihan', rumahtangga:'Belanja Alat Rumah Tangga', perangko:'Belanja Perangko' };
 function kelompokBelanjaKeFromLabel(val){
   const norm = normalizeHeader(val);
   if(!norm) return '';
@@ -9292,7 +9315,7 @@ document.getElementById('input-import-csv').addEventListener('change', (e)=>{
         kualitas: String(f.kualitas||'').trim(),
         satuan: String(f.satuan||'').trim(),
         jenis,
-        kelompokBelanja: kelompokBelanjaKeFromLabel(f.kelompokBelanja),
+        kelompokBelanja: kelompokBelanjaKeFromLabel(f.kelompokBelanja) || ((jenis==='pengeluaran' && window.kelompokDariTransaksi) ? kelompokDariTransaksi(f.kodeRekening, uraian, {noBukti:f.noBukti, kualitas:f.kualitas, jumlah:jumlah}) : ''),
         jumlah,
         penerima: String(f.penerima||'').trim(),
         nipPenerima: String(f.nipPenerima||'').trim(),
@@ -9429,7 +9452,8 @@ document.getElementById('btn-export-pdf').addEventListener('click', ()=>{
 document.querySelectorAll('.cetak-tab').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     state.cetakDoc = btn.dataset.doc;
-    state.cetakSelection.clear(); // pindah jenis dokumen -> pilihan sebelumnya tidak relevan lagi
+    /* Centang transaksi SENGAJA dipertahankan saat pindah jenis dokumen (Kwitansi/Nota/BAST/dst.), supaya tidak perlu mencentang ulang.
+       Pilihan tetap dikosongkan saat pindah tahap/jenis dana/bulan atau logout. */
     document.querySelectorAll('.cetak-tab').forEach(b=>{
       b.classList.remove('bg-navy','text-white'); b.classList.add('bg-white','border','border-navy-200','text-navy');
     });
@@ -9530,7 +9554,11 @@ function renderCetakList(){
   // Buang id yang sudah dicentang tapi transaksinya sudah tidak ada lagi di
   // daftar ini (mis. terhapus/berubah jenis), supaya cetakSelection tidak
   // menumpuk id basi selamanya.
-  const idsTersedia = new Set(list.map(t=>t.id));
+  /* Pruning memakai SEMUA pengeluaran periode ini (bukan hanya daftar tab aktif), agar centangan
+     tetap tersimpan ketika pindah ke tab Lampiran lalu kembali ke Nota/BAST. */
+  const idsTersedia = new Set(state.transactions
+    .filter(t=>t.jenis==='pengeluaran' && bulanDalamTahap(t.tanggal, tahapAktifCetak) && jenisDanaTransaksi(t)===jenisDanaAktifCetak && cetakBulanCocok(t.tanggal))
+    .map(t=>t.id));
   Array.from(state.cetakSelection).forEach(id=>{ if(!idsTersedia.has(id)) state.cetakSelection.delete(id); });
 
   const rows = list.map(t=>{
@@ -9562,7 +9590,19 @@ function renderCetakList(){
 document.getElementById('tbl-cetak-pilih').addEventListener('change', (e)=>{
   const cb = e.target.closest('.chk-cetak');
   if(!cb) return;
-  if(cb.checked) state.cetakSelection.add(cb.dataset.id);
+  if(cb.checked){
+    /* Pindah ke No. Bukti yang berbeda -> centang sebelumnya dikosongkan, hanya transaksi yang baru dicentang yang tersisa.
+       Centang pada No. Bukti yang sama tetap bertambah (untuk nota/BAST/kwitansi gabungan). */
+    const kunci = x => String((x && x.noBukti) || '').toLowerCase().replace(/\s+/g,'');
+    const tBaru = state.transactions.find(t=>t.id===cb.dataset.id);
+    const kBaru = kunci(tBaru);
+    const beda = Array.from(state.cetakSelection).some(id=>{ const t = state.transactions.find(x=>x.id===id); return t && kunci(t)!==kBaru; });
+    if(beda){
+      state.cetakSelection.clear();
+      document.querySelectorAll('#tbl-cetak-pilih .chk-cetak').forEach(x=>{ if(x!==cb) x.checked = false; });
+    }
+    state.cetakSelection.add(cb.dataset.id);
+  }
   else state.cetakSelection.delete(cb.dataset.id);
 });
 
@@ -10113,7 +10153,8 @@ document.getElementById('btn-cetak-sptjm-print').addEventListener('click', async
 document.getElementById('btn-cetak-print').addEventListener('click', async ()=>{
   const ids = Array.from(state.cetakSelection);
   if(ids.length===0){ alertFix('Pilih minimal satu transaksi untuk dicetak.'); return; }
-  const items = state.transactions.filter(t=>ids.includes(t.id));
+  const items = state.transactions.filter(t=>ids.includes(t.id) && (state.cetakDoc!=='lampiran' || t.lampiran));   // tab Lampiran hanya memuat transaksi bertanda Sertakan
+  if(items.length===0){ alertFix('Tidak ada transaksi terpilih yang cocok untuk dokumen ini.'); return; }
   if(['nota','bast','faktur','sp','bap'].includes(state.cetakDoc)) await isiNomorOtomatisBilaKosong('cetak-nomor');
 
   const docHeader = {
@@ -14676,7 +14717,7 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
         ada.add(k);
         const id = db.ref('transaksi_bku/'+npsn).push().key;
         /* penerimaan diberi createdAt lebih awal agar pada tanggal yang sama tampil SEBELUM pengeluaran (saldo tidak minus semu) */
-        updates[id] = { tanggal:r.tgl, kode:r.kegiatan||'', noBukti:r.bukti||'', kodeProgram:r.kegiatan||'', kodeRekening:r.rek||'', uraian:r.uraian, kualitas:'', satuan:'', jenis, kelompokBelanja:'', jumlah:jml, penerima:'', nipPenerima:'', jabatan:'', lampiran:false, jenisDana:jd, createdAt:Date.now()-(jenis==='penerimaan'?1:0) };
+        updates[id] = { tanggal:r.tgl, kode:r.kegiatan||'', noBukti:r.bukti||'', kodeProgram:r.kegiatan||'', kodeRekening:r.rek||'', uraian:r.uraian, kualitas:'', satuan:'', jenis, kelompokBelanja:(jenis==='pengeluaran' && window.kelompokDariTransaksi) ? kelompokDariTransaksi(r.rek, r.uraian, {noBukti:r.bukti, jumlah:jml}) : '', jumlah:jml, penerima:'', nipPenerima:'', jabatan:'', lampiran:false, jenisDana:jd, createdAt:Date.now()-(jenis==='penerimaan'?1:0) };
         tahapImpor[thp] = (tahapImpor[thp]||0)+1;
         if(jenis==='penerimaan'){ nT++; sT+=jml; } else { nK++; sK+=jml; }
       });
@@ -14836,6 +14877,10 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
     return Math.round(Math.max(0,sisaRp(it))/tr);
   }
   function kelompok(it){
+    const kt = window.kelompokDariTransaksi ? kelompokDariTransaksi(it.rek, it.uraian, {noBukti:($('tx-nobukti')||{}).value, kualitas:1, jumlah:it.tarif}) : '';   /* harga satuan = tarif RAPBS */
+    if(kt) return kt;
+    const kr = window.kelompokDariRekening ? kelompokDariRekening(it.rek, it.uraian) : '';   /* patokan: kode rekening */
+    if(kr) return kr;
     const k = window.RekonFill && RekonFill.classify ? RekonFill.classify(it) : '';
     if(String(it.rek).startsWith('5.2.')) return 'modal';
     if(k==='honor' || k==='kebersihan') return k;
@@ -15102,7 +15147,7 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
   }
   function itemsTerpilih(){
     const ids = Array.from(state.cetakSelection||[]);
-    return (state.transactions||[]).filter(t=>ids.includes(t.id));
+    return (state.transactions||[]).filter(t=>ids.includes(t.id) && (state.cetakDoc!=='lampiran' || t.lampiran));
   }
   function isiOpsiCetak(){
     const sel = selCetak(); if(!sel) return;
@@ -15251,6 +15296,405 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
   navigateTo = function(id){ asal.apply(this, arguments); if(id==='penyedia') render(); };
 
   window.PenyediaApp = { render, lengkapiHeader, penerimaKwitansiHtml, penerimaKwitansiBagian, untukTransaksi, daftar };
+})();
+</script>
+<script>
+/* Penanda menu aktif (tambahan): aria-current, penanda grup, dan gulir otomatis agar menu aktif selalu terlihat.
+   Hanya membungkus navigateTo; seluruh logika navigasi lama tetap berjalan seperti semula. */
+(function(){
+  function tandaiMenuAktif(id){
+    try{
+      document.querySelectorAll('.nav-btn[data-nav]').forEach(function(b){
+        var on = b.dataset.nav === id;
+        if(on) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
+      });
+      document.querySelectorAll('.jw-nav-group.jw-group-aktif').forEach(function(g){ g.classList.remove('jw-group-aktif'); });
+      document.querySelectorAll('.nav-btn[data-nav="'+id+'"]').forEach(function(b){
+        // header grup ada tepat sebelum item pertama grup; telusuri ke atas sampai ketemu
+        var h = b.previousElementSibling;
+        while(h && h.classList.contains('nav-btn')) h = h.previousElementSibling;
+        if(h && h.classList.contains('jw-nav-group')) h.classList.add('jw-group-aktif');
+      });
+      var sb = document.getElementById('sidebar-nav');
+      var aktif = sb && sb.querySelector('.nav-btn.active-nav');
+      if(aktif && aktif.scrollIntoView){
+        var aside = sb.closest('aside') || sb;
+        var r = aktif.getBoundingClientRect(), ra = aside.getBoundingClientRect();
+        if(r.top < ra.top + 8 || r.bottom > ra.bottom - 8) aktif.scrollIntoView({block:'center'});
+      }
+    }catch(e){}
+  }
+  var asalNav = navigateTo;
+  navigateTo = function(id){ var r = asalNav.apply(this, arguments); tandaiMenuAktif(id); return r; };
+})();
+</script>
+<script>
+/* Menu baru (tambahan): Penerimaan Dana, Manajemen Pajak, Mutasi Kas (Bank -> Tunai).
+   Memakai data yang sudah ada: transaksi_bku (penerimaan), buku_pajak (pajak), buku_bank; node baru: mutasi_kas/{npsn}. */
+(function(){
+  const NAVADD = [
+    { id:'penerimaan-dana', label:'Penerimaan Dana', title:'Penerimaan Dana BOSP ke Rekening Sekolah' },
+    { id:'manajemen-pajak', label:'Manajemen Pajak', title:'Manajemen Pajak (PPN, PPh 21, 22, 23)' },
+    { id:'mutasi-kas', label:'Mutasi Kas', title:'Mutasi Kas (Penarikan Bank ke Tunai)' }
+  ];
+  const lst = NAV.admin_sekolah, at = lst.findIndex(n=>n.id==='buku-pembantu');
+  if(!lst.some(n=>n.id==='penerimaan-dana')) lst.splice(at+1, 0, ...NAVADD);
+  NAV_ICONS['penerimaan-dana'] = '<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>';
+  NAV_ICONS['manajemen-pajak'] = '<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3z"/><path d="M9 14l6-6M9.5 8.5h.01M14.5 13.5h.01"/>';
+  NAV_ICONS['mutasi-kas'] = '<path d="M4 8h14l-3-3M20 16H6l3 3"/>';
+  ['penerimaan-dana','manajemen-pajak','mutasi-kas'].forEach(k=>NAV_GROUP_OF[k]='kas');
+
+  const el = id => document.getElementById(id);
+  const E = v => escapeHtml(String(v==null?'':v));
+  const npsn = () => state.userData && state.userData.npsn;
+  const today = () => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+  const INP = 'w-full rounded border border-navy-100 px-3 py-2 text-sm bg-white';
+  const LBL = 'block text-xs font-semibold text-navy-400 mb-1';
+  const CARD = 'bg-white rounded-lg border border-navy-100 p-5';
+  const BTN = 'bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2';
+  const stat = (t,v,c)=>`<div class="${CARD}"><div class="text-xs font-semibold uppercase ${c||'text-navy-400'}">${t}</div><div class="font-mono text-lg font-semibold mt-1 ${c||'text-navy'}">${v}</div></div>`;
+  const danaOpts = () => Object.keys(JENIS_DANA).map(k=>`<option value="${k}">${E(JENIS_DANA[k].label)}</option>`).join('');
+  const danaLbl = k => (JENIS_DANA[k||'reguler']||{}).label || k;
+  const kosong = (n,t)=>`<tr><td colspan="${n}" class="py-8 text-center text-navy-300 font-sans">${t}</td></tr>`;
+  let mutasi = [], mutasiNp = null;
+
+  /* ---------- 1. PENERIMAAN DANA ---------- */
+  function renderPenerimaan(){
+    const root = el('penerimaan-dana-root'); if(!root) return;
+    if(!root.dataset.built){
+      root.dataset.built='1';
+      root.innerHTML = `<div class="${CARD}"><h3 class="font-serif font-semibold text-navy mb-1">Catat Dana BOSP Masuk</h3>
+        <p class="text-xs text-navy-400 mb-4">Dana yang dicatat di sini otomatis masuk sebagai Penerimaan pada Buku Kas Umum dan menambah saldo.</p>
+        <div class="grid md:grid-cols-5 gap-3 items-end">
+          <div><label class="${LBL}">Tanggal diterima</label><input type="date" id="pd-tgl" class="${INP}"></div>
+          <div><label class="${LBL}">Jenis dana</label><select id="pd-dana" class="${INP}">${danaOpts()}</select></div>
+          <div class="md:col-span-2"><label class="${LBL}">Uraian</label><input id="pd-uraian" class="${INP}" placeholder="Penerimaan Dana BOSP Tahap I"></div>
+          <div><label class="${LBL}">Jumlah (Rp)</label><input type="number" min="0" id="pd-jml" class="${INP} font-mono"></div>
+        </div>
+        <div class="mt-3 flex items-end gap-3"><div class="flex-1"><label class="${LBL}">No. bukti / referensi rekening koran (opsional)</label><input id="pd-bukti" class="${INP}"></div>
+          <button id="pd-simpan" class="${BTN}">Simpan Penerimaan</button></div></div>
+        <div id="pd-stat" class="grid sm:grid-cols-3 gap-3"></div>
+        <div class="${CARD} overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100">
+          <th class="py-2 px-3">Tanggal</th><th class="py-2 px-3">Jenis Dana</th><th class="py-2 px-3">Uraian</th><th class="py-2 px-3">No. Bukti</th><th class="py-2 px-3 text-right">Jumlah</th><th class="py-2 px-3">Aksi</th></tr></thead>
+          <tbody id="pd-tbl" class="font-mono text-[13px]"></tbody></table></div>`;
+      el('pd-tgl').value = today();
+      el('pd-simpan').addEventListener('click', async ()=>{
+        const jumlah = Number(el('pd-jml').value)||0, tanggal = el('pd-tgl').value;
+        if(!tanggal || jumlah<=0){ alertFix('Isi tanggal dan jumlah dana yang diterima (harus lebih dari 0).'); return; }
+        const uraian = el('pd-uraian').value.trim() || 'Penerimaan Dana BOSP';
+        const payload = { tanggal, kode:'', noBukti:el('pd-bukti').value.trim(), kodeProgram:'', kodeRekening:'', uraian, kualitas:'', satuan:'', jenis:'penerimaan',
+          kelompokBelanja:'', jumlah, penerima:'', nipPenerima:'', jabatan:'', lampiran:false, jenisDana:el('pd-dana').value, createdAt:Date.now(), updatedAt:Date.now() };
+        try{
+          await db.ref('transaksi_bku/'+npsn()).push(payload);
+          logAudit('Penerimaan Dana','tambah',`Catat penerimaan ${formatTanggal(tanggal)} — ${uraian} (${fmtRupiah(jumlah)})`);
+          el('pd-jml').value=''; el('pd-uraian').value=''; el('pd-bukti').value='';
+        }catch(err){ alertFix('Gagal menyimpan: '+(err.message||'periksa koneksi internet.')); }
+      });
+      el('pd-tbl').addEventListener('click', async e=>{
+        const b = e.target.closest('button[data-hapus]'); if(!b) return;
+        const t = state.transactions.find(x=>x.id===b.dataset.hapus); if(!t) return;
+        if(!await confirmFix(`Hapus penerimaan "${t.uraian}" sebesar ${fmtRupiah(t.jumlah)}? Saldo BKU akan berkurang.`)) return;
+        try{ await db.ref('transaksi_bku/'+npsn()+'/'+t.id).remove(); logAudit('Penerimaan Dana','hapus',`Hapus penerimaan ${formatTanggal(t.tanggal)} — ${t.uraian} (${fmtRupiah(t.jumlah)})`); }
+        catch(err){ alertFix('Gagal menghapus: '+(err.message||'periksa koneksi.')); }
+      });
+    }
+    const rows = state.transactions.filter(t=>t.jenis==='penerimaan').slice().reverse();
+    const tot = rows.reduce((a,t)=>a+(Number(t.jumlah)||0),0);
+    const per = k=>rows.filter(t=>jenisDanaTransaksi(t)===k).reduce((a,t)=>a+(Number(t.jumlah)||0),0);
+    el('pd-stat').innerHTML = stat('Total Dana Masuk',fmtRupiah(tot),'text-forest') + Object.keys(JENIS_DANA).slice(0,2).map(k=>stat(JENIS_DANA[k].label,fmtRupiah(per(k)))).join('');
+    el('pd-tbl').innerHTML = rows.length ? rows.map(t=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(t.tanggal)}</td>
+      <td class="py-2 px-3 font-sans">${E(danaLbl(jenisDanaTransaksi(t)))}</td><td class="py-2 px-3 font-sans">${E(t.uraian)}</td><td class="py-2 px-3">${E(t.noBukti||'—')}</td>
+      <td class="py-2 px-3 text-right">${fmtRupiah(t.jumlah)}</td><td class="py-2 px-3"><button data-hapus="${E(t.id)}" class="text-xs font-semibold text-rust hover:underline font-sans">Hapus</button></td></tr>`).join('')
+      : kosong(6,'Belum ada dana yang dicatat.');
+  }
+
+  /* ---------- 2. MANAJEMEN PAJAK ---------- */
+  const JENIS_TRX = {
+    barang:{ l:'Pembelian barang (ATK, dll.)', p:[['PPN','ppn-pkp'],['PPh Pasal 22','22-barang']] },
+    jasa:{ l:'Jasa / katering / servis / sewa', p:[['PPN','ppn-pkp'],['PPh Pasal 23','23-jasa']] },
+    honor:{ l:'Honor narasumber / tenaga ahli (non-pegawai)', p:[['PPh Pasal 21','21-ahli']] },
+    asn3:{ l:'Honorarium ASN Gol. III', p:[['PPh Pasal 21','21-asn3']] },
+    asn4:{ l:'Honorarium ASN Gol. IV', p:[['PPh Pasal 21','21-asn4']] }
+  };
+  function hitungPajakMenu(){
+    const k = el('mp-trx').value, nilai = Number(el('mp-nilai').value)||0, npwp = el('mp-npwp').value, inc = el('mp-incl').checked;
+    const out = JENIS_TRX[k].p.map(([j,kd])=>{
+      const r = pajakHitung(j,kd,nilai,npwp,inc);
+      const nonPkp = j==='PPN' && el('mp-pkp').value==='tidak';
+      const jml = nonPkp ? 0 : r.jumlah;
+      return `<tr class="border-b border-navy-50"><td class="py-2 px-3 font-sans">${E(j)}</td><td class="py-2 px-3 text-right">${fmtRupiah(r.dpp)}</td><td class="py-2 px-3 text-right">${nonPkp?0:r.tarif}%</td>
+        <td class="py-2 px-3 text-right font-semibold">${fmtRupiah(jml)}</td><td class="py-2 px-3 font-sans text-xs text-navy-400">${nonPkp?'Rekanan non-PKP: PPN tidak dipungut.':(r.dipungut?E(r.skema.catatan):'Tidak dipungut (nilai di bawah ambang).')}</td></tr>`;
+    });
+    el('mp-hasil').innerHTML = out.join('');
+  }
+  function renderPajak(){
+    const root = el('manajemen-pajak-root'); if(!root) return;
+    if(!root.dataset.built){
+      root.dataset.built='1';
+      root.innerHTML = `<div id="mp-stat" class="grid sm:grid-cols-3 gap-3"></div>
+        <div class="${CARD}"><h3 class="font-serif font-semibold text-navy mb-1">Hitung Pajak Otomatis</h3>
+          <p class="text-xs text-navy-400 mb-4">Pilih jenis transaksi; PPN, PPh 21, 22, atau 23 yang berlaku dihitung otomatis (tarif sama dengan form Catatan Pajak).</p>
+          <div class="grid md:grid-cols-5 gap-3 items-end">
+            <div class="md:col-span-2"><label class="${LBL}">Jenis transaksi</label><select id="mp-trx" class="${INP}">${Object.keys(JENIS_TRX).map(k=>`<option value="${k}">${E(JENIS_TRX[k].l)}</option>`).join('')}</select></div>
+            <div><label class="${LBL}">Nilai transaksi (Rp)</label><input type="number" min="0" id="mp-nilai" class="${INP} font-mono"></div>
+            <div><label class="${LBL}">Status NPWP rekanan</label><select id="mp-npwp" class="${INP}"><option value="ada">Punya NPWP</option><option value="tanpa">Tanpa NPWP</option></select></div>
+            <div><label class="${LBL}">Rekanan PKP?</label><select id="mp-pkp" class="${INP}"><option value="ya">PKP</option><option value="tidak">Bukan PKP</option></select></div>
+          </div>
+          <label class="inline-flex items-center gap-2 text-sm mt-3"><input type="checkbox" id="mp-incl" class="accent-navy"> Nilai sudah termasuk PPN</label>
+          <div class="overflow-x-auto mt-3"><table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100"><th class="py-2 px-3">Pajak</th><th class="py-2 px-3 text-right">DPP</th><th class="py-2 px-3 text-right">Tarif</th><th class="py-2 px-3 text-right">Pajak</th><th class="py-2 px-3">Keterangan</th></tr></thead><tbody id="mp-hasil" class="font-mono text-[13px]"></tbody></table></div>
+          <div class="mt-3"><button id="mp-catat" class="${BTN}">+ Catat ke Buku Pajak (Kode Billing &amp; NTPN)</button></div></div>
+        <div class="${CARD} overflow-x-auto"><h3 class="font-serif font-semibold text-navy mb-3">Pajak Belum Disetor</h3>
+          <table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100"><th class="py-2 px-3">Tanggal</th><th class="py-2 px-3">Uraian</th><th class="py-2 px-3">Jenis</th><th class="py-2 px-3 text-right">Jumlah</th><th class="py-2 px-3">Kode Billing</th><th class="py-2 px-3">NTPN</th><th class="py-2 px-3">Aksi</th></tr></thead><tbody id="mp-tbl" class="font-mono text-[13px]"></tbody></table></div>
+        <div class="${CARD} overflow-x-auto"><h3 class="font-serif font-semibold text-navy mb-3">Rekap per Jenis Pajak</h3>
+          <table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100"><th class="py-2 px-3">Jenis</th><th class="py-2 px-3 text-right">Dipungut</th><th class="py-2 px-3 text-right">Sudah Disetor</th><th class="py-2 px-3 text-right">Belum Disetor</th></tr></thead><tbody id="mp-rekap" class="font-mono text-[13px]"></tbody></table></div>`;
+      ['mp-trx','mp-nilai','mp-npwp','mp-pkp','mp-incl'].forEach(i=>el(i).addEventListener('input',hitungPajakMenu));
+      el('mp-catat').addEventListener('click',()=>openPajakModal(null));
+      el('mp-tbl').addEventListener('click',e=>{ const b=e.target.closest('button[data-id]'); if(b) openPajakModal(b.dataset.id); });
+      hitungPajakMenu();
+    }
+    const arr = state.bukuPajak||[], n = x=>Number(x.jumlah)||0, sdh = x=>x.status==='sudah';
+    const tot = arr.reduce((a,x)=>a+n(x),0), set = arr.filter(sdh).reduce((a,x)=>a+n(x),0);
+    el('mp-stat').innerHTML = stat('Total Pajak Dipungut',fmtRupiah(tot)) + stat('Sudah Disetor',fmtRupiah(set),'text-forest') + stat('Belum Disetor',fmtRupiah(tot-set),'text-rust');
+    const bel = arr.filter(x=>!sdh(x));
+    el('mp-tbl').innerHTML = bel.length ? bel.map(x=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(x.tanggal)}</td><td class="py-2 px-3 font-sans">${E(x.uraian)}</td><td class="py-2 px-3 font-sans">${E(x.jenisPajak)}</td><td class="py-2 px-3 text-right">${fmtRupiah(x.jumlah)}</td><td class="py-2 px-3">${E(x.kodeBilling||'—')}</td><td class="py-2 px-3">${E(x.ntpn||'—')}</td><td class="py-2 px-3"><button data-id="${E(x.id)}" class="text-xs font-semibold text-navy hover:underline font-sans">Isi Billing / NTPN</button></td></tr>`).join('') : kosong(7,'Semua pajak sudah disetor.');
+    const jn = [...new Set(arr.map(x=>x.jenisPajak||'Lainnya'))];
+    el('mp-rekap').innerHTML = jn.length ? jn.map(j=>{ const a=arr.filter(x=>(x.jenisPajak||'Lainnya')===j), t=a.reduce((s,x)=>s+n(x),0), d=a.filter(sdh).reduce((s,x)=>s+n(x),0);
+      return `<tr class="border-b border-navy-50"><td class="py-2 px-3 font-sans">${E(j)}</td><td class="py-2 px-3 text-right">${fmtRupiah(t)}</td><td class="py-2 px-3 text-right">${fmtRupiah(d)}</td><td class="py-2 px-3 text-right">${fmtRupiah(t-d)}</td></tr>`; }).join('') : kosong(4,'Belum ada catatan pajak.');
+  }
+
+  /* ---------- 3. MUTASI KAS (Bank -> Tunai) ---------- */
+  function renderMutasi(){
+    const root = el('mutasi-kas-root'); if(!root) return;
+    if(!root.dataset.built){
+      root.dataset.built='1';
+      root.innerHTML = `<div class="${CARD}"><h3 class="font-serif font-semibold text-navy mb-1">Catat Penarikan Tunai dari Bank</h3>
+        <p class="text-xs text-navy-400 mb-4">Memindahkan dana dari rekening bank ke kas tunai bendahara. Tidak mengubah total saldo BKU; otomatis dicatat juga sebagai penarikan di Buku Pembantu Bank.</p>
+        <div class="grid md:grid-cols-4 gap-3 items-end">
+          <div><label class="${LBL}">Tanggal penarikan</label><input type="date" id="mk-tgl" class="${INP}"></div>
+          <div><label class="${LBL}">Jumlah (Rp)</label><input type="number" min="0" id="mk-jml" class="${INP} font-mono"></div>
+          <div><label class="${LBL}">No. cek / bukti</label><input id="mk-bukti" class="${INP}"></div>
+          <div><label class="${LBL}">Keperluan</label><input id="mk-ket" class="${INP}" placeholder="Penarikan tunai untuk belanja"></div>
+        </div><div class="mt-3"><button id="mk-simpan" class="${BTN}">Simpan Mutasi</button></div></div>
+        <div id="mk-stat" class="grid sm:grid-cols-2 gap-3"></div>
+        <div class="${CARD} overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100"><th class="py-2 px-3">Tanggal</th><th class="py-2 px-3">No. Bukti</th><th class="py-2 px-3">Keperluan</th><th class="py-2 px-3 text-right">Jumlah</th><th class="py-2 px-3">Aksi</th></tr></thead><tbody id="mk-tbl" class="font-mono text-[13px]"></tbody></table></div>`;
+      el('mk-tgl').value = today();
+      el('mk-simpan').addEventListener('click', async ()=>{
+        const jumlah=Number(el('mk-jml').value)||0, tanggal=el('mk-tgl').value;
+        if(!tanggal || jumlah<=0){ alertFix('Isi tanggal dan jumlah penarikan (harus lebih dari 0).'); return; }
+        const ket = el('mk-ket').value.trim() || 'Penarikan tunai dari bank ke kas tunai';
+        try{
+          const bank = await db.ref('buku_bank/'+npsn()).push({ tanggal, uraian:ket+' (Mutasi Kas)', noRekening:'', jenis:'keluar', jumlah, updatedAt:Date.now() });
+          await db.ref('mutasi_kas/'+npsn()).push({ tanggal, jumlah, noBukti:el('mk-bukti').value.trim(), keterangan:ket, bankId:bank.key, createdAt:Date.now() });
+          logAudit('Mutasi Kas','tambah',`Tarik tunai ${formatTanggal(tanggal)} — ${ket} (${fmtRupiah(jumlah)})`);
+          el('mk-jml').value=''; el('mk-bukti').value=''; el('mk-ket').value='';
+        }catch(err){ alertFix('Gagal menyimpan mutasi: '+(err.message||'periksa koneksi internet / izin database.')); }
+      });
+      el('mk-tbl').addEventListener('click', async e=>{
+        const b=e.target.closest('button[data-hapus]'); if(!b) return;
+        const m=mutasi.find(x=>x.id===b.dataset.hapus); if(!m) return;
+        if(!await confirmFix(`Hapus mutasi ${fmtRupiah(m.jumlah)} tanggal ${formatTanggal(m.tanggal)}? Catatan penarikan di Buku Pembantu Bank ikut dihapus.`)) return;
+        try{ if(m.bankId) await db.ref('buku_bank/'+npsn()+'/'+m.bankId).remove(); await db.ref('mutasi_kas/'+npsn()+'/'+m.id).remove();
+          logAudit('Mutasi Kas','hapus',`Hapus mutasi ${formatTanggal(m.tanggal)} (${fmtRupiah(m.jumlah)})`);
+        }catch(err){ alertFix('Gagal menghapus: '+(err.message||'periksa koneksi.')); }
+      });
+    }
+    const tot = mutasi.reduce((a,m)=>a+(Number(m.jumlah)||0),0), bln = today().slice(0,7);
+    el('mk-stat').innerHTML = stat('Total Ditarik ke Tunai',fmtRupiah(tot)) + stat('Ditarik Bulan Ini',fmtRupiah(mutasi.filter(m=>(m.tanggal||'').startsWith(bln)).reduce((a,m)=>a+(Number(m.jumlah)||0),0)));
+    el('mk-tbl').innerHTML = mutasi.length ? mutasi.slice().reverse().map(m=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(m.tanggal)}</td><td class="py-2 px-3">${E(m.noBukti||'—')}</td><td class="py-2 px-3 font-sans">${E(m.keterangan)}</td><td class="py-2 px-3 text-right">${fmtRupiah(m.jumlah)}</td><td class="py-2 px-3"><button data-hapus="${E(m.id)}" class="text-xs font-semibold text-rust hover:underline font-sans">Hapus</button></td></tr>`).join('') : kosong(5,'Belum ada mutasi kas.');
+  }
+  function pantauMutasi(){
+    const np = npsn(); if(!np || mutasiNp===np) return;
+    mutasiNp = np;
+    db.ref('mutasi_kas/'+np).on('value', snap=>{
+      mutasi = Object.entries(snap.val()||{}).map(([id,t])=>({id,...t})).sort((a,b)=>(a.tanggal||'').localeCompare(b.tanggal||'')||(a.createdAt||0)-(b.createdAt||0));
+      if(state.currentView==='mutasi-kas') renderMutasi();
+    }, err=>console.error('mutasi_kas:',err));
+    /* render ulang bila data transaksi / pajak berubah (listener bawaan tidak mengenal menu ini) */
+    db.ref('transaksi_bku/'+np).on('value', ()=>{ if(state.currentView==='penerimaan-dana') renderPenerimaan(); });
+    db.ref('buku_pajak/'+np).on('value', ()=>{ if(state.currentView==='manajemen-pajak') setTimeout(renderPajak,0); });
+  }
+  const asalMenu = navigateTo;
+  navigateTo = function(id){
+    const r = asalMenu.apply(this, arguments);
+    try{
+      if(id==='penerimaan-dana'||id==='manajemen-pajak'||id==='mutasi-kas') pantauMutasi();
+      if(id==='penerimaan-dana') renderPenerimaan();
+      if(id==='manajemen-pajak') renderPajak();
+      if(id==='mutasi-kas') renderMutasi();
+    }catch(e){ console.error(e); }
+    return r;
+  };
+})();
+</script>
+<script>
+/* Kelompok Belanja otomatis (tambahan): kelompok diisi dari kata kunci pada Uraian transaksi BKU.
+   Urutan aturan penting: yang lebih spesifik dicek lebih dulu (mis. "honor kegiatan" -> Honor, bukan Jasa). */
+(function(){
+  const ATURAN = [
+    ['perangko',    /\b(materai|meterai|perangko|benda pos)\b/],
+    ['honor',       /\b(honor|honorarium|narasumber|insentif|upah|gaji)\b/],
+    ['jasa',        /\b(jasa|servis|service|sewa|perbaikan|langganan)\b/],
+    ['modal',       /\b(belanja modal|laptop|komputer|notebook|printer|proyektor|lcd|lemari|almari|meja|kursi|rak|kipas angin|ac|tablet|kamera|speaker|sound system|televisi|tv)\b/],
+    ['kebersihan',  /\b(kebersihan|sapu|pel|pembersih|sabun|deterjen|pewangi|tisu|tissue|kemoceng|ember|tempat sampah|hand sanitizer|disinfektan|karbol)\b/],
+    ['rumahtangga', /\b(rumah tangga|gelas|piring|sendok|teko|dispenser|taplak|gorden|tikar|karpet|lampu|bohlam|panci|jam dinding)\b/],
+    ['atk',         /\b(atk|alat tulis|kertas|pulpen|pensil|bolpoin|bolpen|spidol|buku|map|stapler|staples|tinta|toner|penghapus|penggaris|lem|isolasi|amplop|folio|hvs|binder|klip|tip-?x|cartridge)\b/],
+    ['jasa',        /\b(kegiatan|makan|minum|snack|konsumsi|uang harian|transport|transportasi|perjalanan dinas|akomodasi|penginapan|pulsa|internet|listrik)\b/]
+  ];
+  window.kelompokDariUraian = function(uraian){
+    const u = String(uraian||'').toLowerCase();
+    if(!u.trim()) return '';
+    for(const [k,re] of ATURAN) if(re.test(u)) return k;
+    return '';
+  };
+  /* Pengelompokan menurut KODE REKENING (acuan: RKA Unit 2.2.1 SDK Jong). Kode rekening didahulukan, uraian sebagai cadangan.
+     5.2.xx                  Belanja Modal            -> modal
+     5.1.02.02 Belanja Jasa                           -> jasa (honor bila uraian honor/narasumber)
+     5.1.02.03 Pemeliharaan                           -> jasa
+     5.1.02.04 Perjalanan Dinas                       -> jasa
+     5.1.02.01 Alat/Bahan Kegiatan Kantor, per item (4 digit terakhir):
+        0024 Alat Tulis, 0025 Kertas & Cover, 0026 Cetak & Penggandaan -> atk, 0027 Benda Pos -> perangko
+        0030 Perabot Kantor (ember, tong sampah, keset) -> kebersihan;  0055 Makanan & Minuman -> jasa */
+  const ITEM_KANTOR = { '0024':'atk', '0025':'atk', '0026':'atk', '0027':'perangko', '0030':'kebersihan', '0055':'jasa' };
+  window.kelompokDariRekening = function(rek, uraian){
+    const r = String(rek||'').replace(/\s+/g,'');
+    const m = r.match(/^(5\.\d+\.\d+\.\d+)/) || r.match(/^(5\.2\.\d+)/);
+    if(!m) return '';
+    const a = m[1], item = (r.match(/(\d{4})\.?$/)||[])[1] || '';
+    if(a.startsWith('5.2.')) return 'modal';
+    if(a==='5.1.02.02') return ATURAN[0][1].test(String(uraian||'').toLowerCase()) ? 'honor' : 'jasa';
+    if(a==='5.1.02.03' || a==='5.1.02.04') return 'jasa';
+    if(a==='5.1.02.01') return ITEM_KANTOR[item] || kelompokDariUraian(uraian) || 'atk';
+    return '';
+  };
+  /* ===== ATURAN TEGAS (urutan prioritas, mengalahkan kode rekening & kata kunci biasa) =====
+     1. No. Bukti berkode BNU                              -> Belanja Modal
+     2. Uraian memuat materai/meterai/perangko             -> Belanja Perangko
+     3. Uraian memuat foto copy / fotokopi / jilid / pulsa -> Belanja Jasa
+     4. Harga satuan BARANG >= Rp1.000.000                 -> Belanja Modal
+        (harga satuan = Jumlah / Kualitas; hanya dihitung bila Kualitas terisi. Kode rekening
+         jasa/pemeliharaan/perjalanan dinas 5.1.02.02-04 dan uraian jasa/honor/perjalanan/konsumsi
+         tidak ikut aturan ini karena bukan barang.) */
+  const HARGA_SATUAN_MODAL = 1000000;
+  const toNum = v => { if(typeof v==='number') return v; const t=String(v==null?'':v).trim().replace(/\./g,'').replace(',','.'); const n=parseFloat(t); return isFinite(n)?n:0; };
+  /* Info harga satuan barang: known=true bila Kualitas & Jumlah terisi dan item adalah BARANG (bukan jasa/honor/perjalanan/konsumsi) */
+  window.infoHargaSatuan = function(rek, uraian, extra){
+    extra = extra || {};
+    const u = String(uraian||'').toLowerCase();
+    const r = String(rek||'').replace(/\s+/g,'');
+    const qty = toNum(extra.kualitas), jml = toNum(extra.jumlah);
+    const bukanBarang = /^5\.1\.02\.0[234]\b/.test(r) || /\b(jasa|honor|narasumber|juri|transport|transportasi|perjalanan|uang harian|makan|minum|konsumsi|dapodik|transaksi keuangan|sewa|langganan)\b/.test(u);
+    if(bukanBarang || !(qty>0) || !(jml>0)) return {known:false, harga:0};
+    return {known:true, harga:jml/qty};
+  };
+  const adaBNU = (extra, uraian) => /(^|[^a-z])bnu(?![a-z])/i.test(String((extra&&extra.noBukti)||'')) || /(^|[^a-z])bnu(?![a-z])/i.test(String(uraian||''));
+  window.kelompokAturanTegas = function(rek, uraian, extra){
+    extra = extra || {};
+    const u = String(uraian||'').toLowerCase();
+    if(adaBNU(extra, uraian)) return 'modal';
+    if(/\b(materai|meterai|perangko)\b/.test(u)) return 'perangko';
+    if(/foto\s?copy|fotocopy|photo\s?copy|foto\s?kopi|fotokopi|jilid|pulsa/.test(u)) return 'jasa';
+    const h = infoHargaSatuan(rek, uraian, extra);
+    if(h.known && h.harga >= HARGA_SATUAN_MODAL) return 'modal';
+    return '';
+  };
+  /* Harga satuan barang di bawah Rp1.000.000 (dan bukan BNU) -> BUKAN modal, walau kode rekeningnya 5.2.xx atau uraiannya laptop dsb. */
+  window.kelompokDariTransaksi = function(rek, uraian, extra){
+    const t = kelompokAturanTegas(rek, uraian, extra);
+    if(t) return t;
+    const h = infoHargaSatuan(rek, uraian, extra);
+    let k = kelompokDariRekening(rek, uraian) || kelompokDariUraian(uraian);
+    if(h.known && h.harga < HARGA_SATUAN_MODAL && k==='modal'){
+      const u = String(uraian||'').toLowerCase();
+      k = '';
+      for(const [kk,re] of ATURAN){ if(kk!=='modal' && re.test(u)){ k = kk; break; } }
+      if(!k) k = 'atk';
+    }
+    return k;
+  };
+  /* True bila transaksi ini tercatat Modal padahal harga satuan barang < Rp1.000.000 dan bukan BNU (dipakai tombol perbaikan) */
+  window.kelompokModalSalah = function(rek, uraian, extra){
+    const h = infoHargaSatuan(rek, uraian, extra);
+    return h.known && h.harga < HARGA_SATUAN_MODAL && !adaBNU(extra, uraian);
+  };
+
+  const el = id => document.getElementById(id);
+  const sel = el('tx-kelompok-belanja'), ura = el('tx-uraian'), jen = el('tx-jenis'), modal = el('modal-transaksi'), rekEl = el('tx-koderekening');
+  if(!sel || !ura) return;
+  const hint = document.createElement('p');
+  hint.className = 'text-[11px] mt-1 text-forest hidden';
+  sel.parentNode.appendChild(hint);
+  const labelOf = k => { const o=[...sel.options].find(x=>x.value===k); return o?o.textContent:k; };
+
+  function terapkan(){
+    if(sel.dataset.manual==='1') return;                       // pilihan manual pengguna tidak ditimpa
+    if(sel.value && sel.dataset.auto!=='1') return;           // sudah terisi dari sumber lain (RAPBS / data tersimpan)
+    const k = jen.value==='pengeluaran' ? kelompokDariTransaksi(rekEl ? rekEl.value : '', ura.value, {noBukti:el('tx-nobukti').value, kualitas:el('tx-kualitas').value, jumlah:el('tx-jumlah').value}) : '';
+    if(k){ sel.value = k; sel.dataset.auto='1'; hint.textContent = 'Terisi otomatis dari kode rekening/uraian: '+labelOf(k)+' (bisa diubah)'; hint.classList.remove('hidden'); }
+    else { if(sel.dataset.auto==='1') sel.value=''; sel.dataset.auto=''; hint.classList.add('hidden'); }
+  }
+  ura.addEventListener('input', terapkan);
+  if(rekEl) rekEl.addEventListener('input', terapkan);
+  ['tx-nobukti','tx-kualitas','tx-jumlah'].forEach(i=>{ const e=el(i); if(e) e.addEventListener('input', terapkan); });
+  jen.addEventListener('change', terapkan);
+  sel.addEventListener('change', e=>{ if(e.isTrusted){ sel.dataset.manual='1'; sel.dataset.auto=''; hint.classList.add('hidden'); } });
+  if(modal) new MutationObserver(()=>{
+    if(modal.classList.contains('hidden')) return;
+    sel.dataset.auto=''; hint.classList.add('hidden');
+    sel.dataset.manual = sel.value ? '1' : '';                 // transaksi yang sudah punya kelompok dianggap final
+    terapkan();
+  }).observe(modal,{attributes:true, attributeFilter:['class']});
+
+  /* Tombol massal: isi kelompok untuk transaksi pengeluaran lama / hasil impor yang kelompoknya masih kosong */
+  const tambah = el('btn-tambah-transaksi');
+  if(tambah){
+    const b = document.createElement('button');
+    b.type='button'; b.id='btn-kelompok-otomatis';
+    b.className = 'bg-white border border-navy-200 text-navy hover:bg-paper text-sm font-semibold rounded px-4 py-2 mr-2 no-print';
+    b.textContent = 'Isi Kelompok Otomatis';
+    b.title = 'Isi Kelompok Belanja yang masih kosong berdasarkan kode rekening / kata kunci uraian';
+    tambah.parentNode.insertBefore(b, tambah);
+    b.addEventListener('click', async ()=>{
+      const kandidat = (state.transactions||[]).map(t=>({t, k:(t.jenis==='pengeluaran' && !t.kelompokBelanja) ? kelompokDariTransaksi(t.kodeRekening, t.uraian, {noBukti:t.noBukti, kualitas:t.kualitas, jumlah:t.jumlah}) : ''})).filter(x=>x.k);
+      if(!kandidat.length){ alertFix('Tidak ada transaksi pengeluaran dengan kelompok kosong yang cocok dengan kata kunci.'); return; }
+      const ringkas = {}; kandidat.forEach(x=>ringkas[x.k]=(ringkas[x.k]||0)+1);
+      const teks = Object.keys(ringkas).map(k=>labelOf(k)+': '+ringkas[k]).join(', ');
+      if(!await confirmFix(`Isi Kelompok Belanja otomatis untuk ${kandidat.length} transaksi? (${teks}). Transaksi yang sudah punya kelompok tidak diubah.`)) return;
+      const up = {}; kandidat.forEach(x=>{ up[x.t.id+'/kelompokBelanja'] = x.k; });
+      try{
+        await db.ref('transaksi_bku/'+state.userData.npsn).update(up);
+        logAudit('Buku Kas Umum','ubah',`Isi otomatis Kelompok Belanja untuk ${kandidat.length} transaksi`);
+      }catch(err){ alertFix('Gagal menyimpan: '+(err.message||'periksa koneksi internet.')); }
+    });
+  }
+
+  /* Tombol: terapkan 4 aturan tegas ke SEMUA transaksi pengeluaran (termasuk yang sudah punya kelompok) */
+  const tambah2 = el('btn-tambah-transaksi');
+  if(tambah2){
+    const b2 = document.createElement('button');
+    b2.type='button'; b2.id='btn-kelompok-aturan';
+    b2.className = 'bg-white border border-navy-200 text-navy hover:bg-paper text-sm font-semibold rounded px-4 py-2 mr-2 no-print';
+    b2.textContent = 'Perbaiki Kelompok (Aturan Baru)';
+    b2.title = 'Terapkan aturan: BNU/harga satuan >= Rp1.000.000 = Modal (di bawahnya bukan Modal); foto copy/jilid/pulsa = Jasa; materai = Perangko';
+    tambah2.parentNode.insertBefore(b2, tambah2);
+    b2.addEventListener('click', async ()=>{
+      const kandidat = (state.transactions||[]).map(t=>{
+        if(t.jenis!=='pengeluaran') return {t,k:''};
+        const ex = {noBukti:t.noBukti, kualitas:t.kualitas, jumlah:t.jumlah};
+        let k = kelompokAturanTegas(t.kodeRekening, t.uraian, ex);
+        if(!k && t.kelompokBelanja==='modal' && kelompokModalSalah(t.kodeRekening, t.uraian, ex)) k = kelompokDariTransaksi(t.kodeRekening, t.uraian, ex);
+        return {t,k};
+      }).filter(x=>x.k && x.k!==x.t.kelompokBelanja);
+      if(!kandidat.length){ alertFix('Semua transaksi sudah sesuai aturan baru, tidak ada yang perlu diperbaiki.'); return; }
+      const ringkas = {}; kandidat.forEach(x=>ringkas[x.k]=(ringkas[x.k]||0)+1);
+      const teks = Object.keys(ringkas).map(k=>labelOf(k)+': '+ringkas[k]).join(', ');
+      if(!await confirmFix(`Ubah Kelompok Belanja ${kandidat.length} transaksi sesuai aturan baru? (${teks}). Pilihan manual sebelumnya pada transaksi tersebut akan diganti.`)) return;
+      const up = {}; kandidat.forEach(x=>{ up[x.t.id+'/kelompokBelanja'] = x.k; });
+      try{
+        await db.ref('transaksi_bku/'+state.userData.npsn).update(up);
+        logAudit('Buku Kas Umum','ubah',`Perbaiki Kelompok Belanja (aturan baru) untuk ${kandidat.length} transaksi`);
+      }catch(err){ alertFix('Gagal menyimpan: '+(err.message||'periksa koneksi internet.')); }
+    });
+  }
 })();
 </script>
 </body>
