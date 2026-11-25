@@ -239,6 +239,17 @@
   #page-cetak .cx-btn-print{ font-size:12.5px; padding:9px 14px; border-radius:11px; gap:8px; }
   #page-cetak .cx-btn-print svg{ width:15px; height:15px; }
   @media (max-width:640px){ #page-cetak .cx-hero h2{ font-size:17px; } #page-cetak .cx-hero{ padding:12px 14px; } #page-cetak .cx-tiles{ grid-template-columns:repeat(3,1fr); width:100%; } }
+  /* Tab grup dokumen cetak: hanya satu grup tampil sekaligus */
+  .cx-grp-tabs{ display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 12px; }
+  .cx-grp-tab{ padding:8px 16px; font-size:13px; font-weight:600; border-radius:999px; border:1.5px solid var(--line); background:#fff; color:inherit; cursor:pointer; }
+  .cx-grp-tab.aktif{ background:rgb(var(--navy-500)); border-color:transparent; color:#fff; }
+  #cx-doc-groups .cx-sub-title{ display:none; }
+  #cx-doc-groups[data-grp="t"] .cx-grp:not([data-g="t"]),
+  #cx-doc-groups[data-grp="l"] .cx-grp:not([data-g="l"]),
+  #cx-doc-groups[data-grp="s"] .cx-grp:not([data-g="s"]){ display:none; }
+  html[data-theme="dark"] .cx-grp-tab:not(.aktif){ background:var(--d-surface); border-color:var(--d-line); }
+  /* Banner judul otomatis di setiap menu disembunyikan (kecuali hero khusus Pusat Cetak Dokumen) */
+  .cx-hero[data-auto]{ display:none !important; }
   /* Pemilih jenis dokumen cetak kini berupa dropdown; deretan tombol tab disembunyikan */
   #cetak-tabs .cetak-tab{ display:none; }
   #cetak-tabs:not(:has(#cetak-gabung-wrap:not(.hidden))){ display:none; }
@@ -407,6 +418,11 @@
 .bkb-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 @media(max-width:900px){.bkb-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:640px){.bkb-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bkb-klik{cursor:pointer;transition:box-shadow .15s,transform .15s,outline-color .15s;outline:2px solid transparent;outline-offset:-2px}
+.bkb-klik:hover{box-shadow:0 4px 12px rgba(20,30,60,.18);transform:translateY(-1px)}
+.bkb-klik:focus-visible{outline-color:#3F8CC8}
+.bkb-sel{outline:2px solid #1F4A73;box-shadow:0 4px 14px rgba(31,74,115,.28)}
+html[data-theme="dark"] .bkb-sel{outline-color:#7FB3E6}
 .bkb-month{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(20,30,60,.10);padding:16px 10px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .bkb-mname{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600;color:#1f2a44}
 .bkb-mname svg{color:#2e9b57}
@@ -1783,32 +1799,48 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
             <div class="bkb-body">
               <div id="bkb-grid" class="bkb-grid"></div>
               <div class="bkb-foot no-print">
+                <button id="bkb-semua-bulan" type="button" class="bkb-link hidden" style="margin-right:14px">Tampilkan semua bulan</button>
                 <button id="bkb-refresh" type="button" class="bkb-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg><span id="bkb-refresh-label">Perbarui Data BKU</span></button>
               </div>
             </div>
             <div id="bkb-prev" class="bkb-prev"></div>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2 justify-between no-print">
-            <div class="flex flex-wrap gap-2">
-              <button id="btn-tambah-transaksi" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2">+ Transaksi</button>
-              <label class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2 cursor-pointer">
-                Import Data<input type="file" id="input-import-csv" accept=".csv,.xlsx,.xls" class="hidden">
-              </label>
-              <label id="lbl-import-bku-pdf" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2 cursor-pointer" title="Baca langsung PDF Buku Kas Umum dari aplikasi RKAS/ARKAS">
-                Import BKU (PDF)<input type="file" id="input-import-bku-pdf" accept="application/pdf,.pdf" multiple class="hidden">
-              </label>
-              <button id="btn-unduh-template" class="bg-white border border-navy-200 text-navy-400 text-sm font-semibold rounded px-4 py-2">Unduh Template</button>
-              <button id="btn-reset-bku" class="bg-white border border-rust text-rust text-sm font-semibold rounded px-4 py-2">Reset Data</button>
+          <div id="bk-toolbar" class="flex flex-wrap items-center gap-2 no-print">
+            <button id="btn-tambah-transaksi" class="bg-navy hover:bg-navy-600 text-white text-sm font-semibold rounded px-4 py-2">+ Transaksi</button>
+
+            <div class="bk-dd" style="position:relative">
+              <button type="button" class="bk-dd-btn bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2" aria-haspopup="true">Import &#9662;</button>
+              <div class="bk-dd-menu hidden bg-white border border-navy-200 rounded shadow-lg" style="position:absolute;left:0;top:100%;margin-top:4px;min-width:230px;z-index:40;padding:4px 0">
+                <label class="bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer">
+                  Import Data (Excel / CSV)<input type="file" id="input-import-csv" accept=".csv,.xlsx,.xls" class="hidden">
+                </label>
+                <label id="lbl-import-bku-pdf" class="bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer" title="Baca langsung PDF Buku Kas Umum dari aplikasi RKAS/ARKAS">
+                  Import BKU (PDF dari ARKAS)<input type="file" id="input-import-bku-pdf" accept="application/pdf,.pdf" multiple class="hidden">
+                </label>
+                <button id="btn-unduh-template" type="button" class="bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer" style="color:rgb(var(--navy-400))">Unduh Template</button>
+              </div>
             </div>
-            <div class="flex flex-wrap gap-2">
-              <button id="btn-export-csv" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">Export CSV</button>
-              <button id="btn-export-xlsx" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">Export Excel</button>
-              <button id="btn-export-pdf" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">Export PDF</button>
+
+            <div class="bk-dd" style="position:relative">
+              <button type="button" class="bk-dd-btn bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2" aria-haspopup="true">Export &#9662;</button>
+              <div class="bk-dd-menu hidden bg-white border border-navy-200 rounded shadow-lg" style="position:absolute;left:0;top:100%;margin-top:4px;min-width:170px;z-index:40;padding:4px 0">
+                <button id="btn-export-csv" type="button" class="bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer">Export CSV</button>
+                <button id="btn-export-xlsx" type="button" class="bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer">Export Excel</button>
+                <button id="btn-export-pdf" type="button" class="bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer">Export PDF</button>
+              </div>
+            </div>
+
+            <div class="bk-dd ml-auto" style="position:relative">
+              <button type="button" class="bk-dd-btn bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2" aria-haspopup="true" title="Alat perbaikan data">Lainnya &#9662;</button>
+              <div id="bk-menu-lainnya" class="bk-dd-menu hidden bg-white border border-navy-200 rounded shadow-lg" style="position:absolute;right:0;top:100%;margin-top:4px;min-width:260px;z-index:40;padding:4px 0">
+                <div id="bk-lainnya-sisip" style="border-top:1px solid rgb(var(--navy-100));margin:4px 0"></div>
+                <button id="btn-reset-bku" type="button" class="bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-rust hover:bg-rust-100 cursor-pointer">Reset Data</button>
+              </div>
             </div>
           </div>
           <div id="import-feedback" class="hidden text-sm rounded px-3 py-2 no-print"></div>
-          <p class="text-xs text-navy-300 no-print">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT/Perangko), Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Kolom Kategori Belanja bersifat opsional (boleh dikosongkan) dan tidak memengaruhi import file lama tanpa kolom ini. Semua baris yang diimpor otomatis masuk ke bagian Jenis Dana BOSP yang sedang aktif di atas — pindah tab Jenis Dana terlebih dahulu bila file berisi data jenis dana lain. Klik "Unduh Template" untuk contoh filenya. Untuk PDF Buku Kas Umum dari aplikasi RKAS/ARKAS, klik "Import BKU (PDF)" — penerimaan &amp; pengeluaran dibaca otomatis (baris saldo awal dilewati, transaksi yang sudah ada tidak digandakan).</p>
+          <details class="text-xs text-navy-300 no-print"><summary class="cursor-pointer font-semibold">Petunjuk format import/export</summary><p class="mt-1">Format kolom import/export (CSV atau Excel): Tanggal, Kode Kegiatan, No. Bukti/BKU, Kode Program, Kode Rekening, Uraian, Kualitas, Satuan, Jenis Transaksi, Kategori Belanja (ATK/Jasa/Modal/Honor/Kebersihan/Alat RT/Perangko), Jumlah (Rp), Nama Penerima, NIP Penerima — sama seperti form "+ Transaksi". Kolom Kategori Belanja bersifat opsional (boleh dikosongkan) dan tidak memengaruhi import file lama tanpa kolom ini. Semua baris yang diimpor otomatis masuk ke bagian Jenis Dana BOSP yang sedang aktif di atas — pindah tab Jenis Dana terlebih dahulu bila file berisi data jenis dana lain. Klik "Unduh Template" untuk contoh filenya. Untuk PDF Buku Kas Umum dari aplikasi RKAS/ARKAS, klik "Import BKU (PDF)" — penerimaan &amp; pengeluaran dibaca otomatis (baris saldo awal dilewati, transaksi yang sudah ada tidak digandakan).</p></details>
           <div class="bg-white rounded-lg border border-navy-100 overflow-hidden">
             <div id="bku-cari-bar" class="no-print flex flex-wrap items-center gap-3 px-4 py-3 border-b border-navy-100">
               <div class="relative flex-1 min-w-[220px] max-w-xl">
@@ -2112,15 +2144,22 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
             </div>
             <div class="cx-sec">
               <p class="cx-step"><i>3</i>Pilih Dokumen <small>dokumen transaksi mengikuti dana, tahap &amp; bulan di atas</small></p>
-              <p class="cx-sub-title cx-g-t"><span></span>Dokumen Transaksi</p>
+              <div class="cx-grp-tabs" role="tablist">
+                <button type="button" data-cxgrp="t" class="cx-grp-tab">Dokumen Transaksi</button>
+                <button type="button" data-cxgrp="l" class="cx-grp-tab">Laporan</button>
+                <button type="button" data-cxgrp="s" class="cx-grp-tab">SK &amp; Surat</button>
+              </div>
+              <div id="cx-doc-groups" data-grp="t">
+              <div class="cx-grp" data-g="t"><p class="cx-sub-title cx-g-t"><span></span>Dokumen Transaksi</p>
               <div class="cx-docs"><button type="button" data-cxdoc="kwitansi" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3zM9 8h6M9 12h6"/></svg></span><span class="cx-dt"><b>Kwitansi</b><em>Bukti pembayaran per transaksi</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="nota" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"/></svg></span><span class="cx-dt"><b>Nota Pesan</b><em>Pemesanan barang & jasa</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="bast" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11l4 4 5-5M4 4h16v16H4z"/></svg></span><span class="cx-dt"><b>BAST</b><em>Berita acara serah terima</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
 <button type="button" data-cxdoc="faktur" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3zM8 8h8M8 12h8M8 16h5"/></svg></span><span class="cx-dt"><b>Nota / Faktur Pembelian</b><em>Rincian barang pembelian di toko/rekanan</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
 <button type="button" data-cxdoc="sp" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v12H4zM4 7l8 6 8-6"/></svg></span><span class="cx-dt"><b>Surat Pesanan</b><em>Pemesanan resmi ke penyedia</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
-<button type="button" data-cxdoc="bap" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l1 2h3v15H5V6h3l1-2zM9 14l2 2 4-4"/></svg></span><span class="cx-dt"><b>Berita Acara Pemeriksaan</b><em>Hasil pemeriksaan barang diterima</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="lampiran" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11l-8.5 8.5a5 5 0 01-7-7L14 4a3.5 3.5 0 015 5l-8.5 8.5a2 2 0 01-3-3L15 7"/></svg></span><span class="cx-dt"><b>Daftar Lampiran</b><em>Rekap lampiran kwitansi</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>
-              <p class="cx-sub-title cx-g-l"><span></span>Laporan</p>
-              <div class="cx-docs"><button type="button" data-cxdoc="kafer" class="cx-doc cx-g-l"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a2 2 0 012-2h11v18H7a2 2 0 00-2 2V4zM9 7h6"/></svg></span><span class="cx-dt"><b>Kafer Laporan</b><em>Sampul laporan penggunaan dana</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="sptjm" class="cx-doc cx-g-l"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16v4zM13 7l4 4"/></svg></span><span class="cx-dt"><b>SPTJM</b><em>Surat pernyataan tanggung jawab mutlak</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>
-              <p class="cx-sub-title cx-g-s"><span></span>SK &amp; Surat</p>
-              <div class="cx-docs"><button type="button" data-cxdoc="skguru" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5L2 9zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></span><span class="cx-dt"><b>SK Guru</b><em>Surat keputusan pembagian tugas</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="hadir" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"/></svg></span><span class="cx-dt"><b>Daftar Hadir</b><em>Presensi kegiatan / rapat</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="skrkas" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6V3zM14 3v5h5M9 13h7M9 17h7"/></svg></span><span class="cx-dt"><b>SK Panitia RKAS</b><em>Panitia penyusun RKAS</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="sktimbos" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9M19 21V9M9 21V9M15 21V9M2 9l10-6 10 6H2z"/></svg></span><span class="cx-dt"><b>SK Tim BOS</b><em>Surat keputusan tim BOS sekolah</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="pengantar" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3zM3 7l9 7 9-7"/></svg></span><span class="cx-dt"><b>Surat Pengantar</b><em>Pengantar pengiriman laporan</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div>
+<button type="button" data-cxdoc="bap" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l1 2h3v15H5V6h3l1-2zM9 14l2 2 4-4"/></svg></span><span class="cx-dt"><b>Berita Acara Pemeriksaan</b><em>Hasil pemeriksaan barang diterima</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="lampiran" class="cx-doc cx-g-t"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11l-8.5 8.5a5 5 0 01-7-7L14 4a3.5 3.5 0 015 5l-8.5 8.5a2 2 0 01-3-3L15 7"/></svg></span><span class="cx-dt"><b>Daftar Lampiran</b><em>Rekap lampiran kwitansi</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div></div>
+              <div class="cx-grp" data-g="l"><p class="cx-sub-title cx-g-l"><span></span>Laporan</p>
+              <div class="cx-docs"><button type="button" data-cxdoc="kafer" class="cx-doc cx-g-l"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4a2 2 0 012-2h11v18H7a2 2 0 00-2 2V4zM9 7h6"/></svg></span><span class="cx-dt"><b>Kafer Laporan</b><em>Sampul laporan penggunaan dana</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="sptjm" class="cx-doc cx-g-l"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16v4zM13 7l4 4"/></svg></span><span class="cx-dt"><b>SPTJM</b><em>Surat pernyataan tanggung jawab mutlak</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div></div>
+              <div class="cx-grp" data-g="s"><p class="cx-sub-title cx-g-s"><span></span>SK &amp; Surat</p>
+              <div class="cx-docs"><button type="button" data-cxdoc="skguru" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5L2 9zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg></span><span class="cx-dt"><b>SK Guru</b><em>Surat keputusan pembagian tugas</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="hadir" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"/></svg></span><span class="cx-dt"><b>Daftar Hadir</b><em>Presensi kegiatan / rapat</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="skrkas" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6V3zM14 3v5h5M9 13h7M9 17h7"/></svg></span><span class="cx-dt"><b>SK Panitia RKAS</b><em>Panitia penyusun RKAS</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="sktimbos" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9M19 21V9M9 21V9M15 21V9M2 9l10-6 10 6H2z"/></svg></span><span class="cx-dt"><b>SK Tim BOS</b><em>Surat keputusan tim BOS sekolah</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button><button type="button" data-cxdoc="pengantar" class="cx-doc cx-g-s"><span class="cx-di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18v12H3zM3 7l9 7 9-7"/></svg></span><span class="cx-dt"><b>Surat Pengantar</b><em>Pengantar pengiriman laporan</em></span><span class="cx-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button></div></div>
+              </div>
             </div>
           </div>
 
@@ -2168,7 +2207,8 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
           <!-- Penjelasan opsi "Gabungkan No. Bukti sama" (isi teks sama seperti sebelumnya,
                hanya dipindah ke sini supaya toggle-nya sendiri bisa sejajar dengan tab). -->
           <p id="cetak-gabung-desc" class="hidden text-xs text-navy-400 no-print -mt-1">Berguna jika beberapa baris transaksi sebenarnya berasal dari satu bukti/nota belanja yang sama (mis. Buku, Balpoint, Kertas HVS, Spidol, Map). Kwitansi gabungan hanya memuat uraian umum (mis. "Belanja ATK") dan total uangnya — rincian tiap barang tidak dicetak. Cukup centang salah satu baris dari No. Bukti tersebut — SEMUA transaksi lain dengan No. Bukti yang sama otomatis ikut digabung ke kwitansi ini, tidak dibatasi jumlah centang. Saat mencetak, Anda akan diminta mengonfirmasi/mengisi uraian umum tersebut.</p>
-          <label for="cetak-spesimen" class="no-print inline-flex items-center gap-2 text-sm text-navy cursor-pointer self-start"><input type="checkbox" id="cetak-spesimen" class="rounded border-navy-200" checked> Sertakan tanda tangan digital &amp; stempel <span class="text-xs text-navy-400">(bila sudah diunggah &amp; berstatus ON di Profil Sekolah / Penyedia)</span></label>
+          <details id="cetak-opsi" class="no-print rounded border border-navy-100 bg-white px-3 py-2"><summary class="cursor-pointer text-sm font-semibold text-navy">Opsi cetak <span class="text-xs font-normal text-navy-400">(tanda tangan &amp; stempel, isi otomatis harga)</span></summary><div class="mt-2 space-y-2">
+<label for="cetak-spesimen" class="no-print inline-flex items-center gap-2 text-sm text-navy cursor-pointer self-start"><input type="checkbox" id="cetak-spesimen" class="rounded border-navy-200" checked> Sertakan tanda tangan digital &amp; stempel <span class="text-xs text-navy-400">(bila sudah diunggah &amp; berstatus ON di Profil Sekolah / Penyedia)</span></label>
 
           <!-- Isi otomatis harga, satuan & kualitas dari data impor BKU & RAPBS (menu Impor BKU & RAPBS) -->
           <div id="cetak-auto-box" class="no-print flex flex-wrap items-center gap-x-3 gap-y-1 rounded border border-navy-100 bg-paper/60 px-3 py-2 text-xs text-navy-500">
@@ -2179,6 +2219,8 @@ document.querySelectorAll('.auth-tab').forEach(function(b){
             <span id="cetak-auto-status" class="text-navy-400"></span>
             <button type="button" id="btn-cetak-ke-impor" class="font-semibold text-gold-600 hover:underline">Kelola data impor</button>
           </div>
+
+          </div></details>
 
           <!-- Panel Kwitansi / Nota / BAST / Lampiran: dokumen berbasis transaksi BKU (dipilih via checklist) -->
           <div id="cetak-panel-transaksi" class="space-y-4">
@@ -3809,7 +3851,7 @@ function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res));
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "3.0.0"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "3.0.2"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -6356,8 +6398,11 @@ function renderBkuBulanGrid(){
     if(p.n===0) pill = '<span class="bkb-pill bkb-empty">Belum Ada Data</span>';
     else if(p.redo) pill = '<span class="bkb-pill bkb-redo">Perlu Ditutup Ulang</span>';
     else { pill = '<span class="bkb-pill bkb-ok">Sudah Selesai</span>'; ico = check; }
-    return `<div class="bkb-month"><div class="bkb-mname">${ico}<span>${NAMA_BULAN_PENUH[i]}</span></div>${pill}</div>`;
+    const sel = state.bkuBulan===i;
+    return `<div class="bkb-month bkb-klik${sel?' bkb-sel':''}" data-bulan="${i}" role="button" tabindex="0" aria-pressed="${sel}" title="${sel?'Klik lagi untuk menampilkan semua bulan':'Tampilkan transaksi bulan '+NAMA_BULAN_PENUH[i]}"><div class="bkb-mname">${ico}<span>${NAMA_BULAN_PENUH[i]}</span></div>${pill}</div>`;
   }).join('');
+  const semuaBtn = document.getElementById('bkb-semua-bulan');
+  if(semuaBtn) semuaBtn.classList.toggle('hidden', state.bkuBulan==null);
   const prev = document.getElementById('bkb-prev');
   const adaPrev = per && (state.transactions||[]).some(t=>jenisDanaTransaksi(t)===jd && t.tanggal && new Date(t.tanggal).getFullYear()===tahun-1);
   if(adaPrev){
@@ -6373,10 +6418,27 @@ function renderBkuBulanGrid(){
   $('bkb-cetak').addEventListener('click', ()=>$('btn-export-pdf').click());
   $('bkb-tambah').addEventListener('click', ()=>$('btn-tambah-transaksi').click());
   $('bkb-refresh').addEventListener('click', ()=>perbaruiDataBku('bkb-refresh-label'));
+
+  /* Klik kartu bulan -> daftar Buku Kas Umum hanya menampilkan transaksi bulan itu (klik lagi = semua bulan) */
+  function pilihBulan(m){
+    state.bkuBulan = (state.bkuBulan===m) ? null : m;
+    if(state.bkuBulan!=null){
+      const tahapTujuan = m < 6 ? '1' : '2';                       // Tahap 1 = Jan–Jun, Tahap 2 = Jul–Des
+      if((state.tahapAktif||getDefaultTahap()) !== tahapTujuan){
+        const tab = document.querySelector('.tahap-tab[data-tahap="'+tahapTujuan+'"]');
+        if(tab){ tab.click(); return; }                              // handler tab memanggil renderBKU()
+      }
+    }
+    renderBKU();
+  }
+  $('bkb-grid').addEventListener('click', e=>{ const k = e.target.closest('.bkb-klik'); if(k) pilihBulan(Number(k.dataset.bulan)); });
+  $('bkb-grid').addEventListener('keydown', e=>{ if(e.key!=='Enter' && e.key!==' ') return; const k = e.target.closest('.bkb-klik'); if(k){ e.preventDefault(); pilihBulan(Number(k.dataset.bulan)); } });
+  const semua = $('bkb-semua-bulan'); if(semua) semua.addEventListener('click', ()=>{ state.bkuBulan = null; renderBKU(); });
 })();
 
 /* ===== Pencarian data pada Buku Kas Umum ===== */
 state.bkuCari = state.bkuCari || '';
+if(state.bkuBulan===undefined) state.bkuBulan = null;
 function bkuNormal(v){ return String(v==null?'':v).toLowerCase(); }
 function bkuKataCari(){
   return bkuNormal(state.bkuCari).split(/\s+/).filter(Boolean);
@@ -6408,8 +6470,9 @@ function bkuUpdateInfoCari(aktif, tampil, total){
   if(clr) clr.addEventListener('click', ()=>{ inp.value=''; state.bkuCari=''; renderBKU(); inp.focus(); });
   /* Cetak BKU selalu memuat seluruh transaksi, bukan hasil pencarian saja */
   let _cariSimpan = null;
-  const _cariMulai = ()=>{ if(state.bkuCari){ _cariSimpan = state.bkuCari; state.bkuCari=''; if(state.currentView==='bku') renderBKU(); } };
-  const _cariSelesai = ()=>{ if(_cariSimpan!==null){ state.bkuCari=_cariSimpan; _cariSimpan=null; if(state.currentView==='bku') renderBKU(); } };
+  let _bulanSimpan = null;
+  const _cariMulai = ()=>{ if(state.bkuCari || state.bkuBulan!=null){ _cariSimpan = state.bkuCari||''; _bulanSimpan = state.bkuBulan; state.bkuCari=''; state.bkuBulan=null; if(state.currentView==='bku') renderBKU(); } };
+  const _cariSelesai = ()=>{ if(_cariSimpan!==null){ state.bkuCari=_cariSimpan; state.bkuBulan=_bulanSimpan; _cariSimpan=null; _bulanSimpan=null; if(state.currentView==='bku') renderBKU(); } };
   window.addEventListener('beforeprint', _cariMulai);
   window.addEventListener('afterprint', _cariSelesai);
   /* Aplikasi desktop (Electron): Simpan PDF & Cetak langsung dipicu dari main process sehingga event
@@ -6435,9 +6498,17 @@ function renderBKU(){
   // atau mereset SPJ salah satu jenis dana tidak menghapus data jenis dana lain.
   const txTahapIni = state.transactions.filter(t=>bulanDalamTahap(t.tanggal, tahap) && jenisDanaTransaksi(t)===jenisDana);
 
+  /* Filter bulan dari kartu bulan; otomatis dilepas bila bulan tidak termasuk tahap yang sedang aktif */
+  if(state.bkuBulan!=null && (state.bkuBulan < 6 ? '1' : '2') !== tahap) state.bkuBulan = null;
+  const bulanAktif = state.bkuBulan;
+  const thnAng = tahunAnggaranAktif();
+  const txBulan = bulanAktif==null ? txTahapIni : txTahapIni.filter(t=>{ const d = new Date(t.tanggal); return !isNaN(d) && d.getMonth()===bulanAktif && d.getFullYear()===thnAng; });
   const kataCari = bkuKataCari();
-  const txTampil = kataCari.length ? txTahapIni.filter(t=>bkuCocokCari(t, kataCari)) : txTahapIni;
-  bkuUpdateInfoCari(kataCari.length, txTampil.length, txTahapIni.length);
+  const txTampil = kataCari.length ? txBulan.filter(t=>bkuCocokCari(t, kataCari)) : txBulan;
+  bkuUpdateInfoCari(kataCari.length || bulanAktif!=null, txTampil.length, txTahapIni.length);
+  if(bulanAktif!=null){ const inf = document.getElementById('bku-cari-info'); if(inf) inf.textContent = `Bulan ${NAMA_BULAN_PENUH[bulanAktif]} ${thnAng}: ${txTampil.length} dari ${txTahapIni.length} transaksi`; }
+  document.querySelectorAll('#bkb-grid .bkb-klik').forEach(k=>{ const on = Number(k.dataset.bulan)===bulanAktif; k.classList.toggle('bkb-sel', on); k.setAttribute('aria-pressed', on); });
+  const btnSemuaBln = document.getElementById('bkb-semua-bulan'); if(btnSemuaBln) btnSemuaBln.classList.toggle('hidden', bulanAktif==null);
 
   const rows = txTampil.map(t=>{
     const isPenerimaan = t.jenis==='penerimaan';
@@ -6461,7 +6532,7 @@ function renderBKU(){
     </tr>`;
   }).join('');
 
-  document.getElementById('tbl-bku').innerHTML = rows || (kataCari.length ? `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Tidak ada transaksi yang cocok dengan pencarian "${escapeHtml(state.bkuCari||'')}" pada ${escapeHtml(TAHAP_PERIODE[tahap].label)}.</td></tr>` : `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Belum ada transaksi ${escapeHtml(JENIS_DANA[jenisDana].label)} pada ${escapeHtml(TAHAP_PERIODE[tahap].label)}. ${bisaUbah ? 'Klik "+ Transaksi" untuk menambahkan.' : ''}</td></tr>`);
+  document.getElementById('tbl-bku').innerHTML = rows || (bulanAktif!=null && !kataCari.length ? `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Belum ada transaksi pada ${NAMA_BULAN_PENUH[bulanAktif]} ${thnAng}.</td></tr>` : kataCari.length ? `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Tidak ada transaksi yang cocok dengan pencarian "${escapeHtml(state.bkuCari||'')}" pada ${escapeHtml(TAHAP_PERIODE[tahap].label)}.</td></tr>` : `<tr><td colspan="11" class="py-8 text-center text-navy-300 font-sans">Belum ada transaksi ${escapeHtml(JENIS_DANA[jenisDana].label)} pada ${escapeHtml(TAHAP_PERIODE[tahap].label)}. ${bisaUbah ? 'Klik "+ Transaksi" untuk menambahkan.' : ''}</td></tr>`);
 
   document.querySelectorAll('.btn-edit-tx').forEach(b=>b.addEventListener('click', ()=>openTransaksiModal(b.dataset.id)));
   document.querySelectorAll('.btn-hapus-tx').forEach(b=>b.addEventListener('click', async ()=>{
@@ -13710,6 +13781,7 @@ if(typeof module!=='undefined' && module.exports) module.exports=api; else root.
     'pengaturan':'Atur mode terang/gelap, warna tema, ukuran teks, dan kepadatan tampilan.'
   };
   function inject(id){
+    return;   /* Banner judul otomatis dinonaktifkan agar tampilan tiap menu lebih rapi */
     if(id==='cetak') return;
     const pg=document.getElementById('page-'+id); if(!pg) return;
     const item=((typeof NAV!=='undefined'?NAV:{})[state.userData&&state.userData.role]||[]).find(n=>n.id===id)||{label:id,title:id};
@@ -14717,7 +14789,7 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
         ada.add(k);
         const id = db.ref('transaksi_bku/'+npsn).push().key;
         /* penerimaan diberi createdAt lebih awal agar pada tanggal yang sama tampil SEBELUM pengeluaran (saldo tidak minus semu) */
-        updates[id] = { tanggal:r.tgl, kode:r.kegiatan||'', noBukti:r.bukti||'', kodeProgram:r.kegiatan||'', kodeRekening:r.rek||'', uraian:r.uraian, kualitas:'', satuan:'', jenis, kelompokBelanja:(jenis==='pengeluaran' && window.kelompokDariTransaksi) ? kelompokDariTransaksi(r.rek, r.uraian, {noBukti:r.bukti, jumlah:jml}) : '', jumlah:jml, penerima:'', nipPenerima:'', jabatan:'', lampiran:false, jenisDana:jd, createdAt:Date.now()-(jenis==='penerimaan'?1:0) };
+        updates[id] = { tanggal:r.tgl, kode:r.kegiatan||'', noBukti:r.bukti||'', kodeProgram:r.kegiatan||'', kodeRekening:r.rek||'', uraian:r.uraian, kualitas:'', satuan:'', jenis, kelompokBelanja:(jenis==='pengeluaran' && window.kelompokDariTransaksi) ? kelompokDariTransaksi(r.rek, r.uraian, {noBukti:r.bukti, jumlah:jml, prog:r.kegiatan, jd:jd}) : '', jumlah:jml, penerima:'', nipPenerima:'', jabatan:'', lampiran:false, jenisDana:jd, createdAt:Date.now()-(jenis==='penerimaan'?1:0) };
         tahapImpor[thp] = (tahapImpor[thp]||0)+1;
         if(jenis==='penerimaan'){ nT++; sT+=jml; } else { nK++; sK+=jml; }
       });
@@ -15427,6 +15499,11 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
     });
     el('mp-hasil').innerHTML = out.join('');
   }
+  const aksiPajak = x => `<button data-pj="ubah" data-id="${E(x.id)}" class="text-xs font-semibold text-navy hover:underline font-sans">Ubah</button>`
+    + (x.status==='sudah'
+        ? `<button data-pj="batal" data-id="${E(x.id)}" class="text-xs font-semibold text-navy-400 hover:underline font-sans">Batalkan Setor</button>`
+        : `<button data-pj="setor" data-id="${E(x.id)}" class="text-xs font-semibold text-forest hover:underline font-sans">Tandai Disetor</button>`)
+    + `<button data-pj="hapus" data-id="${E(x.id)}" class="text-xs font-semibold text-rust hover:underline font-sans">Hapus</button>`;
   function renderPajak(){
     const root = el('manajemen-pajak-root'); if(!root) return;
     if(!root.dataset.built){
@@ -15445,24 +15522,81 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
           <div class="mt-3"><button id="mp-catat" class="${BTN}">+ Catat ke Buku Pajak (Kode Billing &amp; NTPN)</button></div></div>
         <div class="${CARD} overflow-x-auto"><h3 class="font-serif font-semibold text-navy mb-3">Pajak Belum Disetor</h3>
           <table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100"><th class="py-2 px-3">Tanggal</th><th class="py-2 px-3">Uraian</th><th class="py-2 px-3">Jenis</th><th class="py-2 px-3 text-right">Jumlah</th><th class="py-2 px-3">Kode Billing</th><th class="py-2 px-3">NTPN</th><th class="py-2 px-3">Aksi</th></tr></thead><tbody id="mp-tbl" class="font-mono text-[13px]"></tbody></table></div>
+        <div class="${CARD} overflow-x-auto"><h3 class="font-serif font-semibold text-navy mb-3">Semua Catatan Pajak <span class="text-xs font-normal text-navy-400">(ubah, hapus, atau tandai status setor)</span></h3>
+          <table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100"><th class="py-2 px-3">Tanggal</th><th class="py-2 px-3">Uraian</th><th class="py-2 px-3">Jenis</th><th class="py-2 px-3 text-right">Jumlah</th><th class="py-2 px-3">Status</th><th class="py-2 px-3">Tgl Setor</th><th class="py-2 px-3">Kode Billing</th><th class="py-2 px-3">NTPN</th><th class="py-2 px-3">Aksi</th></tr></thead><tbody id="mp-semua" class="font-mono text-[13px]"></tbody></table></div>
         <div class="${CARD} overflow-x-auto"><h3 class="font-serif font-semibold text-navy mb-3">Rekap per Jenis Pajak</h3>
           <table class="w-full text-sm"><thead><tr class="text-left text-xs uppercase text-navy-400 border-b border-navy-100"><th class="py-2 px-3">Jenis</th><th class="py-2 px-3 text-right">Dipungut</th><th class="py-2 px-3 text-right">Sudah Disetor</th><th class="py-2 px-3 text-right">Belum Disetor</th></tr></thead><tbody id="mp-rekap" class="font-mono text-[13px]"></tbody></table></div>`;
       ['mp-trx','mp-nilai','mp-npwp','mp-pkp','mp-incl'].forEach(i=>el(i).addEventListener('input',hitungPajakMenu));
       el('mp-catat').addEventListener('click',()=>openPajakModal(null));
-      el('mp-tbl').addEventListener('click',e=>{ const b=e.target.closest('button[data-id]'); if(b) openPajakModal(b.dataset.id); });
+      root.addEventListener('click', async e=>{
+        const b = e.target.closest('button[data-pj]'); if(!b) return;
+        const id = b.dataset.id, aksi = b.dataset.pj, x = (state.bukuPajak||[]).find(v=>v.id===id); if(!x) return;
+        const ref = db.ref('buku_pajak/'+npsn()+'/'+id);
+        try{
+          if(aksi==='ubah'){ openPajakModal(id); }
+          else if(aksi==='hapus'){
+            if(!await confirmFix(`Hapus catatan pajak "${x.uraian||''}" sebesar ${fmtRupiah(x.jumlah)}?`)) return;
+            await ref.remove(); logAudit('Manajemen Pajak','hapus',`Hapus catatan ${formatTanggal(x.tanggal)} — ${x.uraian||''} (${fmtRupiah(x.jumlah)})`);
+          } else if(aksi==='setor'){
+            await ref.update({ status:'sudah', tglSetor:x.tglSetor||today(), updatedAt:Date.now() });
+            logAudit('Manajemen Pajak','ubah',`Tandai sudah disetor — ${x.uraian||''} (${fmtRupiah(x.jumlah)})`);
+          } else if(aksi==='batal'){
+            if(!await confirmFix('Batalkan status setor? Tanggal setor akan dikosongkan (kode billing & NTPN tetap tersimpan).')) return;
+            await ref.update({ status:'belum', tglSetor:'', updatedAt:Date.now() });
+            logAudit('Manajemen Pajak','ubah',`Batalkan status setor — ${x.uraian||''} (${fmtRupiah(x.jumlah)})`);
+          }
+        }catch(err){ alertFix('Gagal memproses: '+(err.message||'periksa koneksi internet.')); }
+      });
       hitungPajakMenu();
     }
     const arr = state.bukuPajak||[], n = x=>Number(x.jumlah)||0, sdh = x=>x.status==='sudah';
     const tot = arr.reduce((a,x)=>a+n(x),0), set = arr.filter(sdh).reduce((a,x)=>a+n(x),0);
     el('mp-stat').innerHTML = stat('Total Pajak Dipungut',fmtRupiah(tot)) + stat('Sudah Disetor',fmtRupiah(set),'text-forest') + stat('Belum Disetor',fmtRupiah(tot-set),'text-rust');
     const bel = arr.filter(x=>!sdh(x));
-    el('mp-tbl').innerHTML = bel.length ? bel.map(x=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(x.tanggal)}</td><td class="py-2 px-3 font-sans">${E(x.uraian)}</td><td class="py-2 px-3 font-sans">${E(x.jenisPajak)}</td><td class="py-2 px-3 text-right">${fmtRupiah(x.jumlah)}</td><td class="py-2 px-3">${E(x.kodeBilling||'—')}</td><td class="py-2 px-3">${E(x.ntpn||'—')}</td><td class="py-2 px-3"><button data-id="${E(x.id)}" class="text-xs font-semibold text-navy hover:underline font-sans">Isi Billing / NTPN</button></td></tr>`).join('') : kosong(7,'Semua pajak sudah disetor.');
+    el('mp-tbl').innerHTML = bel.length ? bel.map(x=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(x.tanggal)}</td><td class="py-2 px-3 font-sans">${E(x.uraian)}</td><td class="py-2 px-3 font-sans">${E(x.jenisPajak)}</td><td class="py-2 px-3 text-right">${fmtRupiah(x.jumlah)}</td><td class="py-2 px-3">${E(x.kodeBilling||'—')}</td><td class="py-2 px-3">${E(x.ntpn||'—')}</td><td class="py-2 px-3 whitespace-nowrap space-x-2">${aksiPajak(x)}</td></tr>`).join('') : kosong(7,'Semua pajak sudah disetor.');
+    el('mp-semua').innerHTML = arr.length ? arr.slice().sort((a,b)=>(b.tanggal||'').localeCompare(a.tanggal||'')).map(x=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(x.tanggal)}</td><td class="py-2 px-3 font-sans">${E(x.uraian)}</td><td class="py-2 px-3 font-sans">${E(x.jenisPajak)}</td><td class="py-2 px-3 text-right">${fmtRupiah(x.jumlah)}</td><td class="py-2 px-3">${sdh(x)?'<span class="text-forest bg-forest-100 text-xs font-semibold px-2 py-1 rounded font-sans">Sudah Disetor</span>':'<span class="text-rust bg-rust-100 text-xs font-semibold px-2 py-1 rounded font-sans">Belum Disetor</span>'}</td><td class="py-2 px-3 whitespace-nowrap">${x.tglSetor?formatTanggal(x.tglSetor):'—'}</td><td class="py-2 px-3">${E(x.kodeBilling||'—')}</td><td class="py-2 px-3">${E(x.ntpn||'—')}</td><td class="py-2 px-3 whitespace-nowrap space-x-2">${aksiPajak(x)}</td></tr>`).join('') : kosong(9,'Belum ada catatan pajak.');
     const jn = [...new Set(arr.map(x=>x.jenisPajak||'Lainnya'))];
     el('mp-rekap').innerHTML = jn.length ? jn.map(j=>{ const a=arr.filter(x=>(x.jenisPajak||'Lainnya')===j), t=a.reduce((s,x)=>s+n(x),0), d=a.filter(sdh).reduce((s,x)=>s+n(x),0);
       return `<tr class="border-b border-navy-50"><td class="py-2 px-3 font-sans">${E(j)}</td><td class="py-2 px-3 text-right">${fmtRupiah(t)}</td><td class="py-2 px-3 text-right">${fmtRupiah(d)}</td><td class="py-2 px-3 text-right">${fmtRupiah(t-d)}</td></tr>`; }).join('') : kosong(4,'Belum ada catatan pajak.');
   }
 
   /* ---------- 3. MUTASI KAS (Bank -> Tunai) ---------- */
+  /* Modal Ubah Mutasi Kas: memperbarui catatan mutasi DAN catatan penarikan terkait di Buku Pembantu Bank */
+  function bukaModalMutasi(m){
+    let md = el('modal-mutasi');
+    if(!md){
+      md = document.createElement('div'); md.id='modal-mutasi';
+      md.className='hidden fixed inset-0 z-50 bg-navy-900/50 flex items-center justify-center p-4 no-print';
+      md.innerHTML = `<div class="bg-white rounded-lg max-w-md w-full p-6"><h3 class="font-serif text-lg font-semibold text-navy mb-4">Ubah Mutasi Kas</h3>
+        <form id="form-mutasi" class="space-y-3"><input type="hidden" id="mu-id">
+          <div><label class="${LBL}">Tanggal penarikan</label><input required type="date" id="mu-tgl" class="${INP}"></div>
+          <div><label class="${LBL}">Jumlah (Rp)</label><input required type="number" min="1" id="mu-jml" class="${INP} font-mono"></div>
+          <div><label class="${LBL}">No. cek / bukti</label><input id="mu-bukti" class="${INP}"></div>
+          <div><label class="${LBL}">Keperluan</label><input id="mu-ket" class="${INP}"></div>
+          <div class="flex justify-end gap-2 pt-2"><button type="button" id="mu-batal" class="bg-white border border-navy-200 text-navy text-sm font-semibold rounded px-4 py-2">Batal</button><button type="submit" class="${BTN}">Simpan Perubahan</button></div>
+        </form></div>`;
+      document.body.appendChild(md);
+      el('mu-batal').addEventListener('click', ()=>md.classList.add('hidden'));
+      el('form-mutasi').addEventListener('submit', async ev=>{
+        ev.preventDefault();
+        const id = el('mu-id').value, lama = mutasi.find(x=>x.id===id); if(!lama) return;
+        const jumlah = Number(el('mu-jml').value)||0, tanggal = el('mu-tgl').value;
+        if(!tanggal || jumlah<=0){ alertFix('Isi tanggal dan jumlah penarikan (harus lebih dari 0).'); return; }
+        const ket = el('mu-ket').value.trim() || 'Penarikan tunai dari bank ke kas tunai', noBukti = el('mu-bukti').value.trim();
+        try{
+          const bankPayload = { tanggal, uraian:ket+' (Mutasi Kas)', noRekening:'', jenis:'keluar', jumlah, updatedAt:Date.now() };
+          let bankId = lama.bankId;
+          if(bankId) await db.ref('buku_bank/'+npsn()+'/'+bankId).update(bankPayload);
+          else bankId = (await db.ref('buku_bank/'+npsn()).push(bankPayload)).key;
+          await db.ref('mutasi_kas/'+npsn()+'/'+id).update({ tanggal, jumlah, noBukti, keterangan:ket, bankId, updatedAt:Date.now() });
+          logAudit('Mutasi Kas','ubah',`Ubah mutasi ${formatTanggal(tanggal)} — ${ket} (${fmtRupiah(jumlah)})`);
+          md.classList.add('hidden');
+        }catch(err){ alertFix('Gagal menyimpan perubahan: '+(err.message||'periksa koneksi internet / izin database.')); }
+      });
+    }
+    el('mu-id').value = m.id; el('mu-tgl').value = m.tanggal||''; el('mu-jml').value = m.jumlah||''; el('mu-bukti').value = m.noBukti||''; el('mu-ket').value = m.keterangan||'';
+    md.classList.remove('hidden');
+  }
   function renderMutasi(){
     const root = el('mutasi-kas-root'); if(!root) return;
     if(!root.dataset.built){
@@ -15490,6 +15624,8 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
         }catch(err){ alertFix('Gagal menyimpan mutasi: '+(err.message||'periksa koneksi internet / izin database.')); }
       });
       el('mk-tbl').addEventListener('click', async e=>{
+        const u=e.target.closest('button[data-ubah]');
+        if(u){ const mm=mutasi.find(x=>x.id===u.dataset.ubah); if(mm) bukaModalMutasi(mm); return; }
         const b=e.target.closest('button[data-hapus]'); if(!b) return;
         const m=mutasi.find(x=>x.id===b.dataset.hapus); if(!m) return;
         if(!await confirmFix(`Hapus mutasi ${fmtRupiah(m.jumlah)} tanggal ${formatTanggal(m.tanggal)}? Catatan penarikan di Buku Pembantu Bank ikut dihapus.`)) return;
@@ -15500,7 +15636,7 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
     }
     const tot = mutasi.reduce((a,m)=>a+(Number(m.jumlah)||0),0), bln = today().slice(0,7);
     el('mk-stat').innerHTML = stat('Total Ditarik ke Tunai',fmtRupiah(tot)) + stat('Ditarik Bulan Ini',fmtRupiah(mutasi.filter(m=>(m.tanggal||'').startsWith(bln)).reduce((a,m)=>a+(Number(m.jumlah)||0),0)));
-    el('mk-tbl').innerHTML = mutasi.length ? mutasi.slice().reverse().map(m=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(m.tanggal)}</td><td class="py-2 px-3">${E(m.noBukti||'—')}</td><td class="py-2 px-3 font-sans">${E(m.keterangan)}</td><td class="py-2 px-3 text-right">${fmtRupiah(m.jumlah)}</td><td class="py-2 px-3"><button data-hapus="${E(m.id)}" class="text-xs font-semibold text-rust hover:underline font-sans">Hapus</button></td></tr>`).join('') : kosong(5,'Belum ada mutasi kas.');
+    el('mk-tbl').innerHTML = mutasi.length ? mutasi.slice().reverse().map(m=>`<tr class="border-b border-navy-50"><td class="py-2 px-3 whitespace-nowrap">${formatTanggal(m.tanggal)}</td><td class="py-2 px-3">${E(m.noBukti||'—')}</td><td class="py-2 px-3 font-sans">${E(m.keterangan)}</td><td class="py-2 px-3 text-right">${fmtRupiah(m.jumlah)}</td><td class="py-2 px-3 whitespace-nowrap space-x-2"><button data-ubah="${E(m.id)}" class="text-xs font-semibold text-navy hover:underline font-sans">Ubah</button><button data-hapus="${E(m.id)}" class="text-xs font-semibold text-rust hover:underline font-sans">Hapus</button></td></tr>`).join('') : kosong(5,'Belum ada mutasi kas.');
   }
   function pantauMutasi(){
     const np = npsn(); if(!np || mutasiNp===np) return;
@@ -15534,6 +15670,7 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
     ['perangko',    /\b(materai|meterai|perangko|benda pos)\b/],
     ['honor',       /\b(honor|honorarium|narasumber|insentif|upah|gaji)\b/],
     ['jasa',        /\b(jasa|servis|service|sewa|perbaikan|langganan)\b/],
+    ['atk',         /\b(tinta|toner|ca?r?trid?ge|catride|catridge|cartride|refill)\b/],
     ['modal',       /\b(belanja modal|laptop|komputer|notebook|printer|proyektor|lcd|lemari|almari|meja|kursi|rak|kipas angin|ac|tablet|kamera|speaker|sound system|televisi|tv)\b/],
     ['kebersihan',  /\b(kebersihan|sapu|pel|pembersih|sabun|deterjen|pewangi|tisu|tissue|kemoceng|ember|tempat sampah|hand sanitizer|disinfektan|karbol)\b/],
     ['rumahtangga', /\b(rumah tangga|gelas|piring|sendok|teko|dispenser|taplak|gorden|tikar|karpet|lampu|bohlam|panci|jam dinding)\b/],
@@ -15555,6 +15692,10 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
         0024 Alat Tulis, 0025 Kertas & Cover, 0026 Cetak & Penggandaan -> atk, 0027 Benda Pos -> perangko
         0030 Perabot Kantor (ember, tong sampah, keset) -> kebersihan;  0055 Makanan & Minuman -> jasa */
   const ITEM_KANTOR = { '0024':'atk', '0025':'atk', '0026':'atk', '0027':'perangko', '0030':'kebersihan', '0055':'jasa' };
+  const KATA_JASA = /\b(jasa|servis|service|perbaikan|pemeliharaan|perawatan|reparasi|sewa|ganti|pasang|pemasangan|isi ulang)\b/;
+  const BARANG_HABIS = /\b(tinta|toner|ca?r?trid?ge|catride|catridge|cartride|ribbon|refill)\b/;
+  function barangHabisPakai(uraian){ const u=String(uraian||'').toLowerCase(); return BARANG_HABIS.test(u) && !KATA_JASA.test(u); }
+  window.kelompokJasaSalah = function(rek, uraian){ return /^5\.1\.02\.03/.test(String(rek||'').replace(/\s+/g,'')) && barangHabisPakai(uraian); };
   window.kelompokDariRekening = function(rek, uraian){
     const r = String(rek||'').replace(/\s+/g,'');
     const m = r.match(/^(5\.\d+\.\d+\.\d+)/) || r.match(/^(5\.2\.\d+)/);
@@ -15562,6 +15703,7 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
     const a = m[1], item = (r.match(/(\d{4})\.?$/)||[])[1] || '';
     if(a.startsWith('5.2.')) return 'modal';
     if(a==='5.1.02.02') return ATURAN[0][1].test(String(uraian||'').toLowerCase()) ? 'honor' : 'jasa';
+    if(a==='5.1.02.03' && barangHabisPakai(uraian)) return 'atk';   /* beli tinta/toner/cartridge = bahan, bukan jasa servis */
     if(a==='5.1.02.03' || a==='5.1.02.04') return 'jasa';
     if(a==='5.1.02.01') return ITEM_KANTOR[item] || kelompokDariUraian(uraian) || 'atk';
     return '';
@@ -15577,33 +15719,93 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
   const HARGA_SATUAN_MODAL = 1000000;
   const toNum = v => { if(typeof v==='number') return v; const t=String(v==null?'':v).trim().replace(/\./g,'').replace(',','.'); const n=parseFloat(t); return isFinite(n)?n:0; };
   /* Info harga satuan barang: known=true bila Kualitas & Jumlah terisi dan item adalah BARANG (bukan jasa/honor/perjalanan/konsumsi) */
+  /* ===== DASAR DATA IMPOR: cari rincian RAPBS yang cocok (kode rekening + uraian [+ kode kegiatan]) ===== */
+  function rapbsAktif(extra){
+    const sd = state.schoolData || {};
+    const jd = (extra && extra.jd) || state.jenisDanaAktif || 'reguler';
+    const r = sd[jd==='kinerja' ? 'rapbsKinerja' : 'rapbs'];
+    if(!r || !r.items) return [];
+    const a = Array.isArray(r.items) ? r.items : Object.keys(r.items).sort((x,y)=>x-y).map(k=>r.items[k]);
+    return a.filter(x=>x && x.rek);
+  }
+  window.rapbsCocok = function(rek, uraian, extra){
+    const items = rapbsAktif(extra);
+    if(!items.length || !window.SumberData || !SumberData.cariRapbs) return null;
+    try{ return SumberData.cariRapbs({uraian:uraian, kodeRekening:rek, kodeProgram:(extra&&extra.prog)||'', jumlah:(extra&&extra.jumlah)||0}, null, items); }catch(e){ return null; }
+  };
   window.infoHargaSatuan = function(rek, uraian, extra){
     extra = extra || {};
     const u = String(uraian||'').toLowerCase();
     const r = String(rek||'').replace(/\s+/g,'');
     const qty = toNum(extra.kualitas), jml = toNum(extra.jumlah);
     const bukanBarang = /^5\.1\.02\.0[234]\b/.test(r) || /\b(jasa|honor|narasumber|juri|transport|transportasi|perjalanan|uang harian|makan|minum|konsumsi|dapodik|transaksi keuangan|sewa|langganan)\b/.test(u);
-    if(bukanBarang || !(qty>0) || !(jml>0)) return {known:false, harga:0};
-    return {known:true, harga:jml/qty};
+    if(bukanBarang) return {known:false, harga:0};
+    if(qty>0 && jml>0) return {known:true, harga:jml/qty};
+    /* Kualitas kosong (mis. baru impor BKU PDF): pakai tarif satuan dari RAPBS bila rinciannya ditemukan */
+    const it = rapbsCocok(rek, uraian, extra), tr = it ? Number(it.tarif)||0 : 0;
+    if(tr>0) return {known:true, harga:tr, dariRapbs:true};
+    return {known:false, harga:0};
   };
   const adaBNU = (extra, uraian) => /(^|[^a-z])bnu(?![a-z])/i.test(String((extra&&extra.noBukti)||'')) || /(^|[^a-z])bnu(?![a-z])/i.test(String(uraian||''));
+  /* ALUR PENGELOMPOKAN (urutan prioritas; mengalahkan kode rekening):
+     1. No. Bukti berkode BNU DAN harga satuan >= Rp1.000.000 -> Modal (BNU tanpa data harga satuan tetap Modal)
+     2. Honor / honorarium / narasumber / insentif            -> Honor
+     3. Materai / meterai / perangko                          -> Perangko
+     4. Makan, Minum, Uang Harian, Transportasi, Kegiatan, Bimbingan, Perbaikan, Lelah,
+        foto copy, jilid, pulsa                               -> Jasa
+     5. Sabun, Ember, Sapu, Sikat, dll                        -> Kebersihan
+     6. Piring, Sendok, Kuali, Gelas, dll                     -> Alat Rumah Tangga
+     Selain itu mengikuti kode rekening, lalu kata kunci ATK dsb. */
+  const RE_HONOR = /\b(honor\w*|narasumber|insentif|upah|gaji)\b/;
+  const RE_JASA = /\b(makan\w*|minum\w*|uang harian|transport\w*|kegiatan|bimbingan|perbaikan|lelah|foto\s?copy|fotocopy|photo\s?copy|foto\s?kopi|fotokopi|jilid\w*|pulsa)\b/;
+  const RE_KEBERSIHAN = /\b(sabun|ember|sapu|sikat|pel|pengki|serokan|keset|kemoceng|pembersih|deterjen|detergen|pewangi|tisu|tissue|tempat sampah|tong sampah|hand sanitizer|disinfektan|karbol|wipol|lap|kain pel|cairan pembersih)\b/;
+  const RE_RUMAHTANGGA = /\b(konvor|konfor|kompor|piring|sendok|garpu|kuali|wajan|gelas|cangkir|teko|panci|dispenser|taplak|gorden|tikar|karpet|lampu|bohlam|jam dinding|rumah tangga)\b/;
+  /* Kelompok menurut RINCIAN RAPBS yang cocok: kode rekening + nama kegiatan (kode program) di RAPBS.
+     Nama kegiatan dipakai bila kode rekening menyesatkan, mis. "Tinta Printer" berkode 5.1.02.03 (pemeliharaan)
+     padahal berada di kegiatan 06.05.08 "Pembelian Bahan Habis Pakai ... (termasuk ATK, Tinta Printer)". */
+  const RE_KEG_BHP = /\b(bahan habis pakai|atk|alat tulis|tinta|toner|penggandaan|surat.?menyurat)\b/;
+  function kelompokDariRapbs(it){
+    const r = String(it.rek||'').replace(/\s+/g,''), keg = String(it.kegiatan||'').toLowerCase(), u = String(it.uraian||'').toLowerCase();
+    if(/^5\.2\./.test(r)) return 'modal';
+    const m = r.match(/^(5\.\d+\.\d+\.\d+)/); if(!m) return '';
+    const a = m[1], item = (r.match(/(\d{4})\.?$/)||[])[1] || '';
+    if(a==='5.1.02.02') return RE_HONOR.test(u) ? 'honor' : 'jasa';
+    if(a==='5.1.02.04') return 'jasa';
+    if(a==='5.1.02.01'){
+      if(item==='0030') return RE_RUMAHTANGGA.test(u) ? 'rumahtangga' : 'kebersihan';
+      return ITEM_KANTOR[item] || '';
+    }
+    if(a==='5.1.02.03'){
+      if(/rumah tangga/.test(keg)) return RE_RUMAHTANGGA.test(u) ? 'rumahtangga' : 'kebersihan';
+      if(RE_KEG_BHP.test(keg) && !KATA_JASA.test(u)) return 'atk';
+      return 'jasa';
+    }
+    return '';
+  }
   window.kelompokAturanTegas = function(rek, uraian, extra){
     extra = extra || {};
     const u = String(uraian||'').toLowerCase();
-    if(adaBNU(extra, uraian)) return 'modal';
+    if(adaBNU(extra, uraian)){
+      const h = infoHargaSatuan(rek, uraian, extra);
+      if(!h.known || h.harga >= HARGA_SATUAN_MODAL) return 'modal';
+    }
+    if(RE_HONOR.test(u)) return 'honor';
     if(/\b(materai|meterai|perangko)\b/.test(u)) return 'perangko';
-    if(/foto\s?copy|fotocopy|photo\s?copy|foto\s?kopi|fotokopi|jilid|pulsa/.test(u)) return 'jasa';
-    const h = infoHargaSatuan(rek, uraian, extra);
-    if(h.known && h.harga >= HARGA_SATUAN_MODAL) return 'modal';
+    if(RE_JASA.test(u)) return 'jasa';
+    if(RE_KEBERSIHAN.test(u)) return 'kebersihan';
+    if(RE_RUMAHTANGGA.test(u)) return 'rumahtangga';
     return '';
   };
   /* Harga satuan barang di bawah Rp1.000.000 (dan bukan BNU) -> BUKAN modal, walau kode rekeningnya 5.2.xx atau uraiannya laptop dsb. */
   window.kelompokDariTransaksi = function(rek, uraian, extra){
     const t = kelompokAturanTegas(rek, uraian, extra);
     if(t) return t;
+    const it = rapbsCocok(rek, uraian, extra);
     const h = infoHargaSatuan(rek, uraian, extra);
-    let k = kelompokDariRekening(rek, uraian) || kelompokDariUraian(uraian);
-    if(h.known && h.harga < HARGA_SATUAN_MODAL && k==='modal'){
+    let k = (it && kelompokDariRapbs(it)) || kelompokDariRekening(rek, uraian) || kelompokDariUraian(uraian);
+    const rekPakai = String(rek || (it && it.rek) || '').replace(/\s+/g,'');
+    /* Buku/koleksi perpustakaan (5.2.05) tetap Belanja Modal walau harga per eksemplar < Rp1.000.000 */
+    if(h.known && h.harga < HARGA_SATUAN_MODAL && k==='modal' && !/^5\.2\.05/.test(rekPakai)){
       const u = String(uraian||'').toLowerCase();
       k = '';
       for(const [kk,re] of ATURAN){ if(kk!=='modal' && re.test(u)){ k = kk; break; } }
@@ -15614,7 +15816,8 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
   /* True bila transaksi ini tercatat Modal padahal harga satuan barang < Rp1.000.000 dan bukan BNU (dipakai tombol perbaikan) */
   window.kelompokModalSalah = function(rek, uraian, extra){
     const h = infoHargaSatuan(rek, uraian, extra);
-    return h.known && h.harga < HARGA_SATUAN_MODAL && !adaBNU(extra, uraian);
+    if(/^5\.2\.05/.test(String(rek||'').replace(/\s+/g,''))) return false;
+    return h.known && h.harga < HARGA_SATUAN_MODAL;
   };
 
   const el = id => document.getElementById(id);
@@ -15649,10 +15852,10 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
   if(tambah){
     const b = document.createElement('button');
     b.type='button'; b.id='btn-kelompok-otomatis';
-    b.className = 'bg-white border border-navy-200 text-navy hover:bg-paper text-sm font-semibold rounded px-4 py-2 mr-2 no-print';
-    b.textContent = 'Isi Kelompok Otomatis';
+    b.className = 'bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer';
+    b.textContent = 'Isi Kelompok Belanja Otomatis';
     b.title = 'Isi Kelompok Belanja yang masih kosong berdasarkan kode rekening / kata kunci uraian';
-    tambah.parentNode.insertBefore(b, tambah);
+    (function(){ const sisip=el('bk-lainnya-sisip'); if(sisip) sisip.parentNode.insertBefore(b, sisip); else tambah.parentNode.insertBefore(b, tambah); })();
     b.addEventListener('click', async ()=>{
       const kandidat = (state.transactions||[]).map(t=>({t, k:(t.jenis==='pengeluaran' && !t.kelompokBelanja) ? kelompokDariTransaksi(t.kodeRekening, t.uraian, {noBukti:t.noBukti, kualitas:t.kualitas, jumlah:t.jumlah}) : ''})).filter(x=>x.k);
       if(!kandidat.length){ alertFix('Tidak ada transaksi pengeluaran dengan kelompok kosong yang cocok dengan kata kunci.'); return; }
@@ -15672,22 +15875,21 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
   if(tambah2){
     const b2 = document.createElement('button');
     b2.type='button'; b2.id='btn-kelompok-aturan';
-    b2.className = 'bg-white border border-navy-200 text-navy hover:bg-paper text-sm font-semibold rounded px-4 py-2 mr-2 no-print';
+    b2.className = 'bk-item block w-full text-left px-4 py-2 text-sm font-semibold text-navy hover:bg-paper cursor-pointer';
     b2.textContent = 'Perbaiki Kelompok (Aturan Baru)';
-    b2.title = 'Terapkan aturan: BNU/harga satuan >= Rp1.000.000 = Modal (di bawahnya bukan Modal); foto copy/jilid/pulsa = Jasa; materai = Perangko';
-    tambah2.parentNode.insertBefore(b2, tambah2);
+    b2.title = 'Terapkan alur: BNU + harga satuan >= Rp1.000.000 = Modal; makan/minum/uang harian/transportasi/kegiatan/bimbingan/perbaikan/lelah = Jasa; materai/perangko = Perangko; sabun/ember/sapu/sikat = Kebersihan; piring/sendok/kuali/gelas = Alat Rumah Tangga';
+    (function(){ const sisip=el('bk-lainnya-sisip'); if(sisip) sisip.parentNode.insertBefore(b2, sisip); else tambah2.parentNode.insertBefore(b2, tambah2); })();
     b2.addEventListener('click', async ()=>{
       const kandidat = (state.transactions||[]).map(t=>{
         if(t.jenis!=='pengeluaran') return {t,k:''};
-        const ex = {noBukti:t.noBukti, kualitas:t.kualitas, jumlah:t.jumlah};
-        let k = kelompokAturanTegas(t.kodeRekening, t.uraian, ex);
-        if(!k && t.kelompokBelanja==='modal' && kelompokModalSalah(t.kodeRekening, t.uraian, ex)) k = kelompokDariTransaksi(t.kodeRekening, t.uraian, ex);
+        const jdT = (typeof jenisDanaTransaksi==='function') ? jenisDanaTransaksi(t) : undefined;
+        const k = kelompokDariTransaksi(t.kodeRekening, t.uraian, {noBukti:t.noBukti, kualitas:t.kualitas, jumlah:t.jumlah, prog:t.kodeProgram, jd:jdT});
         return {t,k};
       }).filter(x=>x.k && x.k!==x.t.kelompokBelanja);
       if(!kandidat.length){ alertFix('Semua transaksi sudah sesuai aturan baru, tidak ada yang perlu diperbaiki.'); return; }
       const ringkas = {}; kandidat.forEach(x=>ringkas[x.k]=(ringkas[x.k]||0)+1);
       const teks = Object.keys(ringkas).map(k=>labelOf(k)+': '+ringkas[k]).join(', ');
-      if(!await confirmFix(`Ubah Kelompok Belanja ${kandidat.length} transaksi sesuai aturan baru? (${teks}). Pilihan manual sebelumnya pada transaksi tersebut akan diganti.`)) return;
+      if(!await confirmFix(`Ubah Kelompok Belanja ${kandidat.length} transaksi sesuai alur pengelompokan + data RAPBS/BKU hasil impor? (${teks}). Pilihan manual sebelumnya pada transaksi tersebut akan diganti.`)) return;
       const up = {}; kandidat.forEach(x=>{ up[x.t.id+'/kelompokBelanja'] = x.k; });
       try{
         await db.ref('transaksi_bku/'+state.userData.npsn).update(up);
@@ -15695,6 +15897,41 @@ if(typeof module!=='undefined'&&module.exports) module.exports=api; else root.Su
       }catch(err){ alertFix('Gagal menyimpan: '+(err.message||'periksa koneksi internet.')); }
     });
   }
+})();
+</script>
+
+<script>
+/* Menu dropdown toolbar Buku Kas Umum */
+(function(){
+  const menus = () => document.querySelectorAll('#bk-toolbar .bk-dd-menu');
+  const tutup = () => menus().forEach(m => m.classList.add('hidden'));
+  document.addEventListener('click', function(e){
+    const tb = e.target.closest('#bk-toolbar .bk-dd-btn');
+    if(tb){
+      const menu = tb.parentNode.querySelector('.bk-dd-menu');
+      const buka = menu.classList.contains('hidden');
+      tutup();
+      if(buka) menu.classList.remove('hidden');
+      return;
+    }
+    const item = e.target.closest('#bk-toolbar .bk-dd-menu .bk-item');
+    if(item){ setTimeout(tutup, 0); return; }   // tutup menu setelah pilihan diklik
+    if(!e.target.closest('#bk-toolbar .bk-dd')) tutup();
+  });
+  document.addEventListener('keydown', e => { if(e.key==='Escape') tutup(); });
+})();
+</script>
+
+<script>
+/* Tab grup dokumen pada Pusat Cetak Dokumen */
+(function(){
+  const box=document.getElementById('cx-doc-groups'); if(!box) return;
+  const tabs=document.querySelectorAll('.cx-grp-tab');
+  function pilih(g){ box.dataset.grp=g; tabs.forEach(t=>t.classList.toggle('aktif',t.dataset.cxgrp===g)); }
+  tabs.forEach(t=>t.addEventListener('click',()=>pilih(t.dataset.cxgrp)));
+  function ikutAktif(){ const a=box.querySelector('.cx-doc.aktif'); if(a){ const g=a.closest('.cx-grp'); if(g) pilih(g.dataset.g); } }
+  new MutationObserver(ikutAktif).observe(box,{subtree:true,attributes:true,attributeFilter:['class']});
+  pilih('t'); ikutAktif();
 })();
 </script>
 </body>
