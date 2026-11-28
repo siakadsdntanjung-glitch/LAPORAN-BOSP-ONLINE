@@ -1005,6 +1005,7 @@ html[data-theme="light"] #app-content .page:not(#page-bku):not(#page-cetak) tabl
       <form id="form-login" class="space-y-4">
         <div><label class="au-label">Email</label><div class="au-field"><svg class="au-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg><input required type="email" id="login-email" autocomplete="username" placeholder="nama@sekolah.sch.id"></div></div>
         <div><label class="au-label">Kata Sandi</label><div class="au-field"><svg class="au-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/></svg><input required type="password" id="login-password" autocomplete="current-password" class="has-eye" placeholder="Masukkan kata sandi"><button type="button" class="au-eye" data-eye aria-label="Tampilkan kata sandi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+        <label id="wrap-ingat-saya" class="hidden flex items-center gap-2 text-sm" style="margin-top:.75rem;cursor:pointer;"><input type="checkbox" id="login-ingat" style="width:1rem;height:1rem;"> <span>Ingat saya di komputer ini</span></label>
         <button type="submit" class="au-btn !mt-6">Masuk</button>
         <button type="button" id="btn-lupa-password" class="au-link">Lupa kata sandi?</button>
       </form>
@@ -3851,7 +3852,7 @@ function confirmFix(pesan){ return new Promise(res=>_dlgBuka(pesan, true, res));
    lama yang dipakai sekolah-sekolah, cukup naikkan nilai minVersion di
    Firebase Console — tidak perlu menyentuh file di laptop sekolah.
    ========================================================================= */
-const APP_VERSION = "3.0.2"; // naikkan setiap kali merilis versi baru
+const APP_VERSION = "3.0.3"; // naikkan setiap kali merilis versi baru
 
 function compareVersion(a, b){
   const pa = String(a).split('.').map(Number);
@@ -4151,6 +4152,12 @@ document.getElementById('form-login').addEventListener('submit', async (e)=>{
   const password = document.getElementById('login-password').value;
   try{
     await auth.signInWithEmailAndPassword(email, password);
+    if(window.sikebosDesktop){
+      try{
+        if(document.getElementById('login-ingat').checked) await window.sikebosDesktop.simpanKredensial(email, password);
+        else await window.sikebosDesktop.hapusKredensial();
+      }catch(e){}
+    }
   }catch(err){
     showAuthError(translateAuthError(err));
   }
@@ -4332,6 +4339,33 @@ document.getElementById('btn-logout-mobile').addEventListener('click', ()=>auth.
 /* =========================================================================
    AUTH STATE ROUTER
    ========================================================================= */
+/* ---- Ingat login (aplikasi desktop) ----
+   - Sesi Firebase dipaksa LOCAL agar tetap login setelah aplikasi ditutup.
+   - Jika sesi tidak ada tetapi pengguna pernah mencentang "Ingat saya", login otomatis
+     memakai email & kata sandi tersimpan (terenkripsi di main process).
+   - Setelah Keluar manual, form login hanya terisi otomatis (tidak langsung masuk). */
+try{ auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(){}); }catch(e){}
+let keluarManual = false;
+let autoLoginSudahDicoba = false;
+['btn-logout-pending','btn-logout-akses-terkunci','btn-logout','btn-logout-mobile','btn-logout-maintenance'].forEach(function(id){
+  var el = document.getElementById(id);
+  if(el) el.addEventListener('click', function(){ keluarManual = true; });
+});
+async function isiFormDariKredensial(){
+  if(!window.sikebosDesktop) return false;
+  document.getElementById('wrap-ingat-saya').classList.remove('hidden');
+  try{
+    const k = await window.sikebosDesktop.ambilKredensial();
+    if(k){
+      document.getElementById('login-email').value = k.email;
+      document.getElementById('login-password').value = k.password;
+      document.getElementById('login-ingat').checked = true;
+      return k;
+    }
+  }catch(e){}
+  return false;
+}
+
 auth.onAuthStateChanged(async (user)=>{
   if(justRegistered) return; // registration handler is driving the UI right now; don't race it
   // Tunggu hasil pengecekan versi minimum dulu. Jika versi di perangkat ini
@@ -4348,6 +4382,21 @@ auth.onAuthStateChanged(async (user)=>{
     // Reset ke tab "Masuk" & bersihkan pesan setiap kembali ke layar auth,
     // supaya form login/daftar sebelumnya tidak nyangkut di tab yang salah.
     resetAuthForm();
+    const kTersimpan = await isiFormDariKredensial();
+    if(kTersimpan && !keluarManual && !autoLoginSudahDicoba){
+      autoLoginSudahDicoba = true;
+      showView('view-loading');
+      try{ await auth.signInWithEmailAndPassword(kTersimpan.email, kTersimpan.password); return; }
+      catch(err){
+        // Kata sandi sudah berubah / akun bermasalah: hapus yang tersimpan agar tidak terus gagal.
+        try{ await window.sikebosDesktop.hapusKredensial(); }catch(e){}
+        document.getElementById('login-password').value = '';
+        document.getElementById('login-ingat').checked = false;
+        showView('view-auth');
+        showAuthError(translateAuthError(err));
+        return;
+      }
+    }
     showView('view-auth');
     return;
   }
@@ -12585,6 +12634,9 @@ document.getElementById('btn-akun-ganti-pw').addEventListener('click', async ()=
     const cred = firebase.auth.EmailAuthProvider.credential(user.email, lama);
     await user.reauthenticateWithCredential(cred);
     await user.updatePassword(baru);
+    if(window.sikebosDesktop){
+      try{ if(await window.sikebosDesktop.ambilKredensial()) await window.sikebosDesktop.simpanKredensial(user.email, baru); }catch(e){}
+    }
     ['akun-pw-lama','akun-pw-baru','akun-pw-ulang'].forEach(id=>{ document.getElementById(id).value = ''; });
     akunTampilPw('Password berhasil diganti. Gunakan password baru saat login berikutnya.', true);
     if(state.userData && state.userData.npsn) logAudit('Akun', 'ubah', 'Ganti password akun');
